@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<info>
+	<infoitem key="UD_requirements" value="name:id;datatype:int,name:identifier;datatype:string,name:description;datatype:blob,name:reqcategories_id;datatype:int,name:name;datatype:string" />
+</info>

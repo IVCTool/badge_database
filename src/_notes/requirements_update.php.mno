@@ -1,0 +1,5 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<info>
+	<infoitem key="UD_record" value="name:id;datatype:int,name:identifier;datatype:string,name:description;datatype:blob,name:reqcategories_id;datatype:int" />
+	<infoitem key="UD_catagories" value="name:name;datatype:string,name:description;datatype:blob,name:identifier;datatype:string,name:id;datatype:int" />
+</info>

@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<info>
+	<infoitem key="UD_badge" value="name:id;datatype:int,name:description;datatype:blob,name:graphicfile;datatype:string,name:identifier;datatype:string" />
+	<infoitem key="UD_badge_dependancies" value="name:id;datatype:int,name:description;datatype:blob,name:graphicfile;datatype:string,name:identifier;datatype:string" />
+	<infoitem key="UD_requirements" value="name:id;datatype:int,name:identifier;datatype:string,name:description;datatype:blob,name:reqidentifier;datatype:blob" />
+</info>

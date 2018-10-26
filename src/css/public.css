@@ -1,0 +1,10 @@
+@charset "utf-8";
+.imgflt {
+	position: absolute;
+	left: auto;
+	top: auto;
+}
+
+body {
+	background-color: #98D3F8;
+}

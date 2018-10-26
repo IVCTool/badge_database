@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<info>
+	<infoitem key="UD_case" value="name:filename;datatype:string,name:id;datatype:int,name:identifier;datatype:string,name:name;datatype:string,name:description;datatype:blob,name:requirements_id;datatype:int" />
+</info>

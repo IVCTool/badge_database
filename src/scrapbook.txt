@@ -1,0 +1,7 @@
+SELECT requirements.id, requirements.identifier, requirements.description, CONCAT(reqcategories.identifier, ' - ' , reqcategories.description) AS reqidentifier FROM requirements inner join reqcategories on requirements.reqcategories_id=reqcategories.id
+
+SELECT requirements.id, requirements.identifier, requirements.description, 
+CONCAT(reqcategories.identifier, ' - ' , reqcategories.description) 
+AS reqidentifier FROM requirements INNER JOIN reqcategories 
+ON requirements.reqcategories_id=reqcategories.id WHERE requirements.id IN
+(SELECT requirements_id FROM badges_has_requirements WHERE badges_id=20)

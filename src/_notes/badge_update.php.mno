@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<info>
+	<infoitem key="UD_badge" value="name:id;datatype:int,name:description;datatype:blob,name:graphicfile;datatype:string,name:identifier;datatype:string" />
+</info>
