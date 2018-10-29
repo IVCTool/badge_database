@@ -1,0 +1,21 @@
+{
+	"id" 			: 	"HLA-BASE-2016",
+	"name" 			: 	"HLA Basic Test 2016",
+	"description"	:	"Basic CS/SOM and Best Practices compliance",
+	"graphics"		:	"/some/icon.png",
+	"packageName"	:	"fr.....",
+	"tsRunTimefolder":	"..../bin",
+	"dependency"	:	["HLA-Verification-2016", "HLA-Declaration-2016", "HLA-Object-2016", "HLA-Services-2016"],
+	"requirements"	:	[
+		{
+			"id"			:	"IR-SOM-0017",
+			"description"	:	"SuT shall encode all updated attribute values according to CS/SOM",
+			"TC"			:	"FOM Data Encoding Verification"
+		},
+		{
+			"id"			:	"IR-SOM-0018",
+			"description"	:	"SuT shall encode all sent interaction class parameters according to CS/SOM",
+			"TC"			:	"FOM Data Encoding Verification"
+		}
+	]
+}
