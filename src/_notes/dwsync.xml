@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <dwsync>
-<file name="index.html" server="131.136.22.218//var/www/badges/" local="131044231639926232" remote="131044233110000000" Dst="2" />
 <file name="login.php" server="131.136.22.218//var/www/badges/" local="131045098012697313" remote="131045104030000000" Dst="2" />
 <file name="register.php" server="131.136.22.218//var/www/badges/" local="131045108030629006" remote="131045108110000000" Dst="2" />
 <file name="review_registrations.php" server="131.136.22.218//var/www/badges/" local="131043538550000000" remote="131043560660000000" Dst="2" />
@@ -9,7 +8,6 @@
 <file name="register.php" server="192.168.2.22//var/www/badges/" local="131054512154399968" remote="131054525860000000" Dst="2" />
 <file name="login.php" server="131.136.22.229//var/www/badges/" local="131057391740120096" remote="131057391920000000" Dst="2" />
 <file name="register.php" server="131.136.22.229//var/www/badges/" local="131057388164270096" remote="131057391920000000" Dst="2" />
-<file name="index.html" server="192.168.106.150//var/www/badges/" local="131134340630338076" remote="131134340670000000" Dst="2" />
 <file name="login.php" server="192.168.106.150//var/www/badges/" local="131127358078389817" remote="131127365080000000" Dst="2" />
 <file name="register.php" server="192.168.106.150//var/www/badges/" local="131127358939229817" remote="131127365080000000" Dst="2" />
 <file name="register_proc.html" server="192.168.106.150//var/www/badges/" local="131127359538749817" remote="131127365080000000" Dst="2" />
@@ -47,7 +45,6 @@
 <file name="delete_registration.php" server="192.168.158.128//var/www/badges/" local="131134354070346800" remote="131169758140000000" Dst="1" />
 <file name="editor_start.php" server="192.168.158.128//var/www/badges/" local="131182530061117753" remote="131182568210000000" Dst="1" />
 <file name="examine_badge.php" server="192.168.158.128//var/www/badges/" local="131127357651699289" remote="131169758140000000" Dst="1" />
-<file name="index.html" server="192.168.158.128//var/www/badges/" local="131251681928585994" remote="131254420750000000" Dst="1" />
 <file name="insert_new_badge.php" server="192.168.158.128//var/www/badges/" local="131099667902751873" remote="131169758140000000" Dst="1" />
 <file name="login.php" server="192.168.158.128//var/www/badges/" local="131182537984500012" remote="131254421120000000" Dst="1" />
 <file name="new_badge.php" server="192.168.158.128//var/www/badges/" local="131257025165069474" remote="131257027010000000" Dst="1" />
@@ -87,7 +84,6 @@
 <file name="badge_details.php" server="192.168.158.128//var/www/" local="131261985760420882" remote="131262119390000000" Dst="1" />
 <file name="badge_delete_confirm.php" server="192.168.158.128//var/www/" local="131261985323747219" remote="131262119390000000" Dst="1" />
 <file name="editor_start.php" server="192.168.158.128//var/www/" local="131262871461952963" remote="131262871940000000" Dst="1" />
-<file name="badge_delete - Copy.php" server="192.168.158.128//var/www/" local="131262963633143425" remote="131262965380000000" Dst="1" />
 <file name="atc_delete.php" server="192.168.158.128//var/www/" local="131262977283498324" remote="131262986880000000" Dst="1" />
 <file name="atc_delete_confirm.php" server="192.168.158.128//var/www/" local="131263674324240077" remote="131263674640000000" Dst="1" />
 <file name="access_denied.html" server="192.168.158.128//var/www/" local="131127354189853139" remote="131263673050000000" Dst="1" />
@@ -104,7 +100,6 @@
 <file name="delete_registration.php" server="192.168.158.128//var/www/" local="131134354070346800" remote="131263673060000000" Dst="1" />
 <file name="editor_search.php" server="192.168.158.128//var/www/" local="131182537133514922" remote="131263673060000000" Dst="1" />
 <file name="examine_badge.php" server="192.168.158.128//var/www/" local="131127357651699289" remote="131263673060000000" Dst="1" />
-<file name="index.html" server="192.168.158.128//var/www/" local="131263709879289757" remote="131263709900000000" Dst="1" />
 <file name="insert_new_badge.php" server="192.168.158.128//var/www/" local="131099667902751873" remote="131263673060000000" Dst="1" />
 <file name="login.php" server="192.168.158.128//var/www/" local="131263722261389049" remote="131263722450000000" Dst="1" />
 <file name="new_badge.php" server="192.168.158.128//var/www/" local="131257025165069474" remote="131263673060000000" Dst="1" />
@@ -129,4 +124,57 @@
 <file name="upload_action.php" server="192.168.158.128//var/www/" local="131098669187941360" remote="131263673060000000" Dst="1" />
 <file name="atc_list.php" server="192.168.158.128//var/www/" local="131263698680059665" remote="131263698770000000" Dst="1" />
 <file name="globals.php" server="192.168.158.128//var/www/" local="131263698501149432" remote="131263698720000000" Dst="1" />
+<file name="access_denied.html" server="192.168.126.128//var/www/" local="131873678102590511" remote="131873704470000000" Dst="1" />
+<file name="approve_registration.php" server="192.168.126.128//var/www/" local="131850324139098468" remote="131873659970000000" Dst="1" />
+<file name="atc_delete.php" server="192.168.126.128//var/www/" local="131878037500931766" remote="131878040100000000" Dst="1" />
+<file name="atc_delete_confirm.php" server="192.168.126.128//var/www/" local="131850324139961574" remote="131873659970000000" Dst="1" />
+<file name="atc_list.php" server="192.168.126.128//var/www/" local="131873678103550513" remote="131873704470000000" Dst="1" />
+<file name="backup.php" server="192.168.126.128//var/www/" local="131873678103870494" remote="131873704470000000" Dst="1" />
+<file name="badge_delete.php" server="192.168.126.128//var/www/" local="131850324141467334" remote="131873659970000000" Dst="1" />
+<file name="badge_delete_confirm.php" server="192.168.126.128//var/www/" local="131850324141859770" remote="131873659970000000" Dst="1" />
+<file name="badge_dependancies.php" server="192.168.126.128//var/www/" local="131873678104550498" remote="131873704470000000" Dst="1" />
+<file name="badge_details.php" server="192.168.126.128//var/www/" local="131873678105430517" remote="131873704470000000" Dst="1" />
+<file name="badge_list.php" server="192.168.126.128//var/www/" local="131873678105949954" remote="131873704470000000" Dst="1" />
+<file name="badge_requirement_delete_action.php" server="192.168.126.128//var/www/" local="131850324144100853" remote="131873659970000000" Dst="1" />
+<file name="badge_requirements.php" server="192.168.126.128//var/www/" local="131873678106589955" remote="131873704470000000" Dst="1" />
+<file name="badge_update.php" server="192.168.126.128//var/www/" local="131873678107109939" remote="131873704470000000" Dst="1" />
+<file name="badge_update_action.php" server="192.168.126.128//var/www/" local="131850324145735779" remote="131873659970000000" Dst="1" />
+<file name="browse.html" server="192.168.126.128//var/www/" local="131873678107309959" remote="131873704470000000" Dst="1" />
+<file name="category_details.php" server="192.168.126.128//var/www/" local="131873678107869938" remote="131873704470000000" Dst="1" />
+<file name="category_list.php" server="192.168.126.128//var/www/" local="131873678108349958" remote="131873704470000000" Dst="1" />
+<file name="delete_registration.php" server="192.168.126.128//var/www/" local="131850324147385214" remote="131873659970000000" Dst="1" />
+<file name="editor_search.php" server="192.168.126.128//var/www/" local="131873678109284140" remote="131873704470000000" Dst="1" />
+<file name="editor_start.php" server="192.168.126.128//var/www/" local="131873678109684091" remote="131873704470000000" Dst="1" />
+<file name="examine_badge.php" server="192.168.126.128//var/www/" local="131873678109924078" remote="131873704470000000" Dst="1" />
+<file name="globals.php" server="192.168.126.128//var/www/" local="131878042817206916" remote="131878042860000000" Dst="1" />
+<file name="index_old.html" server="192.168.126.128//var/www/" local="131850324149706425" remote="131873659970000000" Dst="1" />
+<file name="insert_new_abstracttestcase.php" server="192.168.126.128//var/www/" local="131878042415056327" remote="131878042490000000" Dst="1" />
+<file name="insert_new_badge.php" server="192.168.126.128//var/www/" local="131850324150628852" remote="131873659970000000" Dst="1" />
+<file name="login.php" server="192.168.126.128//var/www/" local="131850324151028731" remote="131873659970000000" Dst="1" />
+<file name="new_abstracttestcase.php" server="192.168.126.128//var/www/" local="131873678110564091" remote="131873704470000000" Dst="1" />
+<file name="new_badge.php" server="192.168.126.128//var/www/" local="131873678111168949" remote="131873704470000000" Dst="1" />
+<file name="new_requirement.php" server="192.168.126.128//var/www/" local="131873678111768951" remote="131873704470000000" Dst="1" />
+<file name="new_requirement_catagory.php" server="192.168.126.128//var/www/" local="131873678112448951" remote="131873704470000000" Dst="1" />
+<file name="register.php" server="192.168.126.128//var/www/" local="131850324153922882" remote="131873659970000000" Dst="1" />
+<file name="register_proc.html" server="192.168.126.128//var/www/" local="131873678112688949" remote="131873704470000000" Dst="1" />
+<file name="reqcatagories_delete.php" server="192.168.126.128//var/www/" local="131850324154660189" remote="131873659970000000" Dst="1" />
+<file name="reqcatagories_update.php" server="192.168.126.128//var/www/" local="131873678113208953" remote="131873704470000000" Dst="1" />
+<file name="reqcatagory_delete_confirm.php" server="192.168.126.128//var/www/" local="131850324155543558" remote="131873659970000000" Dst="1" />
+<file name="requirement_delete_confirm.php" server="192.168.126.128//var/www/" local="131850324155942414" remote="131873659970000000" Dst="1" />
+<file name="requirement_details.php" server="192.168.126.128//var/www/" local="131873678113848935" remote="131873704470000000" Dst="1" />
+<file name="requirements_delete.php" server="192.168.126.128//var/www/" local="131850324157034297" remote="131873659970000000" Dst="1" />
+<file name="requirements_list.php" server="192.168.126.128//var/www/" local="131873678114368954" remote="131873704470000000" Dst="1" />
+<file name="requirements_update.php" server="192.168.126.128//var/www/" local="131850324158026356" remote="131873659970000000" Dst="1" />
+<file name="review_registrations.php" server="192.168.126.128//var/www/" local="131873678114888954" remote="131873704470000000" Dst="1" />
+<file name="scrapbook.txt" server="192.168.126.128//var/www/" local="131850324158888761" remote="131873659970000000" Dst="1" />
+<file name="search.php" server="192.168.126.128//var/www/" local="131873678115728955" remote="131873704480000000" Dst="1" />
+<file name="search_details_badge.php" server="192.168.126.128//var/www/" local="131873678116208956" remote="131873704480000000" Dst="1" />
+<file name="search_details_category.php" server="192.168.126.128//var/www/" local="131873678116808962" remote="131873704480000000" Dst="1" />
+<file name="search_details_requirement.php" server="192.168.126.128//var/www/" local="131873678117328962" remote="131873704480000000" Dst="1" />
+<file name="upload.php" server="192.168.126.128//var/www/" local="131850324161765546" remote="131873659970000000" Dst="1" />
+<file name="upload_action.php" server="192.168.126.128//var/www/" local="131850324162090828" remote="131873659970000000" Dst="1" />
+<file name="index.php" server="192.168.126.128//var/www/" local="131873702794067441" remote="131873703220000000" Dst="1" />
+<file name="atc_edit.php" server="192.168.126.128//var/www/" local="131877381780666959" remote="131877381840000000" Dst="1" />
+<file name="atc_edit_proc.php" server="192.168.126.128//var/www/" local="131877380543486328" remote="131877380580000000" Dst="1" />
+<file name="editor_menu.html" server="192.168.126.128//var/www/" local="131873809341009957" remote="131873912540000000" Dst="1" />
 </dwsync>

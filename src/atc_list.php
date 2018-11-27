@@ -67,7 +67,7 @@ $totalRows_cases = mysql_num_rows($cases);
     </tr>
     <?php } while ($row_cases = mysql_fetch_assoc($cases)); ?>
 </table>
-<p>[ <a href="index.html">Home</a> | <a href="browse.html">Browse</a> ]</p>
+<p>[ <a href="index.php">Home</a> | <a href="browse.html">Browse</a> ]</p>
 </body>
 </html>
 <?php

@@ -1,6 +1,10 @@
-<?php require_once('Connections/badgesdbcon.php'); ?>
+<?php 
+require_once('Connections/badgesdbcon.php'); 
+require_once('globals.php');
+echo $atcsURL;
+?>
 <?php
-$target_dir = "abstract_test_case_files/";
+$target_dir = $atcsURL;
 $target_file_name = basename($_FILES["fileToUpload"]["name"]);
 $target_file = $target_dir . $target_file_name;
 
@@ -12,9 +16,13 @@ while (file_exists($target_file)) {
 	$target_file = $target_dir . $target_file_name;
 }
 
-//Now move it into the directory
+//Now move it into the directo
 $uploadOK = move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file);
-
+if (!$uploadOK) {
+	echo "Problem uploading file: " . $target_file;
+	echo error_getlast();
+	die();
+}
 
 ?>
 

@@ -88,7 +88,7 @@ $totalRows_badges = mysql_num_rows($badges);
 <?php } //end if there are rows to show ?>
 <br />
 
-<p>[ <a href="index.html">Home / Search</a> | <a href="browse.html">Browse</a> | <a href="requirements_list.php">Requirements</a> ]</p>
+<p>[ <a href="index.php">Home / Search</a> | <a href="browse.html">Browse</a> | <a href="requirements_list.php">Requirements</a> ]</p>
 </body>
 </html>
 <?php

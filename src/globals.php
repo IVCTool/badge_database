@@ -6,10 +6,13 @@
 //Used to construct links when required.
 //This should be the publically available address of
 //the server.
-$urlStub = "http://192.168.158.128/";
+$urlStub = "http://192.168.126.128/";
 
 //Where test case documents are kept
-$atcURL = "abstract_test_case_files/";
+$atcsURL = "atcs_files/";
+
+//where the badge graphics go
+$bgURL = "badge_graphics/";
 
 
 ?>

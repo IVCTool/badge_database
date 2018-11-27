@@ -183,7 +183,7 @@ if ($totalRows_categories > 0) {
 }//end if there's any requirements results
 ?>
 
-<p>[ <a href="index.html">home</a> ]</p>
+<p>[ <a href="index.php">home</a> ]</p>
 
 </body>
 </html>

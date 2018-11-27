@@ -1,7 +1,8 @@
-<?php require_once('Connections/badgesdbcon.php'); ?>
-<?php
-	$target_dir = "abstract_test_case_files/";
+<?php 
+require_once('Connections/badgesdbcon.php'); 
+require_once('globals.php');
 ?>
+
 <?php
 if (!function_exists("GetSQLValueString")) {
 function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
@@ -44,8 +45,8 @@ $recordset = mysql_query($query_recordset, $badgesdbcon) or die(mysql_error());
 $row_recordset = mysql_fetch_assoc($recordset);
 $totalRows_recordset = mysql_num_rows($recordset);
 
-//Get rid of the graphic
-$target_file = $target_dir . $row_recordset["filename"];
+//Get rid of the file
+$target_file = $atcsURL . $row_recordset["filename"];
 echo $target_file;
 unlink($target_file);
 

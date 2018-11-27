@@ -88,7 +88,7 @@ $totalRows_badges = mysql_num_rows($badges);
 </table>
 <?php } //end if there are badges ?>
 <p>&nbsp;</p>
-<p>[ <a href="index.html">Home</a> ]</p>
+<p>[ <a href="index.php">Home</a> ]</p>
 
 </body>
 </html>

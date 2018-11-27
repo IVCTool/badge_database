@@ -87,7 +87,7 @@ $totalRows_requirements = mysql_num_rows($requirements);
 <?php } while ($row_requirements = mysql_fetch_assoc($requirements)); ?>
 </table>
 <p>&nbsp;</p>
-<p>[ <a href="index.html">Home</a> ]</p>
+<p>[ <a href="index.php">Home</a> ]</p>
 </body>
 </html>
 <?php

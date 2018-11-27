@@ -67,7 +67,7 @@ $totalRows_categories = mysql_num_rows($categories);
     </tr>
     <?php } while ($row_categories = mysql_fetch_assoc($categories)); ?>
 </table>
-<p>[ <a href="index.html">Home / Search</a> | <a href="browse.html">Browse</a> ]</p>
+<p>[ <a href="index.php">Home / Search</a> | <a href="browse.html">Browse</a> ]</p>
 </body>
 </html>
 <?php

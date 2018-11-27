@@ -10,4 +10,6 @@
 <file name="mysql.php" server="192.168.158.128//var/www/badges/" local="131043559646179738" remote="131169758240000000" Dst="1" />
 <file name="MMHTTPDB.php" server="192.168.158.128//var/www/" local="131043559646149738" remote="131261986640000000" Dst="1" />
 <file name="mysql.php" server="192.168.158.128//var/www/" local="131043559646179738" remote="131263673130000000" Dst="1" />
+<file name="MMHTTPDB.php" server="192.168.126.128//var/www/" local="131850324177058605" remote="131873815420000000" Dst="1" />
+<file name="mysql.php" server="192.168.126.128//var/www/" local="131850324177550192" remote="131263673130000000" Dst="1" />
 </dwsync>

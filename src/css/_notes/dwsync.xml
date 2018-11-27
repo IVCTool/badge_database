@@ -6,4 +6,6 @@
 <file name="public.css" server="192.168.158.128//var/www/badges/" local="131127354342508403" remote="131169758140000000" Dst="1" />
 <file name="admin.css" server="192.168.158.128//var/www/" local="131127353094783643" remote="131263673060000000" Dst="1" />
 <file name="public.css" server="192.168.158.128//var/www/" local="131127354342508403" remote="131263673060000000" Dst="1" />
+<file name="admin.css" server="192.168.126.128//var/www/" local="131850324203163350" remote="131873659960000000" Dst="1" />
+<file name="public.css" server="192.168.126.128//var/www/" local="131850324203486882" remote="131873659960000000" Dst="1" />
 </dwsync>

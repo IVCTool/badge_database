@@ -75,7 +75,7 @@ $totalRows_badges = mysql_num_rows($badges);
 </table>
 
 <p>&nbsp;</p>
-<p>[ <a href="index.html">Home</a> | <a href="browse.html">Browse</a> ]</p>
+<p>[ <a href="index.php">Home</a> | <a href="browse.html">Browse</a> ]</p>
 </body>
 </html>
 <?php

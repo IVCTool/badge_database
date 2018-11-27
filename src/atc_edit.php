@@ -104,79 +104,57 @@ function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDe
 }
 }
 
+$colname_abstracttestcase = "-1";
+if (isset($_POST['id'])) {
+  $colname_abstracttestcase = $_POST['id'];
+}
 mysql_select_db($database_badgesdbcon, $badgesdbcon);
-$query_atcs = "SELECT * FROM abstracttcs ORDER BY identifier ASC";
-$atcs = mysql_query($query_atcs, $badgesdbcon) or die(mysql_error());
-$row_atcs = mysql_fetch_assoc($atcs);
-$totalRows_atcs = mysql_num_rows($atcs);
+$query_abstracttestcase = sprintf("SELECT * FROM abstracttcs WHERE id = %s", GetSQLValueString($colname_abstracttestcase, "int"));
+$abstracttestcase = mysql_query($query_abstracttestcase, $badgesdbcon) or die(mysql_error());
+$row_abstracttestcase = mysql_fetch_assoc($abstracttestcase);
+$totalRows_abstracttestcase = mysql_num_rows($abstracttestcase);
 
 mysql_select_db($database_badgesdbcon, $badgesdbcon);
-$query_requirements = "SELECT * FROM requirements ORDER BY identifier ASC";
+$query_requirements = "SELECT * FROM requirements";
 $requirements = mysql_query($query_requirements, $badgesdbcon) or die(mysql_error());
 $row_requirements = mysql_fetch_assoc($requirements);
 $totalRows_requirements = mysql_num_rows($requirements);
+
+	//TODO - retrieve the data from the DB
+	//Parse out the required stuff
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>Abstract Test Cases</title>
+<title>Edit Abstract Test Case</title>
 <link href="css/admin.css" rel="stylesheet" type="text/css" />
 </head>
 
 <body>
-<h1>Abstract Test Cases</h1>
-<p>Each abstract test case addresses a single interoperability requirement. The abstract test case is used by software developers to create executable test cases that can be run by IVCT.</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<table border="1">
-  <tr>
-    <th>File Name</th>
-    <th>Identifier</th>
-    <th>Name</th>
-    <th>Description</th>
-    <th>Requirement</th>
-  </tr>
-  
-  <!-- this is the part for displaying the records -->
-  <?php if ($totalRows_atcs > 0) { ?>
-  <?php do { ?>
-
-    <tr>
-      <td><?php echo $row_atcs['filename']; ?></td>
-      <td><?php echo $row_atcs['identifier']; ?></td>
-      <td><?php echo $row_atcs['name']; ?></td>
-      <td><?php echo $row_atcs['description']; ?></td>
-      <td>&nbsp;</td>
-      <td><form action="atc_edit.php" method="post" enctype="multipart/form-data" name="delete" id="edit">
-        <input name="id" type="hidden" id="id" value="<?php echo $row_atcs['id']; ?>" />
-        <input type="submit" name="submit2" id="submit2" value="Edit" />
-      </form></td>
-      <td><form action="atc_delete_confirm.php" method="post" enctype="multipart/form-data" name="delete" id="delete">
-        <input name="id" type="hidden" id="id" value="<?php echo $row_atcs['id']; ?>" />
-        <input type="submit" name="submit2" id="submit2" value="Delete" />
-      </form></td>
-    </tr>
-    <?php } while ($row_atcs = mysql_fetch_assoc($atcs)); ?>
-    <?php } //end if there are any records to show ?>
-    
-    <!-- This is the add new part -->    
-    <tr>
-    	<form action="insert_new_abstracttestcase.php" method="post" enctype="multipart/form-data">
-    	<td><input type="file" name="fileToUpload" id="fileToUpload"/></td>
-    	<td><label for="identifier"></label>
-    	  <input type="text" name="identifier" id="identifier" /></td>
-    	<td><label for="name"></label>
-    	  <input type="text" name="name" id="name" /></td>
-      	<td><label for="description"></label>
-      	  <input type="text" name="description" id="description" /></td>
-    	<td><label for="requirement"></label>
-    	  <select name="requirement" id="requirement">
-    	    <?php
+<h1>Edit Abstract Test Case</h1>
+<form action="atc_edit_proc.php" method="post" enctype="multipart/form-data" name="form1" id="form1">
+  <p>
+    <input name="id" type="hidden" id="id" value="<?php echo $row_abstracttestcase['id']; ?>" />
+    Identifier: 
+    <input name="identifier" type="text" id="textfield" value="<?php echo $row_abstracttestcase['identifier']; ?>" />
+  </p>
+  <p>Name::
+    <label for="name"></label>
+    <input name="name" type="text" id="name" value="<?php echo $row_abstracttestcase['name']; ?>" />
+  </p>
+  <p>Description: 
+    <label for="description"></label>
+    <input name="description" type="text" id="description" value="<?php echo $row_abstracttestcase['description']; ?>" />
+  </p>
+  <p>Requirement:
+    <label for="requirement"></label>
+    <select name="requirementsid" id="requirement">
+      <?php
 do {  
 ?>
-    	    <option value="<?php echo $row_requirements['id']?>"><?php echo $row_requirements['identifier']?></option>
-    	    <?php
+      <option value="<?php echo $row_requirements['id']?>"<?php if (!(strcmp($row_requirements['id'], $row_abstracttestcase['id']))) {echo "selected=\"selected\"";} ?>><?php echo $row_requirements['description']?></option>
+      <?php
 } while ($row_requirements = mysql_fetch_assoc($requirements));
   $rows = mysql_num_rows($requirements);
   if($rows > 0) {
@@ -184,16 +162,24 @@ do {
 	  $row_requirements = mysql_fetch_assoc($requirements);
   }
 ?>
-          </select></td>
-          <td><input type="submit" name="submit" id="submit" value="Create" /></td>        
-        </form>
-  </tr>
-</table>
-<p>[ <a href="editor_start.php">Editor Home</a> | <a href="<?php echo $logoutAction ?>">Log out</a> ]</p>
+    </select>
+  </p>
+  <p>
+    <input name="oldfile" type="hidden" id="oldfile" value="<?php echo $row_abstracttestcase['filename']; ?>" />
+    New File: 
+    <label for="file"></label>
+    <input type="file" name="file" id="file" />
+  <a href="./ats_files/<?php echo $row_abstracttestcase['filename']; ?>" target="new">view existing file</a></p>
+  <p>
+    <input type="submit" name="button" id="button" value="Save" />
+  </p>
+</form>
+<p>&nbsp;</p>
+<p> [<a href="editor_start.php"> Editor Home </a>| <a href="<?php echo $logoutAction ?>">Log out</a> ] </p>
 </body>
 </html>
 <?php
-mysql_free_result($atcs);
+mysql_free_result($abstracttestcase);
 
 mysql_free_result($requirements);
 ?>

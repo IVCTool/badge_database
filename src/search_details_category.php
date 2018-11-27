@@ -90,7 +90,7 @@ $totalRows_category = mysql_num_rows($category);
 <p><strong>No requirements in this categrory.</strong></p>
 <?php } //end if totalrows ?>
 <p>&nbsp;</p>
-<p>[ <a href="index.html">Home</a> ]
+<p>[ <a href="index.php">Home</a> ]
 </body>
 </html>
 <?php
