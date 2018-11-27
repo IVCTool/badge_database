@@ -1,4 +1,7 @@
-<?php require_once('Connections/badgesdbcon.php'); ?>
+<?php 
+require_once('Connections/badgesdbcon.php');
+require_once('globals.php');
+?>
 <?php
 //initialize the session
 if (!isset($_SESSION)) {
@@ -105,16 +108,10 @@ function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDe
 }
 
 mysql_select_db($database_badgesdbcon, $badgesdbcon);
-$query_atcs = "SELECT * FROM abstracttcs ORDER BY identifier ASC";
+$query_atcs = "SELECT abstracttcs.*, requirements.identifier AS rident, requirements.description AS rdesc FROM (abstracttcs JOIN requirements ON (abstracttcs.requirements_id = requirements.id)) ORDER BY abstracttcs.identifier ASC";
 $atcs = mysql_query($query_atcs, $badgesdbcon) or die(mysql_error());
 $row_atcs = mysql_fetch_assoc($atcs);
 $totalRows_atcs = mysql_num_rows($atcs);
-
-mysql_select_db($database_badgesdbcon, $badgesdbcon);
-$query_requirements = "SELECT * FROM requirements ORDER BY identifier ASC";
-$requirements = mysql_query($query_requirements, $badgesdbcon) or die(mysql_error());
-$row_requirements = mysql_fetch_assoc($requirements);
-$totalRows_requirements = mysql_num_rows($requirements);
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -143,11 +140,11 @@ $totalRows_requirements = mysql_num_rows($requirements);
   <?php do { ?>
 
     <tr>
-      <td><?php echo $row_atcs['filename']; ?></td>
+      <td><a href="./<?php echo $atcsURL . $row_atcs['filename']; ?>" target="_blank"><?php echo $row_atcs['filename']; ?></a></td>
       <td><?php echo $row_atcs['identifier']; ?></td>
       <td><?php echo $row_atcs['name']; ?></td>
       <td><?php echo $row_atcs['description']; ?></td>
-      <td>&nbsp;</td>
+      <td><?php echo $row_atcs['rident'] . ": " .$row_atcs['rdesc']; ?></td>
       <td><form action="atc_edit.php" method="post" enctype="multipart/form-data" name="delete" id="edit">
         <input name="id" type="hidden" id="id" value="<?php echo $row_atcs['id']; ?>" />
         <input type="submit" name="submit2" id="submit2" value="Edit" />
@@ -194,6 +191,4 @@ do {
 </html>
 <?php
 mysql_free_result($atcs);
-
-mysql_free_result($requirements);
 ?>

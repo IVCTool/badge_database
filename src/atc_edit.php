@@ -1,4 +1,7 @@
-<?php require_once('Connections/badgesdbcon.php'); ?>
+<?php 
+require_once('Connections/badgesdbcon.php');
+require_once('globals.php');
+?>
 <?php
 //initialize the session
 if (!isset($_SESSION)) {
@@ -153,7 +156,7 @@ $totalRows_requirements = mysql_num_rows($requirements);
       <?php
 do {  
 ?>
-      <option value="<?php echo $row_requirements['id']?>"<?php if (!(strcmp($row_requirements['id'], $row_abstracttestcase['id']))) {echo "selected=\"selected\"";} ?>><?php echo $row_requirements['description']?></option>
+      <option value="<?php echo $row_requirements['id']?>"<?php if (!(strcmp($row_requirements['id'], $row_abstracttestcase['requirements_id']))) {echo "selected=\"selected\"";} ?>><?php echo $row_requirements['identifier'] . ": " . $row_requirements['description']?></option>
       <?php
 } while ($row_requirements = mysql_fetch_assoc($requirements));
   $rows = mysql_num_rows($requirements);
@@ -169,7 +172,7 @@ do {
     New File: 
     <label for="file"></label>
     <input type="file" name="file" id="file" />
-  <a href="./ats_files/<?php echo $row_abstracttestcase['filename']; ?>" target="new">view existing file</a></p>
+  <a href="./<?php echo $atcsURL . $row_abstracttestcase['filename']; ?>" target="new">view existing file</a></p>
   <p>
     <input type="submit" name="button" id="button" value="Save" />
   </p>
