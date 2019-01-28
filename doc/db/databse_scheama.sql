@@ -7,14 +7,16 @@ SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';
 
 DROP TABLE IF EXISTS `abstracttcs`;
 CREATE TABLE `abstracttcs` (
+  `filename` varchar(255) CHARACTER SET armscii8 NOT NULL,
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `identifier` varchar(25) NOT NULL,
   `name` varchar(25) DEFAULT NULL,
   `description` longtext NOT NULL,
   `requirements_id` int(10) unsigned NOT NULL,
+  `version` varchar(45) NOT NULL,
   PRIMARY KEY (`id`,`requirements_id`),
   KEY `fk_abstracttcs_requirements1_idx` (`requirements_id`),
-  CONSTRAINT `fk_abstracttcs_requirements1` FOREIGN KEY (`requirements_id`) REFERENCES `requirements` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `abstracttcs_ibfk_1` FOREIGN KEY (`requirements_id`) REFERENCES `requirements` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -22,7 +24,7 @@ DROP TABLE IF EXISTS `badges`;
 CREATE TABLE `badges` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `description` longtext NOT NULL,
-  `graphic` blob NOT NULL,
+  `graphicfile` varchar(255) DEFAULT NULL,
   `identifier` varchar(25) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
@@ -44,9 +46,20 @@ CREATE TABLE `badges_has_requirements` (
   `badges_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`requirements_id`,`badges_id`),
   KEY `fk_requirements_has_badges_badges1_idx` (`badges_id`),
-  KEY `fk_requirements_has_badges_requirements1_idx` (`requirements_id`),
-  CONSTRAINT `fk_requirements_has_badges_badges1` FOREIGN KEY (`badges_id`) REFERENCES `badges` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_requirements_has_badges_requirements1` FOREIGN KEY (`requirements_id`) REFERENCES `requirements` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  KEY `fk_requirements_has_badges_requirements1_idx` (`requirements_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+DROP TABLE IF EXISTS `executabletcs`;
+CREATE TABLE `executabletcs` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `Description` text NOT NULL,
+  `classname` varchar(255) NOT NULL,
+  `version` varchar(45) NOT NULL,
+  `abstracttcs_id` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`id`,`abstracttcs_id`),
+  KEY `fk_executabletcs_abstracttcs1_idx` (`abstracttcs_id`),
+  CONSTRAINT `executabletcs_ibfk_1` FOREIGN KEY (`abstracttcs_id`) REFERENCES `abstracttcs` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -85,4 +98,4 @@ CREATE TABLE `users` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 
--- 2016-05-30 17:04:26
+-- 2019-01-28 17:06:08
