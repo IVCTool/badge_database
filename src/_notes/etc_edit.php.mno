@@ -1,0 +1,5 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<info>
+	<infoitem key="UD_atcs" value="name:filename;datatype:string,name:id;datatype:int,name:identifier;datatype:string,name:name;datatype:string,name:description;datatype:blob,name:requirements_id;datatype:int,name:version;datatype:string" />
+	<infoitem key="UD_etc" value="name:id;datatype:int,name:Description;datatype:blob,name:classname;datatype:string,name:version;datatype:string,name:abstracttcs_id;datatype:int" />
+</info>

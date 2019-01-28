@@ -104,11 +104,12 @@ if ($uploadOk == 0) {
 
 //Now we need to update the record.
 
-$SQL = sprintf("UPDATE abstracttcs SET filename=%s, identifier=%s, name=%s, description=%s, requirements_id=%d WHERE id=%d;",
+$SQL = sprintf("UPDATE abstracttcs SET filename=%s, identifier=%s, name=%s, description=%s, version=%s, requirements_id=%d WHERE id=%d;",
 	GetSQLValueString($target_file_name, "text"),
 	GetSQLValueString($_POST["identifier"], "text"),
 	GetSQLValueString($_POST["name"], "text"),
 	GetSQLValueString($_POST["description"], "text"),
+	GetSQLValueString($_POST["version"], "text"),
 	GetSQLValueString($_POST["requirementsid"], "int"),
 	GetSQLValueString($_POST["id"], "int") );
 

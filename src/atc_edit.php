@@ -1,3 +1,4 @@
+<?php require_once('Connections/badgesdbcon.php'); ?>
 <?php 
 require_once('Connections/badgesdbcon.php');
 require_once('globals.php');
@@ -150,13 +151,17 @@ $totalRows_requirements = mysql_num_rows($requirements);
     <label for="description"></label>
     <input name="description" type="text" id="description" value="<?php echo $row_abstracttestcase['description']; ?>" />
   </p>
+  <p>Version: 
+    <label for="version"></label>
+    <input name="version" type="text" id="version" value="<?php echo $row_abstracttestcase['version']; ?>" />
+  </p>
   <p>Requirement:
     <label for="requirement"></label>
     <select name="requirementsid" id="requirement">
       <?php
 do {  
 ?>
-      <option value="<?php echo $row_requirements['id']?>"<?php if (!(strcmp($row_requirements['id'], $row_abstracttestcase['requirements_id']))) {echo "selected=\"selected\"";} ?>><?php echo $row_requirements['identifier'] . ": " . $row_requirements['description']?></option>
+      <option value="<?php echo $row_requirements['id']?>"<?php if (!(strcmp($row_requirements['id'], $row_abstracttestcase['requirements_id']))) {echo "selected=\"selected\"";} ?>><?php echo $row_requirements['identifier']?></option>
       <?php
 } while ($row_requirements = mysql_fetch_assoc($requirements));
   $rows = mysql_num_rows($requirements);

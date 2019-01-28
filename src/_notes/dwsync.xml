@@ -144,14 +144,14 @@
 <file name="category_list.php" server="192.168.126.128//var/www/" local="131873678108349958" remote="131873704470000000" Dst="1" />
 <file name="delete_registration.php" server="192.168.126.128//var/www/" local="131850324147385214" remote="131873659970000000" Dst="1" />
 <file name="editor_search.php" server="192.168.126.128//var/www/" local="131873678109284140" remote="131873704470000000" Dst="1" />
-<file name="editor_start.php" server="192.168.126.128//var/www/" local="131873678109684091" remote="131873704470000000" Dst="1" />
+<file name="editor_start.php" server="192.168.126.128//var/www/" local="131928121144638480" remote="131928121210000000" Dst="1" />
 <file name="examine_badge.php" server="192.168.126.128//var/www/" local="131873678109924078" remote="131873704470000000" Dst="1" />
 <file name="globals.php" server="192.168.126.128//var/www/" local="131878042817206916" remote="131878042860000000" Dst="1" />
 <file name="index_old.html" server="192.168.126.128//var/www/" local="131850324149706425" remote="131873659970000000" Dst="1" />
 <file name="insert_new_abstracttestcase.php" server="192.168.126.128//var/www/" local="131878042415056327" remote="131878042490000000" Dst="1" />
 <file name="insert_new_badge.php" server="192.168.126.128//var/www/" local="131850324150628852" remote="131873659970000000" Dst="1" />
 <file name="login.php" server="192.168.126.128//var/www/" local="131850324151028731" remote="131873659970000000" Dst="1" />
-<file name="new_abstracttestcase.php" server="192.168.126.128//var/www/" local="131878230767837761" remote="131878230810000000" Dst="1" />
+<file name="new_abstracttestcase.php" server="192.168.126.128//var/www/" local="131928095203574252" remote="131928097000000000" Dst="1" />
 <file name="new_badge.php" server="192.168.126.128//var/www/" local="131873678111168949" remote="131873704470000000" Dst="1" />
 <file name="new_requirement.php" server="192.168.126.128//var/www/" local="131873678111768951" remote="131873704470000000" Dst="1" />
 <file name="new_requirement_catagory.php" server="192.168.126.128//var/www/" local="131873678112448951" remote="131873704470000000" Dst="1" />
@@ -174,7 +174,14 @@
 <file name="upload.php" server="192.168.126.128//var/www/" local="131850324161765546" remote="131873659970000000" Dst="1" />
 <file name="upload_action.php" server="192.168.126.128//var/www/" local="131850324162090828" remote="131873659970000000" Dst="1" />
 <file name="index.php" server="192.168.126.128//var/www/" local="131873702794067441" remote="131873703220000000" Dst="1" />
-<file name="atc_edit.php" server="192.168.126.128//var/www/" local="131878224038828545" remote="131878224060000000" Dst="1" />
-<file name="atc_edit_proc.php" server="192.168.126.128//var/www/" local="131877380543486328" remote="131877380580000000" Dst="1" />
-<file name="editor_menu.html" server="192.168.126.128//var/www/" local="131873809341009957" remote="131873912540000000" Dst="1" />
+<file name="atc_edit.php" server="192.168.126.128//var/www/" local="131928096365381259" remote="131928097000000000" Dst="1" />
+<file name="atc_edit_proc.php" server="192.168.126.128//var/www/" local="131928096879363010" remote="131928097000000000" Dst="1" />
+<file name="new_executabletcs.php" server="192.168.126.128//var/www/" local="131927393642117060" remote="131927393800000000" Dst="1" />
+<file name="obsolete_index.html" server="192.168.126.128//var/www/" local="131263709900000000" remote="131926423040000000" Dst="1" />
+<file name="view_atc.php" server="192.168.126.128//var/www/" local="131927409532351331" remote="131927409610000000" Dst="1" />
+<file name="etc_edit.php" server="192.168.126.128//var/www/" local="131927212035394598" remote="131927212250000000" Dst="1" />
+<file name="etc_edit_proc.php" server="192.168.126.128//var/www/" local="131926451190000000" remote="131927201900000000" Dst="1" />
+<file name="insert_new_executabletestcase.php" server="192.168.126.128//var/www/" local="131927390338503161" remote="131927390590000000" Dst="1" />
+<file name="coverage_atc.php" server="192.168.126.128//var/www/" local="131928109287106251" remote="131928114820000000" Dst="1" />
+<file name="coverage_requirements.php" server="192.168.126.128//var/www/" local="131928121810000000" remote="131928121890000000" Dst="1" />
 </dwsync>

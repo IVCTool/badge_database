@@ -89,14 +89,19 @@ if (!((isset($_SESSION['MM_Username'])) && (isAuthorized("",$MM_authorizedUsers,
     <input type="submit" name="button" id="button" value="Submit" />
 
 </form>  </p>
-<p><strong>Browse:</strong></p>
+<p><strong>Browse and Edit:</strong></p>
 <ul>
   <li><a href="new_requirement_catagory.php">Requirement categories</a></li>
 <li><a href="new_requirement.php">Interoperability requirements</a></li>
 <li><a href="new_badge.php">Interoperability badges</a></li>
 <li><a href="new_abstracttestcase.php">Abstract test cases</a></li>
+<li><a href="new_executabletcs.php">Executable test cases</a></li>
 </ul>
-<p>&nbsp;</p>
+<p><strong>Coverage reports:</strong></p>
+<ul>
+  <li><strong><a href="coverage_requirements.php">Requirement coverage</a></strong></li>
+  <li><strong><a href="coverage_atc.php">Abstract test case coverage</a></strong></li>
+</ul>
 <p><strong>Administrative functions:</strong></p>
 <ul>
   <li><a href="review_registrations.php">Review editor applications</a></li>

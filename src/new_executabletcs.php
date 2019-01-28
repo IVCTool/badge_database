@@ -109,90 +109,86 @@ function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDe
 }
 
 mysql_select_db($database_badgesdbcon, $badgesdbcon);
-$query_atcs = "SELECT abstracttcs.*, requirements.identifier AS rident, requirements.description AS rdesc FROM (abstracttcs JOIN requirements ON (abstracttcs.requirements_id = requirements.id)) ORDER BY abstracttcs.identifier ASC";
+$query_etcs = "SELECT executabletcs.id AS id, executabletcs.description as description, executabletcs.classname as classname, executabletcs.version as version, abstracttcs.id as aid, abstracttcs.name as aname FROM (executabletcs JOIN abstracttcs ON (executabletcs.abstracttcs_id = abstracttcs.id))";
+$etcs = mysql_query($query_etcs, $badgesdbcon) or die(mysql_error());
+$row_etcs = mysql_fetch_assoc($etcs);
+$totalRows_etcs = mysql_num_rows($etcs);
+
+mysql_select_db($database_badgesdbcon, $badgesdbcon);
+$query_atcs = "SELECT * FROM abstracttcs";
 $atcs = mysql_query($query_atcs, $badgesdbcon) or die(mysql_error());
 $row_atcs = mysql_fetch_assoc($atcs);
 $totalRows_atcs = mysql_num_rows($atcs);
-
-mysql_select_db($database_badgesdbcon, $badgesdbcon);
-$query_requirements = "SELECT * FROM requirements";
-$requirements = mysql_query($query_requirements, $badgesdbcon) or die(mysql_error());
-$row_requirements = mysql_fetch_assoc($requirements);
-$totalRows_requirements = mysql_num_rows($requirements);
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>Abstract Test Cases</title>
+<title>Executable Test Cases</title>
 <link href="css/admin.css" rel="stylesheet" type="text/css" />
 </head>
 
 <body>
-<h1>Abstract Test Cases</h1>
-<p>Each abstract test case addresses a single interoperability requirement. The abstract test case is used by software developers to create executable test cases that can be run by IVCT.</p>
+<h1>Executable Test Cases</h1>
+<p>Each executable test case implements a single abstract test case. The executable test cases are run by IVCT.</p>
 <p>&nbsp;</p>
 <p>&nbsp;</p>
 <table border="1">
   <tr>
-    <th>File Name</th>
-    <th>Identifier</th>
-    <th>Name</th>
     <th>Description</th>
-    <th>Version</th>
-    <th>Requirement</th>
+    <th>Classname</th>
+    <th>version</th>
+    <th>Abstract Test Case</th>
+
   </tr>
   
   <!-- this is the part for displaying the records -->
-  <?php if ($totalRows_atcs > 0) { ?>
+  <?php if ($totalRows_etcs > 0) { ?>
   <?php do { ?>
+  <tr>
+    <td><a target="_blank"><?php echo $row_etcs['description']; ?></a></td>
+    <td><?php echo $row_etcs['classname']; ?></td>
+    <td><?php echo $row_etcs['version']; ?></td>
+    <td><a href="view_atc.php?id=<?php echo $row_etcs['aid']; ?>"><?php echo $row_etcs['aname']; ?></a></td>
 
-    <tr>
-      <td><a href="./<?php echo $atcsURL . $row_atcs['filename']; ?>" target="_blank"><?php echo $row_atcs['filename']; ?></a></td>
-      <td><?php echo $row_atcs['identifier']; ?></td>
-      <td><?php echo $row_atcs['name']; ?></td>
-      <td><?php echo $row_atcs['description']; ?></td>
-      <td><?php echo $row_atcs['version']; ?></td>
-      <td><?php echo $row_atcs['rident'] . ": " .$row_atcs['rdesc']; ?></td>
-      <td><form action="atc_edit.php" method="post" enctype="multipart/form-data" name="delete" id="edit">
-        <input name="id" type="hidden" id="id" value="<?php echo $row_atcs['id']; ?>" />
-        <input type="submit" name="submit2" id="submit2" value="Edit" />
-      </form></td>
-      <td><form action="atc_delete_confirm.php" method="post" enctype="multipart/form-data" name="delete" id="delete">
-        <input name="id" type="hidden" id="id" value="<?php echo $row_atcs['id']; ?>" />
-        <input type="submit" name="submit2" id="submit2" value="Delete" />
-      </form></td>
-    </tr>
-    <?php } while ($row_atcs = mysql_fetch_assoc($atcs)); ?>
-    <?php } //end if there are any records to show ?>
+    <td><form action="etc_edit.php" method="post" enctype="multipart/form-data" name="delete" id="edit">
+      <input name="id" type="hidden" id="id" value="<?php echo $row_etcs['id']; ?>"/>
+      <input type="submit" name="submit2" id="submit2" value="Edit" />
+    </form></td>
+    <td><form action="etc_delete_confirm.php" method="post" enctype="multipart/form-data" name="delete" id="delete">
+      <input name="id" type="hidden" id="id" value="<?php echo $row_etcs['id']; ?>" />
+      <input type="submit" name="submit2" id="submit2" value="Delete" />
+    </form></td>
+  </tr>
+  
+<?php } while ($row_etcs = mysql_fetch_assoc($etcs)); ?>
+<?php } //end if there are any records to show ?>
     
     <!-- This is the add new part -->    
     <tr>
-    	<form action="insert_new_abstracttestcase.php" method="post" enctype="multipart/form-data">
-    	<td><input type="file" name="fileToUpload" id="fileToUpload"/></td>
-    	<td><label for="identifier"></label>
-    	  <input type="text" name="identifier" id="identifier" /></td>
-    	<td><label for="name"></label>
-    	  <input type="text" name="name" id="name" /></td>
-      	<td><label for="description"></label>
-      	  <input type="text" name="description" id="description" /></td>
-          <td><label for="version"></label>
-          <input name="version" type="text" id="version" value="<?php echo $row_atcs['version']; ?>" /></td>
-    	<td><label for="requirement"></label>
-    	  <select name="requirement" id="requirement">
-    	    <?php
+    	<form action="insert_new_executabletestcase.php" method="post" enctype="multipart/form-data">
+    	<td><label for="description2"></label>
+    	  <input type="text" name="description" id="description2" /></td>
+    	<td><label for="classname"></label>
+    	  <input type="text" name="classname" id="classname" /></td>
+    	<td><label for="version"></label>
+    	  <input type="text" name="version" id="version" /></td>
+      	<td><label for="aid"></label>
+      	  <select name="aid" id="aid">
+      	    <?php
 do {  
 ?>
-    	    <option value="<?php echo $row_requirements['id']?>"><?php echo $row_requirements['identifier']?></option>
-    	    <?php
-} while ($row_requirements = mysql_fetch_assoc($requirements));
-  $rows = mysql_num_rows($requirements);
+      	    <option value="<?php echo $row_atcs['id']?>"><?php echo $row_atcs['identifier']?></option>
+      	    <?php
+} while ($row_atcs = mysql_fetch_assoc($atcs));
+  $rows = mysql_num_rows($atcs);
   if($rows > 0) {
-      mysql_data_seek($requirements, 0);
-	  $row_requirements = mysql_fetch_assoc($requirements);
+      mysql_data_seek($atcs, 0);
+	  $row_atcs = mysql_fetch_assoc($atcs);
   }
 ?>
-          </select></td>
+   	      </select>      	  <label for="description"></label></td>
+    	<td><label for="requirement"></label></td>
           <td><input type="submit" name="submit" id="submit" value="Create" /></td>        
         </form>
   </tr>
@@ -201,7 +197,7 @@ do {
 </body>
 </html>
 <?php
-mysql_free_result($atcs);
+mysql_free_result($etcs);
 
-mysql_free_result($requirements);
+mysql_free_result($atcs);
 ?>
