@@ -45,47 +45,18 @@ if (!((isset($_SESSION['MM_Username'])) && (isAuthorized("",$MM_authorizedUsers,
   exit;
 }
 ?>
+<?php require_once('include/getsqlvaluestring.php'); ?>
 <?php
-if (!function_exists("GetSQLValueString")) {
-function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
-{
-  if (PHP_VERSION < 6) {
-    $theValue = get_magic_quotes_gpc() ? stripslashes($theValue) : $theValue;
-  }
-
-  $theValue = function_exists("mysql_real_escape_string") ? mysql_real_escape_string($theValue) : mysql_escape_string($theValue);
-
-  switch ($theType) {
-    case "text":
-      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-      break;    
-    case "long":
-    case "int":
-      $theValue = ($theValue != "") ? intval($theValue) : "NULL";
-      break;
-    case "double":
-      $theValue = ($theValue != "") ? doubleval($theValue) : "NULL";
-      break;
-    case "date":
-      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-      break;
-    case "defined":
-      $theValue = ($theValue != "") ? $theDefinedValue : $theNotDefinedValue;
-      break;
-  }
-  return $theValue;
-}
-}
 
 $colname_atc = "-1";
 if (isset($_GET['id'])) {
   $colname_atc = $_GET['id'];
 }
-mysql_select_db($database_badgesdbcon, $badgesdbcon);
-$query_atc = sprintf("SELECT * FROM abstracttcs WHERE id = %s", GetSQLValueString($colname_atc, "int"));
-$atc = mysql_query($query_atc, $badgesdbcon) or die(mysql_error());
-$row_atc = mysql_fetch_assoc($atc);
-$totalRows_atc = mysql_num_rows($atc);
+ 
+$query_atc = sprintf("SELECT * FROM abstracttcs WHERE id = %s", GetSQLValueString($badgesdbcon, $colname_atc, "int"));
+$atc = mysqli_query($badgesdbcon, $query_atc) or die(mysqli_error());
+$row_atc = mysqli_fetch_assoc($atc);
+$totalRows_atc = mysqli_num_rows($atc);
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -112,5 +83,5 @@ $totalRows_atc = mysql_num_rows($atc);
 </body>
 </html>
 <?php
-mysql_free_result($atc);
+mysqli_free_result($atc);
 ?>

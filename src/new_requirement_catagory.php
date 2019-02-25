@@ -1,4 +1,5 @@
 <?php require_once('Connections/badgesdbcon.php'); ?>
+<?php require_once('include/getsqlvaluestring.php'); ?>
 <?php
 //initialize the session
 if (!isset($_SESSION)) {
@@ -73,36 +74,6 @@ if (!((isset($_SESSION['MM_Username'])) && (isAuthorized("",$MM_authorizedUsers,
 }
 ?>
 <?php
-if (!function_exists("GetSQLValueString")) {
-function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
-{
-  if (PHP_VERSION < 6) {
-    $theValue = get_magic_quotes_gpc() ? stripslashes($theValue) : $theValue;
-  }
-
-  $theValue = function_exists("mysql_real_escape_string") ? mysql_real_escape_string($theValue) : mysql_escape_string($theValue);
-
-  switch ($theType) {
-    case "text":
-      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-      break;    
-    case "long":
-    case "int":
-      $theValue = ($theValue != "") ? intval($theValue) : "NULL";
-      break;
-    case "double":
-      $theValue = ($theValue != "") ? doubleval($theValue) : "NULL";
-      break;
-    case "date":
-      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-      break;
-    case "defined":
-      $theValue = ($theValue != "") ? $theDefinedValue : $theNotDefinedValue;
-      break;
-  }
-  return $theValue;
-}
-}
 
 $editFormAction = $_SERVER['PHP_SELF'];
 if (isset($_SERVER['QUERY_STRING'])) {
@@ -111,12 +82,12 @@ if (isset($_SERVER['QUERY_STRING'])) {
 
 if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "newform")) {
   $insertSQL = sprintf("INSERT INTO reqcategories (name, `description`, identifier) VALUES (%s, %s, %s)",
-                       GetSQLValueString($_POST['name'], "text"),
-                       GetSQLValueString($_POST['description'], "text"),
-                       GetSQLValueString($_POST['identifier'], "text"));
+                       GetSQLValueString($badgesdbcon,  $_POST['name'], "text"),
+                       GetSQLValueString($badgesdbcon,  $_POST['description'], "text"),
+                       GetSQLValueString($badgesdbcon,  $_POST['identifier'], "text"));
 
-  mysql_select_db($database_badgesdbcon, $badgesdbcon);
-  $Result1 = mysql_query($insertSQL, $badgesdbcon) or die(mysql_error());
+   
+  $Result1 = mysqli_query($badgesdbcon, $insertSQL);
 
   $insertGoTo = "new_requirement_catagory.php";
   if (isset($_SERVER['QUERY_STRING'])) {
@@ -126,11 +97,11 @@ if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "newform")) {
   header(sprintf("Location: %s", $insertGoTo));
 }
 
-mysql_select_db($database_badgesdbcon, $badgesdbcon);
+ 
 $query_reqcatrecords = "SELECT * FROM reqcategories";
-$reqcatrecords = mysql_query($query_reqcatrecords, $badgesdbcon) or die(mysql_error());
-$row_reqcatrecords = mysql_fetch_assoc($reqcatrecords);
-$totalRows_reqcatrecords = mysql_num_rows($reqcatrecords);
+$reqcatrecords = mysqli_query($badgesdbcon, $query_reqcatrecords);
+$row_reqcatrecords = mysqli_fetch_assoc($reqcatrecords);
+$totalRows_reqcatrecords = mysqli_num_rows($reqcatrecords);
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -141,6 +112,7 @@ $totalRows_reqcatrecords = mysql_num_rows($reqcatrecords);
 </head>
 
 <body>
+
 <h1>Interoperability Requirement Catagories</h1>
 <p>&nbsp;</p>
 <table width="100%" border="1">
@@ -170,9 +142,8 @@ do {
 	</tr>
     
 <?php
-	//now get the next one
-	$row_reqcatrecords = mysqli_fetch_assoc($reqcatrecords);
-} while ($row_reqcatrecords = mysql_fetch_assoc($reqcatrecords));
+//end do loop
+} while ($row_reqcatrecords = mysqli_fetch_assoc($reqcatrecords));
 ?>
 <form method="POST" action="<?php echo $editFormAction; ?>" name="newform">
 <tr>
@@ -194,5 +165,5 @@ do {
 </body>
 </html>
 <?php
-mysql_free_result($reqcatrecords);
+mysqli_free_result($reqcatrecords);
 ?>

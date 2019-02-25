@@ -73,67 +73,38 @@ if (!((isset($_SESSION['MM_Username'])) && (isAuthorized("",$MM_authorizedUsers,
   exit;
 }
 ?>
+<?php require_once('include/getsqlvaluestring.php'); ?>
 <?php
-if (!function_exists("GetSQLValueString")) {
-function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
-{
-  if (PHP_VERSION < 6) {
-    $theValue = get_magic_quotes_gpc() ? stripslashes($theValue) : $theValue;
-  }
-
-  $theValue = function_exists("mysql_real_escape_string") ? mysql_real_escape_string($theValue) : mysql_escape_string($theValue);
-
-  switch ($theType) {
-    case "text":
-      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-      break;    
-    case "long":
-    case "int":
-      $theValue = ($theValue != "") ? intval($theValue) : "NULL";
-      break;
-    case "double":
-      $theValue = ($theValue != "") ? doubleval($theValue) : "NULL";
-      break;
-    case "date":
-      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-      break;
-    case "defined":
-      $theValue = ($theValue != "") ? $theDefinedValue : $theNotDefinedValue;
-      break;
-  }
-  return $theValue;
-}
-}
 
 $term_requirements = "bananna";
 if (isset($_POST['searchterm'])) {
   $term_requirements = $_POST['searchterm'];
 }
-mysql_select_db($database_badgesdbcon, $badgesdbcon);
-$query_requirements = sprintf("SELECT * FROM requirements WHERE (description like %s or identifier like %s)", GetSQLValueString("%" . $term_requirements . "%", "text"),GetSQLValueString("%" . $term_requirements . "%", "text"));
-$requirements = mysql_query($query_requirements, $badgesdbcon) or die(mysql_error());
-$row_requirements = mysql_fetch_assoc($requirements);
-$totalRows_requirements = mysql_num_rows($requirements);
+ 
+$query_requirements = sprintf("SELECT * FROM requirements WHERE (description like %s or identifier like %s)", GetSQLValueString($badgesdbcon, "%" . $term_requirements . "%", "text"),GetSQLValueString($badgesdbcon, "%" . $term_requirements . "%", "text"));
+$requirements = mysqli_query($badgesdbcon, $query_requirements) or die(mysqli_error());
+$row_requirements = mysqli_fetch_assoc($requirements);
+$totalRows_requirements = mysqli_num_rows($requirements);
 
 $term_categories = "bananna";
 if (isset($_POST['searchterm'])) {
   $term_categories = $_POST['searchterm'];
 }
-mysql_select_db($database_badgesdbcon, $badgesdbcon);
-$query_categories = sprintf("SELECT * FROM reqcategories WHERE (description like %s or name like %s)", GetSQLValueString("%" . $term_categories . "%", "text"),GetSQLValueString("%" . $term_categories . "%", "text"));
-$categories = mysql_query($query_categories, $badgesdbcon) or die(mysql_error());
-$row_categories = mysql_fetch_assoc($categories);
-$totalRows_categories = mysql_num_rows($categories);
+ 
+$query_categories = sprintf("SELECT * FROM reqcategories WHERE (description like %s or name like %s)", GetSQLValueString($badgesdbcon, "%" . $term_categories . "%", "text"),GetSQLValueString($badgesdbcon, "%" . $term_categories . "%", "text"));
+$categories = mysqli_query($badgesdbcon, $query_categories) or die(mysqli_error());
+$row_categories = mysqli_fetch_assoc($categories);
+$totalRows_categories = mysqli_num_rows($categories);
 
 $term_badges = "bananna";
 if (isset($_POST['searchterm'])) {
   $term_badges = $_POST['searchterm'];
 }
-mysql_select_db($database_badgesdbcon, $badgesdbcon);
-$query_badges = sprintf("SELECT * FROM badges WHERE (description like %s or identifier like %s)", GetSQLValueString("%" . $term_badges . "%", "text"),GetSQLValueString("%" . $term_badges . "%", "text"));
-$badges = mysql_query($query_badges, $badgesdbcon) or die(mysql_error());
-$row_badges = mysql_fetch_assoc($badges);
-$totalRows_badges = mysql_num_rows($badges);
+ 
+$query_badges = sprintf("SELECT * FROM badges WHERE (description like %s or identifier like %s)", GetSQLValueString($badgesdbcon, "%" . $term_badges . "%", "text"),GetSQLValueString($badgesdbcon, "%" . $term_badges . "%", "text"));
+$badges = mysqli_query($badgesdbcon, $query_badges) or die(mysqli_error());
+$row_badges = mysqli_fetch_assoc($badges);
+$totalRows_badges = mysqli_num_rows($badges);
 
 
 ?>
@@ -173,7 +144,7 @@ if ($totalRows_badges > 0) {
   </tr>
 <?php
 	//now get the next one
-	} while ($row_badges = mysql_fetch_assoc($badges));
+	} while ($row_badges = mysqli_fetch_assoc($badges));
 ?>
 </table>
 <?php
@@ -210,7 +181,7 @@ if ($totalRows_requirements > 0) {
   </tr>
 <?php
 	//now get the next one
-	} while ($row_requirements = mysql_fetch_assoc($requirements));
+	} while ($row_requirements = mysqli_fetch_assoc($requirements));
 ?>
 </table>
 <?php
@@ -246,7 +217,7 @@ if ($totalRows_categories > 0) {
   </tr>
 <?php
 	//now get the next one
-	} while ($row_categories = mysql_fetch_assoc($categories));
+	} while ($row_categories = mysqli_fetch_assoc($categories));
 ?>
 </table>
 <?php
@@ -262,9 +233,9 @@ if ($totalRows_categories > 0) {
 </body>
 </html>
 <?php
-mysql_free_result($requirements);
+mysqli_free_result($requirements);
 
-mysql_free_result($categories);
+mysqli_free_result($categories);
 
-mysql_free_result($badges);
+mysqli_free_result($badges);
 ?>

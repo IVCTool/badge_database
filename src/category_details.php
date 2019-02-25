@@ -1,51 +1,22 @@
 <?php require_once('Connections/badgesdbcon.php'); ?>
+<?php require_once('include/getsqlvaluestring.php'); ?>
 <?php
-if (!function_exists("GetSQLValueString")) {
-function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
-{
-  if (PHP_VERSION < 6) {
-    $theValue = get_magic_quotes_gpc() ? stripslashes($theValue) : $theValue;
-  }
 
-  $theValue = function_exists("mysql_real_escape_string") ? mysql_real_escape_string($theValue) : mysql_escape_string($theValue);
-
-  switch ($theType) {
-    case "text":
-      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-      break;    
-    case "long":
-    case "int":
-      $theValue = ($theValue != "") ? intval($theValue) : "NULL";
-      break;
-    case "double":
-      $theValue = ($theValue != "") ? doubleval($theValue) : "NULL";
-      break;
-    case "date":
-      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-      break;
-    case "defined":
-      $theValue = ($theValue != "") ? $theDefinedValue : $theNotDefinedValue;
-      break;
-  }
-  return $theValue;
-}
-}
-
-mysql_select_db($database_badgesdbcon, $badgesdbcon);
+ 
 $query_category = "SELECT * FROM reqcategories ORDER BY identifier ASC";
-$category = mysql_query($query_category, $badgesdbcon) or die(mysql_error());
-$row_category = mysql_fetch_assoc($category);
-$totalRows_category = mysql_num_rows($category);
+$category = mysqli_query($badgesdbcon, $query_category) or die(mysqli_error());
+$row_category = mysqli_fetch_assoc($category);
+$totalRows_category = mysqli_num_rows($category);
 
 $colname_requirements = "-1";
 if (isset($_POST['id'])) {
   $colname_requirements = $_POST['id'];
 }
-mysql_select_db($database_badgesdbcon, $badgesdbcon);
-$query_requirements = sprintf("SELECT * FROM requirements WHERE reqcategories_id = %s ORDER BY identifier ASC", GetSQLValueString($colname_requirements, "int"));
-$requirements = mysql_query($query_requirements, $badgesdbcon) or die(mysql_error());
-$row_requirements = mysql_fetch_assoc($requirements);
-$totalRows_requirements = mysql_num_rows($requirements);
+ 
+$query_requirements = sprintf("SELECT * FROM requirements WHERE reqcategories_id = %s ORDER BY identifier ASC", GetSQLValueString($badgesdbcon, $colname_requirements, "int"));
+$requirements = mysqli_query($badgesdbcon, $query_requirements) or die(mysqli_error());
+$row_requirements = mysqli_fetch_assoc($requirements);
+$totalRows_requirements = mysqli_num_rows($requirements);
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -76,13 +47,13 @@ $totalRows_requirements = mysql_num_rows($requirements);
         <input type="submit" name="button" id="button" value="Details" />
       </form></td>
     </tr>
-    <?php } while ($row_requirements = mysql_fetch_assoc($requirements)); ?>
+    <?php } while ($row_requirements = mysqli_fetch_assoc($requirements)); ?>
 </table>
 <p>[ <a href="index.php">Home / Search</a> | <a href="browse.html">Browse</a> | <a href="category_list.php">Categories</a> ]</p>
 </body>
 </html>
 <?php
-mysql_free_result($category);
+mysqli_free_result($category);
 
-mysql_free_result($requirements);
+mysqli_free_result($requirements);
 ?>

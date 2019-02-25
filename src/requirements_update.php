@@ -1,35 +1,6 @@
 <?php require_once('Connections/badgesdbcon.php'); ?>
+<?php require_once('include/getsqlvaluestring.php'); ?>
 <?php
-if (!function_exists("GetSQLValueString")) {
-function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
-{
-  if (PHP_VERSION < 6) {
-    $theValue = get_magic_quotes_gpc() ? stripslashes($theValue) : $theValue;
-  }
-
-  $theValue = function_exists("mysql_real_escape_string") ? mysql_real_escape_string($theValue) : mysql_escape_string($theValue);
-
-  switch ($theType) {
-    case "text":
-      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-      break;    
-    case "long":
-    case "int":
-      $theValue = ($theValue != "") ? intval($theValue) : "NULL";
-      break;
-    case "double":
-      $theValue = ($theValue != "") ? doubleval($theValue) : "NULL";
-      break;
-    case "date":
-      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-      break;
-    case "defined":
-      $theValue = ($theValue != "") ? $theDefinedValue : $theNotDefinedValue;
-      break;
-  }
-  return $theValue;
-}
-}
 
 $editFormAction = $_SERVER['PHP_SELF'];
 if (isset($_SERVER['QUERY_STRING'])) {
@@ -37,14 +8,13 @@ if (isset($_SERVER['QUERY_STRING'])) {
 }
 
 if ((isset($_POST["MM_update"])) && ($_POST["MM_update"] == "updateform")) {
-  $updateSQL = sprintf("UPDATE requirements SET identifier=%s, `description`=%s, reqcategories_id=%s WHERE id=%s",
-                       GetSQLValueString($_POST['identifier'], "text"),
-                       GetSQLValueString($_POST['description'], "text"),
-                       GetSQLValueString($_POST['catagory'], "int"),
-                       GetSQLValueString($_POST['id'], "int"));
+  $updateSQL = sprintf("UPDATE requirements SET identifier=%s, `description`=%s, reqcategories_id=%s WHERE id=%s", GetSQLValueString($badgesdbcon, $_POST['identifier'], "text"),
+  GetSQLValueString($badgesdbcon, $_POST['description'], "text"),
+  GetSQLValueString($badgesdbcon, $_POST['catagory'], "int"),
+  GetSQLValueString($badgesdbcon, $_POST['id'], "int"));
 
-  mysql_select_db($database_badgesdbcon, $badgesdbcon);
-  $Result1 = mysql_query($updateSQL, $badgesdbcon) or die(mysql_error());
+   
+  $Result1 = mysqli_query($badgesdbcon, $updateSQL) or die(mysqli_error());
 
   $updateGoTo = "new_requirement.php";
   if (isset($_SERVER['QUERY_STRING'])) {
@@ -58,17 +28,17 @@ $colname_record = "-1";
 if (isset($_POST['id'])) {
   $colname_record = $_POST['id'];
 }
-mysql_select_db($database_badgesdbcon, $badgesdbcon);
-$query_record = sprintf("SELECT * FROM requirements WHERE id = %s", GetSQLValueString($colname_record, "int"));
-$record = mysql_query($query_record, $badgesdbcon) or die(mysql_error());
-$row_record = mysql_fetch_assoc($record);
-$totalRows_record = mysql_num_rows($record);
+ 
+$query_record = sprintf("SELECT * FROM requirements WHERE id = %s", GetSQLValueString($badgesdbcon, $colname_record, "int"));
+$record = mysqli_query($badgesdbcon, $query_record) or die(mysqli_error());
+$row_record = mysqli_fetch_assoc($record);
+$totalRows_record = mysqli_num_rows($record);
 
-mysql_select_db($database_badgesdbcon, $badgesdbcon);
+ 
 $query_catagories = "SELECT * FROM reqcategories ORDER BY identifier ASC";
-$catagories = mysql_query($query_catagories, $badgesdbcon) or die(mysql_error());
-$row_catagories = mysql_fetch_assoc($catagories);
-$totalRows_catagories = mysql_num_rows($catagories);
+$catagories = mysqli_query($badgesdbcon, $query_catagories) or die(mysqli_error());
+$row_catagories = mysqli_fetch_assoc($catagories);
+$totalRows_catagories = mysqli_num_rows($catagories);
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -100,11 +70,11 @@ do {
 ?>
     <option value="<?php echo $row_catagories['id']?>"<?php if (!(strcmp($row_catagories['id'], $row_record['reqcategories_id']))) {echo "selected=\"selected\"";} ?>><?php echo $row_catagories['name']?></option>
     <?php
-} while ($row_catagories = mysql_fetch_assoc($catagories));
-  $rows = mysql_num_rows($catagories);
+} while ($row_catagories = mysqli_fetch_assoc($catagories));
+  $rows = mysqli_num_rows($catagories);
   if($rows > 0) {
-      mysql_data_seek($catagories, 0);
-	  $row_catagories = mysql_fetch_assoc($catagories);
+      mysqli_data_seek($catagories, 0);
+	  $row_catagories = mysqli_fetch_assoc($catagories);
   }
 ?>
   </select>
@@ -118,7 +88,7 @@ do {
 </body>
 </html>
 <?php
-mysql_free_result($record);
+mysqli_free_result($record);
 
-mysql_free_result($catagories);
+mysqli_free_result($catagories);
 ?>

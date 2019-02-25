@@ -2,13 +2,13 @@
 
 <?php 
 if (!function_exists("GetSQLValueString")) {
-function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
+function GetSQLValueString($badgesdbcon, $theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
 {
   if (PHP_VERSION < 6) {
     $theValue = get_magic_quotes_gpc() ? stripslashes($theValue) : $theValue;
   }
 
-  $theValue = function_exists("mysql_real_escape_string") ? mysql_real_escape_string($theValue) : mysql_escape_string($theValue);
+  $theValue = function_exists("mysqli_real_escape_string") ? mysqli_real_escape_string($theValue) : mysqli_escape_string($theValue);
 
   switch ($theType) {
     case "text":
@@ -34,11 +34,11 @@ function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDe
 
 
 $deleteSQL = sprintf("DELETE FROM badges_has_requirements WHERE (badges_id=%s AND requirements_id=%s)",
-             GetSQLValueString($_POST['badgeid'], "int"),
-			 GetSQLValueString($_POST['reqid'], "int"));
+             GetSQLValueString($badgesdbcon, $_POST['badgeid'], "int"),
+			 GetSQLValueString($badgesdbcon, $_POST['reqid'], "int"));
 			 
-mysql_select_db($database_badgesdbcon, $badgesdbcon);
-$result = mysql_query($deleteSQL, $badgesdbcon) or die(mysql_error());
+ 
+$result = mysqli_query($badgesdbcon, $deleteSQL) or die(mysqli_error());
 
 header('Location: editor_start.php');
 

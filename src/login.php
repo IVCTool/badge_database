@@ -1,43 +1,14 @@
+<?php error_reporting(E_ALL); ?>
 <?php require_once('Connections/badgesdbcon.php'); ?>
-<?php
-if (!function_exists("GetSQLValueString")) {
-function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
-{
-  if (PHP_VERSION < 6) {
-    $theValue = get_magic_quotes_gpc() ? stripslashes($theValue) : $theValue;
-  }
-
-  $theValue = function_exists("mysql_real_escape_string") ? mysql_real_escape_string($theValue) : mysql_escape_string($theValue);
-
-  switch ($theType) {
-    case "text":
-      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-      break;    
-    case "long":
-    case "int":
-      $theValue = ($theValue != "") ? intval($theValue) : "NULL";
-      break;
-    case "double":
-      $theValue = ($theValue != "") ? doubleval($theValue) : "NULL";
-      break;
-    case "date":
-      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-      break;
-    case "defined":
-      $theValue = ($theValue != "") ? $theDefinedValue : $theNotDefinedValue;
-      break;
-  }
-  return $theValue;
-}
-}
-?>
-<?php
+<?php  require_once('include/mysqli_result.php'); ?>
+<?php  require_once('include/getsqlvaluestring.php'); ?>
+<?php 
 // *** Validate request to login to this site.
 if (!isset($_SESSION)) {
   session_start();
 }
 
-$loginFormAction = $_SERVER['PHP_SELF'];
+//$loginFormAction = $_SERVER['PHP_SELF'];
 if (isset($_GET['accesscheck'])) {
   $_SESSION['PrevUrl'] = $_GET['accesscheck'];
 }
@@ -49,18 +20,21 @@ if (isset($_POST['username'])) {
   $MM_redirectLoginSuccess = "editor_start.php";
   $MM_redirectLoginFailed = "access_denied.html";
   $MM_redirecttoReferrer = false;
-  mysql_select_db($database_badgesdbcon, $badgesdbcon);
-  	
+ 
+
+  
   $LoginRS__query=sprintf("SELECT username, password, approved FROM users WHERE username=%s AND password=%s",
-  GetSQLValueString($loginUsername, "text"), GetSQLValueString($password, "text")); 
+  GetSQLValueString($badgesdbcon, $loginUsername, "text"), GetSQLValueString($badgesdbcon, $password, "text")); 
    
-  $LoginRS = mysql_query($LoginRS__query, $badgesdbcon) or die(mysql_error());
-  $loginFoundUser = mysql_num_rows($LoginRS);
+  $LoginRS = mysqli_query($badgesdbcon, $LoginRS__query);
+  $loginFoundUser = mysqli_num_rows($LoginRS);
+  
+  //echo $loginFoundUser;
   if ($loginFoundUser) {
     
-    $loginStrGroup  = mysql_result($LoginRS,0,'approved');
+    $loginStrGroup  = mysqli_result($LoginRS,0,'approved');
     
-	if (PHP_VERSION >= 5.1) {session_regenerate_id(true);} else {session_regenerate_id();}
+	session_regenerate_id(true);
     //declare two session variables and assign them
     $_SESSION['MM_Username'] = $loginUsername;
     $_SESSION['MM_UserGroup'] = $loginStrGroup;	      
@@ -71,7 +45,7 @@ if (isset($_POST['username'])) {
     header("Location: " . $MM_redirectLoginSuccess );
   }
   else {
-    header("Location: ". $MM_redirectLoginFailed );
+   header("Location: ". $MM_redirectLoginFailed );
   }
 }
 ?>
@@ -85,7 +59,7 @@ if (isset($_POST['username'])) {
 
 <body>
 <h1>Log in</h1>
-<form id="form1" name="form1" method="POST" action="<?php echo $loginFormAction; ?>">
+<form id="form1" name="form1" method="POST" action="login.php">
   <p>username: 
     <label for="username"></label>
   <input type="text" name="username" id="username" tabindex="1" />

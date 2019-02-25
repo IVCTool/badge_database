@@ -5,7 +5,7 @@
 $sql="DELETE FROM users WHERE id=" . $_POST["id"];
 
 
-mysql_select_db($database_badgesdbcon, $badgesdbcon);
-$Result1 = mysql_query($sql, $badgesdbcon) or die(mysql_error());
+ 
+$Result1 = mysqli_query($badgesdbcon, $sql);
 
 header(sprintf("Location: %s", "review_registrations.php"));

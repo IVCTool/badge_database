@@ -1,55 +1,26 @@
 <?php require_once('Connections/badgesdbcon.php'); ?>
+<?php require_once('include/getsqlvaluestring.php'); ?>
 <?php
-if (!function_exists("GetSQLValueString")) {
-function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
-{
-  if (PHP_VERSION < 6) {
-    $theValue = get_magic_quotes_gpc() ? stripslashes($theValue) : $theValue;
-  }
-
-  $theValue = function_exists("mysql_real_escape_string") ? mysql_real_escape_string($theValue) : mysql_escape_string($theValue);
-
-  switch ($theType) {
-    case "text":
-      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-      break;    
-    case "long":
-    case "int":
-      $theValue = ($theValue != "") ? intval($theValue) : "NULL";
-      break;
-    case "double":
-      $theValue = ($theValue != "") ? doubleval($theValue) : "NULL";
-      break;
-    case "date":
-      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-      break;
-    case "defined":
-      $theValue = ($theValue != "") ? $theDefinedValue : $theNotDefinedValue;
-      break;
-  }
-  return $theValue;
-}
-}
 
 $theid_requirement = "-1";
 if (isset($_POST['id'])) {
   $theid_requirement = $_POST['id'];
 }
-mysql_select_db($database_badgesdbcon, $badgesdbcon);
-$query_requirement = sprintf("SELECT requirements.*, reqcategories.name FROM (requirements INNER JOIN reqcategories on requirements.reqcategories_id = reqcategories.id) WHERE requirements.id=%s", GetSQLValueString($theid_requirement, "int"));
-$requirement = mysql_query($query_requirement, $badgesdbcon) or die(mysql_error());
-$row_requirement = mysql_fetch_assoc($requirement);
-$totalRows_requirement = mysql_num_rows($requirement);
+ 
+$query_requirement = sprintf("SELECT requirements.*, reqcategories.name FROM (requirements INNER JOIN reqcategories on requirements.reqcategories_id = reqcategories.id) WHERE requirements.id=%s", GetSQLValueString($badgesdbcon, $theid_requirement, "int"));
+$requirement = mysqli_query($badgesdbcon, $query_requirement) or die(mysqli_error());
+$row_requirement = mysqli_fetch_assoc($requirement);
+$totalRows_requirement = mysqli_num_rows($requirement);
 
 $theid_badges = "-1";
 if (isset($_POST['id'])) {
   $theid_badges = $_POST['id'];
 }
-mysql_select_db($database_badgesdbcon, $badgesdbcon);
-$query_badges = sprintf("SELECT id,identifier,description,graphicfile FROM (badges INNER JOIN badges_has_requirements ON badges.id=badges_has_requirements.badges_id) WHERE badges_has_requirements.requirements_id=%s", GetSQLValueString($theid_badges, "int"));
-$badges = mysql_query($query_badges, $badgesdbcon) or die(mysql_error());
-$row_badges = mysql_fetch_assoc($badges);
-$totalRows_badges = mysql_num_rows($badges);
+ 
+$query_badges = sprintf("SELECT id,identifier,description,graphicfile FROM (badges INNER JOIN badges_has_requirements ON badges.id=badges_has_requirements.badges_id) WHERE badges_has_requirements.requirements_id=%s", GetSQLValueString($badgesdbcon, $theid_badges, "int"));
+$badges = mysqli_query($badgesdbcon, $query_badges) or die(mysqli_error());
+$row_badges = mysqli_fetch_assoc($badges);
+$totalRows_badges = mysqli_num_rows($badges);
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -83,7 +54,7 @@ $totalRows_badges = mysql_num_rows($badges);
           <input type="submit" name="button" id="button" value="Details" />
         </form></td>
       </tr>
-      <?php } while ($row_badges = mysql_fetch_assoc($badges)); ?>
+      <?php } while ($row_badges = mysqli_fetch_assoc($badges)); ?>
 </table>
 <?php } //end if there are rows to show ?>
 <br />
@@ -92,7 +63,7 @@ $totalRows_badges = mysql_num_rows($badges);
 </body>
 </html>
 <?php
-mysql_free_result($requirement);
+mysqli_free_result($requirement);
 
-mysql_free_result($badges);
+mysqli_free_result($badges);
 ?>

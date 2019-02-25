@@ -28,37 +28,8 @@ if ((isset($_GET['doLogout'])) &&($_GET['doLogout']=="true")){
   }
 }
 ?>
+<?php require_once('include/getsqlvaluestring.php'); ?>
 <?php
-if (!function_exists("GetSQLValueString")) {
-function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
-{
-  if (PHP_VERSION < 6) {
-    $theValue = get_magic_quotes_gpc() ? stripslashes($theValue) : $theValue;
-  }
-
-  $theValue = function_exists("mysql_real_escape_string") ? mysql_real_escape_string($theValue) : mysql_escape_string($theValue);
-
-  switch ($theType) {
-    case "text":
-      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-      break;    
-    case "long":
-    case "int":
-      $theValue = ($theValue != "") ? intval($theValue) : "NULL";
-      break;
-    case "double":
-      $theValue = ($theValue != "") ? doubleval($theValue) : "NULL";
-      break;
-    case "date":
-      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-      break;
-    case "defined":
-      $theValue = ($theValue != "") ? $theDefinedValue : $theNotDefinedValue;
-      break;
-  }
-  return $theValue;
-}
-}
 
 $editFormAction = $_SERVER['PHP_SELF'];
 if (isset($_SERVER['QUERY_STRING'])) {
@@ -67,38 +38,38 @@ if (isset($_SERVER['QUERY_STRING'])) {
 
 if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "addform")) {
   $insertSQL = sprintf("INSERT INTO badges_has_requirements (requirements_id, badges_id) VALUES (%s, %s)",
-                       GetSQLValueString($_POST['requirementid'], "int"),
-                       GetSQLValueString($_POST['id'], "int"));
+                       GetSQLValueString($badgesdbcon, $_POST['requirementid'], "int"),
+                       GetSQLValueString($badgesdbcon, $_POST['id'], "int"));
 
-  mysql_select_db($database_badgesdbcon, $badgesdbcon);
-  $Result1 = mysql_query($insertSQL, $badgesdbcon) or die(mysql_error());
+   
+  $Result1 = mysqli_query($badgesdbcon, $insertSQL) or die(mysqli_error());
 }
 
 $colname_badge = "-1";
 if (isset($_POST['id'])) {
   $colname_badge = $_POST['id'];
 }
-mysql_select_db($database_badgesdbcon, $badgesdbcon);
-$query_badge = sprintf("SELECT * FROM badges WHERE id = %s", GetSQLValueString($colname_badge, "int"));
-$badge = mysql_query($query_badge, $badgesdbcon) or die(mysql_error());
-$row_badge = mysql_fetch_assoc($badge);
-$totalRows_badge = mysql_num_rows($badge);
+ 
+$query_badge = sprintf("SELECT * FROM badges WHERE id = %s", GetSQLValueString($badgesdbcon, $colname_badge, "int"));
+$badge = mysqli_query($badgesdbcon, $query_badge) or die(mysqli_error());
+$row_badge = mysqli_fetch_assoc($badge);
+$totalRows_badge = mysqli_num_rows($badge);
 
-mysql_select_db($database_badgesdbcon, $badgesdbcon);
+ 
 $query_requirements = "SELECT id, CONCAT(identifier, ' ', description) AS iddes FROM requirements ORDER BY identifier";
-$requirements = mysql_query($query_requirements, $badgesdbcon) or die(mysql_error());
-$row_requirements = mysql_fetch_assoc($requirements);
-$totalRows_requirements = mysql_num_rows($requirements);
+$requirements = mysqli_query($badgesdbco, $query_requirementsn) or die(mysqli_error());
+$row_requirements = mysqli_fetch_assoc($requirements);
+$totalRows_requirements = mysqli_num_rows($requirements);
 
 $theid_depreq = "-1";
 if (isset($_POST['id'])) {
   $theid_depreq = $_POST['id'];
 }
-mysql_select_db($database_badgesdbcon, $badgesdbcon);
-$query_depreq = sprintf("SELECT requirements.id, requirements.identifier, requirements.description,  CONCAT(reqcategories.identifier, ' - ' , reqcategories.description)  AS reqidentifier FROM requirements INNER JOIN reqcategories  ON requirements.reqcategories_id=reqcategories.id WHERE requirements.id IN (SELECT requirements_id FROM badges_has_requirements WHERE badges_id=%s) ORDER BY requirements.identifier", GetSQLValueString($theid_depreq, "int"));
-$depreq = mysql_query($query_depreq, $badgesdbcon) or die(mysql_error());
-$row_depreq = mysql_fetch_assoc($depreq);
-$totalRows_depreq = mysql_num_rows($depreq);
+ 
+$query_depreq = sprintf("SELECT requirements.id, requirements.identifier, requirements.description,  CONCAT(reqcategories.identifier, ' - ' , reqcategories.description)  AS reqidentifier FROM requirements INNER JOIN reqcategories  ON requirements.reqcategories_id=reqcategories.id WHERE requirements.id IN (SELECT requirements_id FROM badges_has_requirements WHERE badges_id=%s) ORDER BY requirements.identifier", GetSQLValueString($badgesdbcon, $theid_depreq, "int"));
+$depreq = mysqli_query($badgesdbcon, $query_depreq) or die(mysqli_error());
+$row_depreq = mysqli_fetch_assoc($depreq);
+$totalRows_depreq = mysqli_num_rows($depreq);
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -136,7 +107,7 @@ $totalRows_depreq = mysql_num_rows($depreq);
     </form></td>
   </tr>
 <?php 
-	} while ($row_depreq = mysql_fetch_assoc($depreq));
+	} while ($row_depreq = mysqli_fetch_assoc($depreq));
 ?>
 </table>
 <p>&nbsp;</p>
@@ -149,11 +120,11 @@ do {
 ?>
     <option value="<?php echo $row_requirements['id']?>"><?php echo $row_requirements['iddes']?></option>
     <?php
-} while ($row_requirements = mysql_fetch_assoc($requirements));
-  $rows = mysql_num_rows($requirements);
+} while ($row_requirements = mysqli_fetch_assoc($requirements));
+  $rows = mysqli_num_rows($requirements);
   if($rows > 0) {
-      mysql_data_seek($requirements, 0);
-	  $row_requirements = mysql_fetch_assoc($requirements);
+      mysqli_data_seek($requirements, 0);
+	  $row_requirements = mysqli_fetch_assoc($requirements);
   }
 ?>
   </select>
@@ -165,9 +136,9 @@ do {
 </body>
 </html>
 <?php
-mysql_free_result($badge);
+mysqli_free_result($badge);
 
-mysql_free_result($requirements);
+mysqli_free_result($requirements);
 
-mysql_free_result($depreq);
+mysqli_free_result($depreq);
 ?>

@@ -76,49 +76,20 @@ if (!((isset($_SESSION['MM_Username'])) && (isAuthorized("",$MM_authorizedUsers,
   exit;
 }
 ?>
+<?php require_once('include/getsqlvaluestring.php'); ?>
 <?php
-if (!function_exists("GetSQLValueString")) {
-function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
-{
-  if (PHP_VERSION < 6) {
-    $theValue = get_magic_quotes_gpc() ? stripslashes($theValue) : $theValue;
-  }
 
-  $theValue = function_exists("mysql_real_escape_string") ? mysql_real_escape_string($theValue) : mysql_escape_string($theValue);
-
-  switch ($theType) {
-    case "text":
-      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-      break;    
-    case "long":
-    case "int":
-      $theValue = ($theValue != "") ? intval($theValue) : "NULL";
-      break;
-    case "double":
-      $theValue = ($theValue != "") ? doubleval($theValue) : "NULL";
-      break;
-    case "date":
-      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-      break;
-    case "defined":
-      $theValue = ($theValue != "") ? $theDefinedValue : $theNotDefinedValue;
-      break;
-  }
-  return $theValue;
-}
-}
-
-mysql_select_db($database_badgesdbcon, $badgesdbcon);
+ 
 $query_atcs = "SELECT abstracttcs.*, requirements.identifier AS rident, requirements.description AS rdesc FROM (abstracttcs JOIN requirements ON (abstracttcs.requirements_id = requirements.id)) ORDER BY abstracttcs.identifier ASC";
-$atcs = mysql_query($query_atcs, $badgesdbcon) or die(mysql_error());
-$row_atcs = mysql_fetch_assoc($atcs);
-$totalRows_atcs = mysql_num_rows($atcs);
+$atcs = mysqli_query($badgesdbcon, $query_atcs) or die(mysqli_error());
+$row_atcs = mysqli_fetch_assoc($atcs);
+$totalRows_atcs = mysqli_num_rows($atcs);
 
-mysql_select_db($database_badgesdbcon, $badgesdbcon);
+ 
 $query_requirements = "SELECT * FROM requirements";
-$requirements = mysql_query($query_requirements, $badgesdbcon) or die(mysql_error());
-$row_requirements = mysql_fetch_assoc($requirements);
-$totalRows_requirements = mysql_num_rows($requirements);
+$requirements = mysqli_query($badgesdbcon, $query_requirements) or die(mysqli_error());
+$row_requirements = mysqli_fetch_assoc($requirements);
+$totalRows_requirements = mysqli_num_rows($requirements);
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -163,7 +134,7 @@ $totalRows_requirements = mysql_num_rows($requirements);
         <input type="submit" name="submit2" id="submit2" value="Delete" />
       </form></td>
     </tr>
-    <?php } while ($row_atcs = mysql_fetch_assoc($atcs)); ?>
+    <?php } while ($row_atcs = mysqli_fetch_assoc($atcs)); ?>
     <?php } //end if there are any records to show ?>
     
     <!-- This is the add new part -->    
@@ -185,11 +156,11 @@ do {
 ?>
     	    <option value="<?php echo $row_requirements['id']?>"><?php echo $row_requirements['identifier']?></option>
     	    <?php
-} while ($row_requirements = mysql_fetch_assoc($requirements));
-  $rows = mysql_num_rows($requirements);
+} while ($row_requirements = mysqli_fetch_assoc($requirements));
+  $rows = mysqli_num_rows($requirements);
   if($rows > 0) {
-      mysql_data_seek($requirements, 0);
-	  $row_requirements = mysql_fetch_assoc($requirements);
+      mysqli_data_seek($requirements, 0);
+	  $row_requirements = mysqli_fetch_assoc($requirements);
   }
 ?>
           </select></td>
@@ -201,7 +172,7 @@ do {
 </body>
 </html>
 <?php
-mysql_free_result($atcs);
+mysqli_free_result($atcs);
 
-mysql_free_result($requirements);
+mysqli_free_result($requirements);
 ?>

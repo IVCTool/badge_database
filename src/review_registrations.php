@@ -44,43 +44,14 @@ if (!((isset($_SESSION['MM_Username'])) && (isAuthorized("",$MM_authorizedUsers,
   exit;
 }
 ?>
+<?php require_once('include/getsqlvaluestring.php'); ?>
 <?php
-if (!function_exists("GetSQLValueString")) {
-function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
-{
-  if (PHP_VERSION < 6) {
-    $theValue = get_magic_quotes_gpc() ? stripslashes($theValue) : $theValue;
-  }
 
-  $theValue = function_exists("mysql_real_escape_string") ? mysql_real_escape_string($theValue) : mysql_escape_string($theValue);
-
-  switch ($theType) {
-    case "text":
-      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-      break;    
-    case "long":
-    case "int":
-      $theValue = ($theValue != "") ? intval($theValue) : "NULL";
-      break;
-    case "double":
-      $theValue = ($theValue != "") ? doubleval($theValue) : "NULL";
-      break;
-    case "date":
-      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-      break;
-    case "defined":
-      $theValue = ($theValue != "") ? $theDefinedValue : $theNotDefinedValue;
-      break;
-  }
-  return $theValue;
-}
-}
-
-mysql_select_db($database_badgesdbcon, $badgesdbcon);
+ 
 $query_unapproved = "SELECT * FROM users WHERE approved = 0";
-$unapproved = mysql_query($query_unapproved, $badgesdbcon) or die(mysql_error());
-$row_unapproved = mysql_fetch_assoc($unapproved);
-$totalRows_unapproved = mysql_num_rows($unapproved);
+$unapproved = mysqli_query($badgesdbcon, $query_unapproved) or die(mysqli_error());
+$row_unapproved = mysqli_fetch_assoc($unapproved);
+$totalRows_unapproved = mysqli_num_rows($unapproved);
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -118,7 +89,7 @@ $totalRows_unapproved = mysql_num_rows($unapproved);
     <td>&nbsp;</td>
   </tr>
 <?php
-  } while( $row_unapproved = mysql_fetch_assoc($unapproved));
+  } while( $row_unapproved = mysqli_fetch_assoc($unapproved));
 ?>
 </table>
 <p>&nbsp;</p>
@@ -126,5 +97,5 @@ $totalRows_unapproved = mysql_num_rows($unapproved);
 </body>
 </html>
 <?php
-mysql_free_result($unapproved);
+mysqli_free_result($unapproved);
 ?>

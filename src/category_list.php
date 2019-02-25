@@ -1,41 +1,12 @@
 <?php require_once('Connections/badgesdbcon.php'); ?>
+<?php require_once('include/getsqlvaluestring.php'); ?>
 <?php
-if (!function_exists("GetSQLValueString")) {
-function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
-{
-  if (PHP_VERSION < 6) {
-    $theValue = get_magic_quotes_gpc() ? stripslashes($theValue) : $theValue;
-  }
 
-  $theValue = function_exists("mysql_real_escape_string") ? mysql_real_escape_string($theValue) : mysql_escape_string($theValue);
-
-  switch ($theType) {
-    case "text":
-      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-      break;    
-    case "long":
-    case "int":
-      $theValue = ($theValue != "") ? intval($theValue) : "NULL";
-      break;
-    case "double":
-      $theValue = ($theValue != "") ? doubleval($theValue) : "NULL";
-      break;
-    case "date":
-      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-      break;
-    case "defined":
-      $theValue = ($theValue != "") ? $theDefinedValue : $theNotDefinedValue;
-      break;
-  }
-  return $theValue;
-}
-}
-
-mysql_select_db($database_badgesdbcon, $badgesdbcon);
+ 
 $query_categories = "SELECT * FROM reqcategories";
-$categories = mysql_query($query_categories, $badgesdbcon) or die(mysql_error());
-$row_categories = mysql_fetch_assoc($categories);
-$totalRows_categories = mysql_num_rows($categories);
+$categories = mysqli_query($badgesdbcon, $query_categories) or die(mysqli_error());
+$row_categories = mysqli_fetch_assoc($categories);
+$totalRows_categories = mysqli_num_rows($categories);
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -65,11 +36,11 @@ $totalRows_categories = mysql_num_rows($categories);
         <input type="submit" name="button" id="button" value="Details" />
       </form></td>
     </tr>
-    <?php } while ($row_categories = mysql_fetch_assoc($categories)); ?>
+    <?php } while ($row_categories = mysqli_fetch_assoc($categories)); ?>
 </table>
 <p>[ <a href="index.php">Home / Search</a> | <a href="browse.html">Browse</a> ]</p>
 </body>
 </html>
 <?php
-mysql_free_result($categories);
+mysqli_free_result($categories);
 ?>

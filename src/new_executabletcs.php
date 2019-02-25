@@ -76,49 +76,20 @@ if (!((isset($_SESSION['MM_Username'])) && (isAuthorized("",$MM_authorizedUsers,
   exit;
 }
 ?>
+<?php require_once('include/getsqlvaluestring.php'); ?>
 <?php
-if (!function_exists("GetSQLValueString")) {
-function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
-{
-  if (PHP_VERSION < 6) {
-    $theValue = get_magic_quotes_gpc() ? stripslashes($theValue) : $theValue;
-  }
 
-  $theValue = function_exists("mysql_real_escape_string") ? mysql_real_escape_string($theValue) : mysql_escape_string($theValue);
-
-  switch ($theType) {
-    case "text":
-      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-      break;    
-    case "long":
-    case "int":
-      $theValue = ($theValue != "") ? intval($theValue) : "NULL";
-      break;
-    case "double":
-      $theValue = ($theValue != "") ? doubleval($theValue) : "NULL";
-      break;
-    case "date":
-      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-      break;
-    case "defined":
-      $theValue = ($theValue != "") ? $theDefinedValue : $theNotDefinedValue;
-      break;
-  }
-  return $theValue;
-}
-}
-
-mysql_select_db($database_badgesdbcon, $badgesdbcon);
+ 
 $query_etcs = "SELECT executabletcs.id AS id, executabletcs.description as description, executabletcs.classname as classname, executabletcs.version as version, abstracttcs.id as aid, abstracttcs.name as aname FROM (executabletcs JOIN abstracttcs ON (executabletcs.abstracttcs_id = abstracttcs.id))";
-$etcs = mysql_query($query_etcs, $badgesdbcon) or die(mysql_error());
-$row_etcs = mysql_fetch_assoc($etcs);
-$totalRows_etcs = mysql_num_rows($etcs);
+$etcs = mysqli_query($badgesdbcon, $query_etcs) or die(mysqli_error());
+$row_etcs = mysqli_fetch_assoc($etcs);
+$totalRows_etcs = mysqli_num_rows($etcs);
 
-mysql_select_db($database_badgesdbcon, $badgesdbcon);
+ 
 $query_atcs = "SELECT * FROM abstracttcs";
-$atcs = mysql_query($query_atcs, $badgesdbcon) or die(mysql_error());
-$row_atcs = mysql_fetch_assoc($atcs);
-$totalRows_atcs = mysql_num_rows($atcs);
+$atcs = mysqli_query($badgesdbcon, $query_atcs) or die(mysqli_error());
+$row_atcs = mysqli_fetch_assoc($atcs);
+$totalRows_atcs = mysqli_num_rows($atcs);
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -161,7 +132,7 @@ $totalRows_atcs = mysql_num_rows($atcs);
     </form></td>
   </tr>
   
-<?php } while ($row_etcs = mysql_fetch_assoc($etcs)); ?>
+<?php } while ($row_etcs = mysqli_fetch_assoc($etcs)); ?>
 <?php } //end if there are any records to show ?>
     
     <!-- This is the add new part -->    
@@ -180,11 +151,11 @@ do {
 ?>
       	    <option value="<?php echo $row_atcs['id']?>"><?php echo $row_atcs['identifier']?></option>
       	    <?php
-} while ($row_atcs = mysql_fetch_assoc($atcs));
-  $rows = mysql_num_rows($atcs);
+} while ($row_atcs = mysqli_fetch_assoc($atcs));
+  $rows = mysqli_num_rows($atcs);
   if($rows > 0) {
-      mysql_data_seek($atcs, 0);
-	  $row_atcs = mysql_fetch_assoc($atcs);
+      mysqli_data_seek($atcs, 0);
+	  $row_atcs = mysqli_fetch_assoc($atcs);
   }
 ?>
    	      </select>      	  <label for="description"></label></td>
@@ -197,7 +168,7 @@ do {
 </body>
 </html>
 <?php
-mysql_free_result($etcs);
+mysqli_free_result($etcs);
 
-mysql_free_result($atcs);
+mysqli_free_result($atcs);
 ?>

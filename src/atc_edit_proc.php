@@ -2,13 +2,13 @@
 require_once('Connections/badgesdbcon.php');
 
 
-function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
+function GetSQLValueString($badgesdbcon, $theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
 {
   if (PHP_VERSION < 6) {
     $theValue = get_magic_quotes_gpc() ? stripslashes($theValue) : $theValue;
   }
 
-  $theValue = function_exists("mysql_real_escape_string") ? mysql_real_escape_string($theValue) : mysql_escape_string($theValue);
+  $theValue = function_exists("mysqli_real_escape_string") ? mysqli_real_escape_string($theValue) : mysqli_escape_string($theValue);
 
   switch ($theType) {
     case "text":
@@ -105,17 +105,17 @@ if ($uploadOk == 0) {
 //Now we need to update the record.
 
 $SQL = sprintf("UPDATE abstracttcs SET filename=%s, identifier=%s, name=%s, description=%s, version=%s, requirements_id=%d WHERE id=%d;",
-	GetSQLValueString($target_file_name, "text"),
-	GetSQLValueString($_POST["identifier"], "text"),
-	GetSQLValueString($_POST["name"], "text"),
-	GetSQLValueString($_POST["description"], "text"),
-	GetSQLValueString($_POST["version"], "text"),
-	GetSQLValueString($_POST["requirementsid"], "int"),
-	GetSQLValueString($_POST["id"], "int") );
+	GetSQLValueString($badgesdbcon, $target_file_name, "text"),
+	GetSQLValueString($badgesdbcon, $_POST["identifier"], "text"),
+	GetSQLValueString($badgesdbcon, $_POST["name"], "text"),
+	GetSQLValueString($badgesdbcon, $_POST["description"], "text"),
+	GetSQLValueString($badgesdbcon, $_POST["version"], "text"),
+	GetSQLValueString($badgesdbcon, $_POST["requirementsid"], "int"),
+	GetSQLValueString($badgesdbcon, $_POST["id"], "int") );
 
 echo $SQL;
-mysql_select_db($database_badgesdbcon, $badgesdbcon);
-$res = mysql_query($SQL, $badgesdbcon) or die(mysql_error());
+ 
+$res = mysqli_query($badgesdbcon, $SQL) or die(mysqli_error());
 
 //and redirect to the list of Abstract test cases
 header("Location: new_abstracttestcase.php");

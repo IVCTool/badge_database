@@ -28,13 +28,13 @@ if (!$uploadOK) {
 
 <?php
 if (!function_exists("GetSQLValueString")) {
-function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
+function GetSQLValueString($badgesdbcon, $theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
 {
   if (PHP_VERSION < 6) {
     $theValue = get_magic_quotes_gpc() ? stripslashes($theValue) : $theValue;
   }
 
-  $theValue = function_exists("mysql_real_escape_string") ? mysql_real_escape_string($theValue) : mysql_escape_string($theValue);
+  $theValue = function_exists("mysqli_real_escape_string") ? mysqli_real_escape_string($theValue) : mysqli_escape_string($theValue);
 
   switch ($theType) {
     case "text":
@@ -61,15 +61,15 @@ function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDe
 ?>
 <?php
 $insertSQL = sprintf("INSERT INTO abstracttcs (description, filename, name, identifier, requirements_id) VALUES (%s, %s, %s, %s, %f)",
-                     GetSQLValueString($_POST['description'], "text"),
-                     GetSQLValueString($target_file_name, "text"),
-					 GetSQLValueString($_POST['name'], "text"),
-                     GetSQLValueString($_POST['identifier'], "text"),
-					 GetSQLValueString($_POST['requirement'], "int")
+                     GetSQLValueString($badgesdbcon, $_POST['description'], "text"),
+                     GetSQLValueString($badgesdbcon, $target_file_name, "text"),
+					 GetSQLValueString($badgesdbcon, $_POST['name'], "text"),
+                     GetSQLValueString($badgesdbcon, $_POST['identifier'], "text"),
+					 GetSQLValueString($badgesdbcon, $_POST['requirement'], "int")
 					 );
 
-  mysql_select_db($database_badgesdbcon, $badgesdbcon);
-  $Result1 = mysql_query($insertSQL, $badgesdbcon) or die(mysql_error());
+   
+  $Result1 = mysqli_query($badgesdbcon, $insertSQL) or die(mysqli_error());
 
 //this is the redirect
 header(sprintf("Location: %s", "new_abstracttestcase.php"));

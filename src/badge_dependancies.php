@@ -27,37 +27,8 @@ if ((isset($_GET['doLogout'])) &&($_GET['doLogout']=="true")){
   }
 }
 ?>
+<?php require_once('include/getsqlvaluestring.php'); ?>
 <?php
-if (!function_exists("GetSQLValueString")) {
-function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
-{
-  if (PHP_VERSION < 6) {
-    $theValue = get_magic_quotes_gpc() ? stripslashes($theValue) : $theValue;
-  }
-
-  $theValue = function_exists("mysql_real_escape_string") ? mysql_real_escape_string($theValue) : mysql_escape_string($theValue);
-
-  switch ($theType) {
-    case "text":
-      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-      break;    
-    case "long":
-    case "int":
-      $theValue = ($theValue != "") ? intval($theValue) : "NULL";
-      break;
-    case "double":
-      $theValue = ($theValue != "") ? doubleval($theValue) : "NULL";
-      break;
-    case "date":
-      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-      break;
-    case "defined":
-      $theValue = ($theValue != "") ? $theDefinedValue : $theNotDefinedValue;
-      break;
-  }
-  return $theValue;
-}
-}
 
 $editFormAction = $_SERVER['PHP_SELF'];
 if (isset($_SERVER['QUERY_STRING'])) {
@@ -66,62 +37,62 @@ if (isset($_SERVER['QUERY_STRING'])) {
 
 if ((isset($_POST['badges_id'])) && ($_POST['badges_id'] != "")) {
   $deleteSQL = sprintf("DELETE FROM badges_has_badges WHERE (badges_id=%s AND badges_id_dependency=%s)",
-                       GetSQLValueString($_POST['badges_id'], "int"),
-					   GetSQLValueString($_POST['badges_id_dependency'], "int"));
+                       GetSQLValueString($badgesdbcon, $_POST['badges_id'], "int"),
+					   GetSQLValueString($badgesdbcon, $_POST['badges_id_dependency'], "int"));
 
-  mysql_select_db($database_badgesdbcon, $badgesdbcon);
-  $Result1 = mysql_query($deleteSQL, $badgesdbcon) or die(mysql_error());
+   
+  $Result1 = mysqli_query($badgesdbcon, $deleteSQL) or die(mysqli_error());
 }
 
 if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "formadd")) {
   $insertSQL = sprintf("INSERT INTO badges_has_badges (badges_id, badges_id_dependency) VALUES (%s, %s)",
-                       GetSQLValueString($_POST['badges_id'], "int"),
-                       GetSQLValueString($_POST['badges_id_dependency'], "int"));
+                       GetSQLValueString($badgesdbcon, $_POST['badges_id'], "int"),
+                       GetSQLValueString($badgesdbcon, $_POST['badges_id_dependency'], "int"));
 
-  mysql_select_db($database_badgesdbcon, $badgesdbcon);
-  $Result1 = mysql_query($insertSQL, $badgesdbcon) or die(mysql_error());
+   
+  $Result1 = mysqli_query($badgesdbcon, $insertSQL) or die(mysqli_error());
 }
 
 $colname_badge = "-1";
 if (isset($_POST['id'])) {
   $colname_badge = $_POST['id'];
 }
-mysql_select_db($database_badgesdbcon, $badgesdbcon);
-$query_badge = sprintf("SELECT * FROM badges WHERE id = %s", GetSQLValueString($colname_badge, "int"));
-$badge = mysql_query($query_badge, $badgesdbcon) or die(mysql_error());
-$row_badge = mysql_fetch_assoc($badge);
-$totalRows_badge = mysql_num_rows($badge);
+ 
+$query_badge = sprintf("SELECT * FROM badges WHERE id = %s", GetSQLValueString($badgesdbcon, $colname_badge, "int"));
+$badge = mysqlI_query($badgesdbcon, $query_badge) or die(mysqli_error());
+$row_badge = mysqli_fetch_assoc($badge);
+$totalRows_badge = mysqli_num_rows($badge);
 
 $colname_otherbadges = "-1";
 if (isset($_POST['id'])) {
   $colname_otherbadges = $_POST['id'];
 }
-mysql_select_db($database_badgesdbcon, $badgesdbcon);
-$query_otherbadges = sprintf("SELECT * FROM badges WHERE id <> %s ORDER BY identifier ASC", GetSQLValueString($colname_otherbadges, "int"));
-$otherbadges = mysql_query($query_otherbadges, $badgesdbcon) or die(mysql_error());
-$row_otherbadges = mysql_fetch_assoc($otherbadges);
-$totalRows_otherbadges = mysql_num_rows($otherbadges);
+ 
+$query_otherbadges = sprintf("SELECT * FROM badges WHERE id <> %s ORDER BY identifier ASC", GetSQLValueString($badgesdbcon, $colname_otherbadges, "int"));
+$otherbadges = mysqli_query($badgesdbcon, $query_otherbadges) or die(mysqli_error());
+$row_otherbadges = mysqli_fetch_assoc($otherbadges);
+$totalRows_otherbadges = mysqli_num_rows($otherbadges);
 
 $theid_dependencies = "-1";
 if (isset($_POST['id'])) {
   $theid_dependencies = $_POST['id'];
 }
-mysql_select_db($database_badgesdbcon, $badgesdbcon);
-$query_dependencies = sprintf("SELECT * FROM badges WHERE badges.id IN  (select badges_id_dependency from badges inner join badges_has_badges ON badges.id=badges_has_badges.badges_id WHERE badges.id=%s) ORDER BY identifier", GetSQLValueString($theid_dependencies, "int"));
-$dependencies = mysql_query($query_dependencies, $badgesdbcon) or die(mysql_error());
-$row_dependencies = mysql_fetch_assoc($dependencies);
-$totalRows_dependencies = mysql_num_rows($dependencies);
+ 
+$query_dependencies = sprintf("SELECT * FROM badges WHERE badges.id IN  (select badges_id_dependency from badges inner join badges_has_badges ON badges.id=badges_has_badges.badges_id WHERE badges.id=%s) ORDER BY identifier", GetSQLValueString($badgesdbcon, $theid_dependencies, "int"));
+$dependencies = mysqli_query($badgesdbcon, $query_dependencies) or die(mysqli_error());
+$row_dependencies = mysqli_fetch_assoc($dependencies);
+$totalRows_dependencies = mysqli_num_rows($dependencies);
  $target_dir = "badge_graphics/" ?>
 <?php
 $colname_badge = "-1";
 if (isset($_POST['id'])) {
   $colname_badge = $_POST['id'];
 }
-mysql_select_db($database_badgesdbcon, $badgesdbcon);
-$query_badge = sprintf("SELECT * FROM badges WHERE id = %s", GetSQLValueString($colname_badge, "int"));
-$badge = mysql_query($query_badge, $badgesdbcon) or die(mysql_error());
-$row_badge = mysql_fetch_assoc($badge);
-$totalRows_badge = mysql_num_rows($badge);
+ 
+$query_badge = sprintf("SELECT * FROM badges WHERE id = %s", GetSQLValueString($badgesdbcon, $colname_badge, "int"));
+$badge = mysqli_query($badgesdbcon, $query_badge) or die(mysqli_error());
+$row_badge = mysqli_fetch_assoc($badge);
+$totalRows_badge = mysqli_num_rows($badge);
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -157,7 +128,7 @@ $totalRows_badge = mysql_num_rows($badge);
       <input type="submit" name="delete" id="delete" value="Delete" />
     </form></td>
   </tr>
-<?php } while ($row_dependencies = mysql_fetch_assoc($dependencies)); ?>
+<?php } while ($row_dependencies = mysqli_fetch_assoc($dependencies)); ?>
 </table>
 <p>Add a new dependancy on an existing badge:
 
@@ -169,11 +140,11 @@ do {
 ?>
     <option value="<?php echo $row_otherbadges['id']?>"><?php echo $row_otherbadges['identifier']?></option>
     <?php
-} while ($row_otherbadges = mysql_fetch_assoc($otherbadges));
-  $rows = mysql_num_rows($otherbadges);
+} while ($row_otherbadges = mysqli_fetch_assoc($otherbadges));
+  $rows = mysqli_num_rows($otherbadges);
   if($rows > 0) {
-      mysql_data_seek($otherbadges, 0);
-	  $row_otherbadges = mysql_fetch_assoc($otherbadges);
+      mysqli_data_seek($otherbadges, 0);
+	  $row_otherbadges = mysqli_fetch_assoc($otherbadges);
   }
 ?>
   </select>
@@ -185,9 +156,9 @@ do {
 </body>
 </html>
 <?php
-mysql_free_result($badge);
+mysqli_free_result($badge);
 
-mysql_free_result($otherbadges);
+mysqli_free_result($otherbadges);
 
-mysql_free_result($dependencies);
+mysqli_free_result($dependencies);
 ?>

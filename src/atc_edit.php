@@ -76,53 +76,24 @@ if (!((isset($_SESSION['MM_Username'])) && (isAuthorized("",$MM_authorizedUsers,
   exit;
 }
 ?>
+<?php require_once('include/getsqlvaluestring.php'); ?>
 <?php
-if (!function_exists("GetSQLValueString")) {
-function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
-{
-  if (PHP_VERSION < 6) {
-    $theValue = get_magic_quotes_gpc() ? stripslashes($theValue) : $theValue;
-  }
-
-  $theValue = function_exists("mysql_real_escape_string") ? mysql_real_escape_string($theValue) : mysql_escape_string($theValue);
-
-  switch ($theType) {
-    case "text":
-      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-      break;    
-    case "long":
-    case "int":
-      $theValue = ($theValue != "") ? intval($theValue) : "NULL";
-      break;
-    case "double":
-      $theValue = ($theValue != "") ? doubleval($theValue) : "NULL";
-      break;
-    case "date":
-      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-      break;
-    case "defined":
-      $theValue = ($theValue != "") ? $theDefinedValue : $theNotDefinedValue;
-      break;
-  }
-  return $theValue;
-}
-}
 
 $colname_abstracttestcase = "-1";
 if (isset($_POST['id'])) {
   $colname_abstracttestcase = $_POST['id'];
 }
-mysql_select_db($database_badgesdbcon, $badgesdbcon);
-$query_abstracttestcase = sprintf("SELECT * FROM abstracttcs WHERE id = %s", GetSQLValueString($colname_abstracttestcase, "int"));
-$abstracttestcase = mysql_query($query_abstracttestcase, $badgesdbcon) or die(mysql_error());
-$row_abstracttestcase = mysql_fetch_assoc($abstracttestcase);
-$totalRows_abstracttestcase = mysql_num_rows($abstracttestcase);
+ 
+$query_abstracttestcase = sprintf("SELECT * FROM abstracttcs WHERE id = %s", GetSQLValueString($badgesdbcon, $colname_abstracttestcase, "int"));
+$abstracttestcase = mysqli_query($badgesdbcon, $query_abstracttestcase) or die(mysqli_error());
+$row_abstracttestcase = mysqli_fetch_assoc($abstracttestcase);
+$totalRows_abstracttestcase = mysqli_num_rows($abstracttestcase);
 
-mysql_select_db($database_badgesdbcon, $badgesdbcon);
+ 
 $query_requirements = "SELECT * FROM requirements";
-$requirements = mysql_query($query_requirements, $badgesdbcon) or die(mysql_error());
-$row_requirements = mysql_fetch_assoc($requirements);
-$totalRows_requirements = mysql_num_rows($requirements);
+$requirements = mysqli_query($badgesdbcon, $query_requirements) or die(mysqli_error());
+$row_requirements = mysqli_fetch_assoc($requirements);
+$totalRows_requirements = mysqli_num_rows($requirements);
 
 	//TODO - retrieve the data from the DB
 	//Parse out the required stuff
@@ -163,11 +134,11 @@ do {
 ?>
       <option value="<?php echo $row_requirements['id']?>"<?php if (!(strcmp($row_requirements['id'], $row_abstracttestcase['requirements_id']))) {echo "selected=\"selected\"";} ?>><?php echo $row_requirements['identifier']?></option>
       <?php
-} while ($row_requirements = mysql_fetch_assoc($requirements));
-  $rows = mysql_num_rows($requirements);
+} while ($row_requirements = mysqli_fetch_assoc($requirements));
+  $rows = mysqli_num_rows($requirements);
   if($rows > 0) {
-      mysql_data_seek($requirements, 0);
-	  $row_requirements = mysql_fetch_assoc($requirements);
+      mysqli_data_seek($requirements, 0);
+	  $row_requirements = mysqli_fetch_assoc($requirements);
   }
 ?>
     </select>
@@ -187,7 +158,7 @@ do {
 </body>
 </html>
 <?php
-mysql_free_result($abstracttestcase);
+mysqli_free_result($abstracttestcase);
 
-mysql_free_result($requirements);
+mysqli_free_result($requirements);
 ?>

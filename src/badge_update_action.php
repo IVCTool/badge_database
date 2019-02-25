@@ -81,37 +81,8 @@ if ($uploadOk == 0) {
 }//endif we should update it at all. (from line 22)
 ?>
 
+<?php require_once('include/getsqlvaluestring.php'); ?>
 <?php
-if (!function_exists("GetSQLValueString")) {
-function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
-{
-  if (PHP_VERSION < 6) {
-    $theValue = get_magic_quotes_gpc() ? stripslashes($theValue) : $theValue;
-  }
-
-  $theValue = function_exists("mysql_real_escape_string") ? mysql_real_escape_string($theValue) : mysql_escape_string($theValue);
-
-  switch ($theType) {
-    case "text":
-      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-      break;    
-    case "long":
-    case "int":
-      $theValue = ($theValue != "") ? intval($theValue) : "NULL";
-      break;
-    case "double":
-      $theValue = ($theValue != "") ? doubleval($theValue) : "NULL";
-      break;
-    case "date":
-      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
-      break;
-    case "defined":
-      $theValue = ($theValue != "") ? $theDefinedValue : $theNotDefinedValue;
-      break;
-  }
-  return $theValue;
-}
-}
 
 /* Not really sure what this does
 $editFormAction = $_SERVER['PHP_SELF'];
@@ -127,19 +98,19 @@ if($uploadOk) {
 
 	if ($updateGraphic == 1) { //we need to update the file name
 		$updateSQL = sprintf("UPDATE badges SET `description`=%s, graphicfile=%s, identifier=%s WHERE id=%s",
-                     GetSQLValueString($_POST['description'], "text"),
-                     GetSQLValueString($target_file_name, "text"),
-                     GetSQLValueString($_POST['identifier'], "text"),
-					 GetSQLValueString($_POST['id'], "int"));
+                     GetSQLValueString($badgesdbcon, $_POST['description'], "text"),
+                     GetSQLValueString($badgesdbcon, $target_file_name, "text"),
+                     GetSQLValueString($badgesdbcon, $_POST['identifier'], "text"),
+					 GetSQLValueString($badgesdbcon, $_POST['id'], "int"));
 	} else { // we don't need to update it
 		$updateSQL = sprintf("UPDATE badges SET `description`=%s, identifier=%s WHERE id=%s",
-            	         GetSQLValueString($_POST['description'], "text"),
-        	             GetSQLValueString($_POST['identifier'], "text"),
-						 GetSQLValueString($_POST['id'], "int"));
+            	         GetSQLValueString($badgesdbcon, $_POST['description'], "text"),
+        	             GetSQLValueString($badgesdbcon, $_POST['identifier'], "text"),
+						 GetSQLValueString($badgesdbcon, $_POST['id'], "int"));
 	}//end make up query string
 
-	mysql_select_db($database_badgesdbcon, $badgesdbcon);
-	$result = mysql_query($updateSQL, $badgesdbcon) or die(mysql_error());
+	 
+	$result = mysqli_query($badgesdbcon, $updateSQL) or die(mysqli_error());
 
 //this is the redirect, we don't need it or do we
 /*
