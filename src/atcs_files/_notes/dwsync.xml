@@ -6,4 +6,7 @@
 <file name="NoExecCase.txt" server="192.168.126.130//var/www/" local="131928044330000000" remote="131947303290000000" Dst="1" />
 <file name="TestAbstractTestCase.txt" server="192.168.126.130//var/www/" local="131927215420000000" remote="131947303300000000" Dst="1" />
 <file name="UberTestAbstractTestCase.txt" server="192.168.126.130//var/www/" local="131926447466799948" remote="131947303300000000" Dst="1" />
+<file name="UberTestAbstractTestCase.txt" server="192.168.20.128//var/www/" local="131970489829921373" remote="131974823420000000" Dst="2" />
+<file name="TestAbstractTestCase.txt" server="192.168.20.128//var/www/" local="131970489829890291" remote="131974823420000000" Dst="2" />
+<file name="NoExecCase.txt" server="192.168.20.128//var/www/" local="131970489829860362" remote="131974823420000000" Dst="2" />
 </dwsync>

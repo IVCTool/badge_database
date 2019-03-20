@@ -76,11 +76,11 @@ if (!((isset($_SESSION['MM_Username'])) && (isAuthorized("",$MM_authorizedUsers,
   exit;
 }
 ?>
-<?php require_once('include/getsqlvaluestring.php'); ?>
+
 <?php
 
  
-$query_atcs = "SELECT abstracttcs.*, requirements.identifier AS rident, requirements.description AS rdesc FROM (abstracttcs JOIN requirements ON (abstracttcs.requirements_id = requirements.id)) ORDER BY abstracttcs.identifier ASC";
+$query_atcs = "SELECT abstracttcs.* FROM abstracttcs ORDER BY abstracttcs.identifier ASC";
 $atcs = mysqli_query($badgesdbcon, $query_atcs) or die(mysqli_error());
 $row_atcs = mysqli_fetch_assoc($atcs);
 $totalRows_atcs = mysqli_num_rows($atcs);
@@ -111,7 +111,6 @@ $totalRows_requirements = mysqli_num_rows($requirements);
     <th>Name</th>
     <th>Description</th>
     <th>Version</th>
-    <th>Requirement</th>
   </tr>
   
   <!-- this is the part for displaying the records -->
@@ -123,8 +122,7 @@ $totalRows_requirements = mysqli_num_rows($requirements);
       <td><?php echo $row_atcs['identifier']; ?></td>
       <td><?php echo $row_atcs['name']; ?></td>
       <td><?php echo $row_atcs['description']; ?></td>
-      <td><?php echo $row_atcs['version']; ?></td>
-      <td><?php echo $row_atcs['rident'] . ": " .$row_atcs['rdesc']; ?></td>
+	  <td><?php echo $row_atcs['version']; ?></td>
       <td><form action="atc_edit.php" method="post" enctype="multipart/form-data" name="delete" id="edit">
         <input name="id" type="hidden" id="id" value="<?php echo $row_atcs['id']; ?>" />
         <input type="submit" name="submit2" id="submit2" value="Edit" />
@@ -141,29 +139,15 @@ $totalRows_requirements = mysqli_num_rows($requirements);
     <tr>
     	<form action="insert_new_abstracttestcase.php" method="post" enctype="multipart/form-data">
     	<td><input type="file" name="fileToUpload" id="fileToUpload"/></td>
-    	<td><label for="identifier"></label>
+    	<td>
     	  <input type="text" name="identifier" id="identifier" /></td>
-    	<td><label for="name"></label>
+    	<td>
     	  <input type="text" name="name" id="name" /></td>
-      	<td><label for="description"></label>
+      	<td>
       	  <input type="text" name="description" id="description" /></td>
-          <td><label for="version"></label>
-          <input name="version" type="text" id="version" value="<?php echo $row_atcs['version']; ?>" /></td>
-    	<td><label for="requirement"></label>
-    	  <select name="requirement" id="requirement">
-    	    <?php
-do {  
-?>
-    	    <option value="<?php echo $row_requirements['id']?>"><?php echo $row_requirements['identifier']?></option>
-    	    <?php
-} while ($row_requirements = mysqli_fetch_assoc($requirements));
-  $rows = mysqli_num_rows($requirements);
-  if($rows > 0) {
-      mysqli_data_seek($requirements, 0);
-	  $row_requirements = mysqli_fetch_assoc($requirements);
-  }
-?>
-          </select></td>
+          <td>
+          <input type="text" name="version" id="version" /></td>
+
           <td><input type="submit" name="submit" id="submit" value="Create" /></td>        
         </form>
   </tr>

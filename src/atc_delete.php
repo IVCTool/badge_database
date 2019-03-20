@@ -1,5 +1,6 @@
-<?php require_once('Connections/badgesdbcon.php'); ?>
-<?php require_once('include/getsqlvaluestring.php'); ?>
+<?php 
+require_once('Connections/badgesdbcon.php');
+require_once('include/getsqlvaluestring.php');
 require_once('globals.php');
 ?>
 
@@ -17,13 +18,17 @@ $totalRows_recordset = mysqli_num_rows($recordset);
 
 //Get rid of the file
 $target_file = $atcsURL . $row_recordset["filename"];
-echo $target_file;
+//echo $target_file;
 unlink($target_file);
 
 //Delete the record
 $query_delete = sprintf("DELETE FROM abstracttcs WHERE id = %s", GetSQLValueString($badgesdbcon, $colname_recordset, "int"));
-echo $query_delete;
+//echo $query_delete;
 $delresult = mysqli_query($badgesdbcon, $query_delete) or die(mysqli_error());
+
+//Delete all the requirement entries
+$query_delete_requirements = sprintf("DELETE FROM abstracttcs_has_requirements WHERE abstracttcs_id = %s", GetSQLValueString($badgesdbcon, $colname_recordset, "int"));
+$delreq_result = mysqli_query($badgesdbcon, $query_delete_requirements) or die(mysqli_error());
 
 /* Redirect to a different page in the current directory that was requested */
 $host  = $_SERVER['HTTP_HOST'];

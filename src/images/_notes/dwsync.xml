@@ -84,4 +84,18 @@
 <file name="Sweden.gif" server="192.168.126.130//var/www/" local="131850324213781542" remote="131947303300000000" Dst="1" />
 <file name="United Kingdom.gif" server="192.168.126.130//var/www/" local="131850324214021465" remote="131947303300000000" Dst="1" />
 <file name="United States.gif" server="192.168.126.130//var/www/" local="131850324214341375" remote="131947303300000000" Dst="1" />
+<file name="United States.gif" server="192.168.20.128//var/www/" local="131970489833442261" remote="131974823420000000" Dst="2" />
+<file name="United Kingdom.gif" server="192.168.20.128//var/www/" local="131970489833432527" remote="131974823420000000" Dst="2" />
+<file name="Sweden.gif" server="192.168.20.128//var/www/" local="131970489833422324" remote="131974823420000000" Dst="2" />
+<file name="Spain.gif" server="192.168.20.128//var/www/" local="131970489833412348" remote="131974823420000000" Dst="2" />
+<file name="Other NATO Body.gif" server="192.168.20.128//var/www/" local="131970489833402357" remote="131974823420000000" Dst="2" />
+<file name="logo.png" server="192.168.20.128//var/www/" local="131970489833492362" remote="131974823420000000" Dst="2" />
+<file name="Italy.gif" server="192.168.20.128//var/www/" local="131970489833392388" remote="131974823420000000" Dst="2" />
+<file name="Germany.gif" server="192.168.20.128//var/www/" local="131970489833382559" remote="131974823420000000" Dst="2" />
+<file name="France.gif" server="192.168.20.128//var/www/" local="131970489833372446" remote="131974823420000000" Dst="2" />
+<file name="Czech Republic.gif" server="192.168.20.128//var/www/" local="131970489833372446" remote="131974823420000000" Dst="2" />
+<file name="Collaboration Support Office.gif" server="192.168.20.128//var/www/" local="131970489833352922" remote="131974823420000000" Dst="2" />
+<file name="Canada.gif" server="192.168.20.128//var/www/" local="131970489833342520" remote="131974823420000000" Dst="2" />
+<file name="Bulgaria.gif" server="192.168.20.128//var/www/" local="131970489833332607" remote="131974823420000000" Dst="2" />
+<file name="Belarus.gif" server="192.168.20.128//var/www/" local="131970489833322583" remote="131974823420000000" Dst="2" />
 </dwsync>

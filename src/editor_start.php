@@ -99,8 +99,7 @@ if (!((isset($_SESSION['MM_Username'])) && (isAuthorized("",$MM_authorizedUsers,
 </ul>
 <p><strong>Coverage reports:</strong></p>
 <ul>
-  <li><strong><a href="coverage_requirements.php">Requirement coverage</a></strong></li>
-  <li><strong><a href="coverage_atc.php">Abstract test case coverage</a></strong></li>
+  <li><strong><a href="coverage.php">Requirement and Abstract Test Case coverage</a></strong></li>
 </ul>
 <p><strong>Administrative functions:</strong></p>
 <ul>

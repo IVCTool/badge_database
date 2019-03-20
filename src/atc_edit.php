@@ -82,6 +82,8 @@ if (!((isset($_SESSION['MM_Username'])) && (isAuthorized("",$MM_authorizedUsers,
 $colname_abstracttestcase = "-1";
 if (isset($_POST['id'])) {
   $colname_abstracttestcase = $_POST['id'];
+} elseif (isset($_GET['id'])) {
+	$colname_abstracttestcase = $_GET['id'];
 }
  
 $query_abstracttestcase = sprintf("SELECT * FROM abstracttcs WHERE id = %s", GetSQLValueString($badgesdbcon, $colname_abstracttestcase, "int"));
@@ -89,14 +91,19 @@ $abstracttestcase = mysqli_query($badgesdbcon, $query_abstracttestcase) or die(m
 $row_abstracttestcase = mysqli_fetch_assoc($abstracttestcase);
 $totalRows_abstracttestcase = mysqli_num_rows($abstracttestcase);
 
+//This query gets all the requirements that are already attached to this case.
+$query_casereqs = sprintf("SELECT * FROM requirements where id IN (Select requirements_id from abstracttcs_has_requirements where abstracttcs_id=%s)", GetSQLValueString($badgesdbcon, $colname_abstracttestcase, "int"));
+$casereqs = mysqli_query($badgesdbcon, $query_casereqs) or die(mysqli_error());
+$row_casereqs = mysqli_fetch_assoc($casereqs);
+$totalRows_casereqs = mysqli_num_rows($casereqs);
  
-$query_requirements = "SELECT * FROM requirements";
+//This query gets all the requirements that are not already attached to this abstract test case.
+$query_requirements = sprintf("select * from requirements where id NOT IN (Select requirements_id from abstracttcs_has_requirements where abstracttcs_id=%s)", GetSQLValueString($badgesdbcon, $colname_abstracttestcase, "int"));
 $requirements = mysqli_query($badgesdbcon, $query_requirements) or die(mysqli_error());
 $row_requirements = mysqli_fetch_assoc($requirements);
 $totalRows_requirements = mysqli_num_rows($requirements);
 
-	//TODO - retrieve the data from the DB
-	//Parse out the required stuff
+
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -126,34 +133,53 @@ $totalRows_requirements = mysqli_num_rows($requirements);
     <label for="version"></label>
     <input name="version" type="text" id="version" value="<?php echo $row_abstracttestcase['version']; ?>" />
   </p>
-  <p>Requirement:
-    <label for="requirement"></label>
-    <select name="requirementsid" id="requirement">
-      <?php
-do {  
-?>
-      <option value="<?php echo $row_requirements['id']?>"<?php if (!(strcmp($row_requirements['id'], $row_abstracttestcase['requirements_id']))) {echo "selected=\"selected\"";} ?>><?php echo $row_requirements['identifier']?></option>
-      <?php
-} while ($row_requirements = mysqli_fetch_assoc($requirements));
-  $rows = mysqli_num_rows($requirements);
-  if($rows > 0) {
-      mysqli_data_seek($requirements, 0);
-	  $row_requirements = mysqli_fetch_assoc($requirements);
-  }
-?>
-    </select>
-  </p>
+
   <p>
     <input name="oldfile" type="hidden" id="oldfile" value="<?php echo $row_abstracttestcase['filename']; ?>" />
     New File: 
     <label for="file"></label>
-    <input type="file" name="file" id="file" />
   <a href="./<?php echo $atcsURL . $row_abstracttestcase['filename']; ?>" target="new">view existing file</a></p>
   <p>
-    <input type="submit" name="button" id="button" value="Save" />
+    <input type="submit" name="button" id="button" value="Save Basic Test Case Info" />
   </p>
 </form>
-<p>&nbsp;</p>
+	
+<table>
+	<tr><th>Requirement Identifier</th><th>Description</th></tr>
+	<?php if ($totalRows_casereqs > 0) {
+		do { ?>
+		<form action="atc_delete_requirement.php" method="post" enctype="multipart/form-data" >
+		<tr><td><?php echo $row_casereqs['identifier']; ?></td>
+			<td><?php echo $row_casereqs['description']; ?></td>
+			<td><input type="hidden" name="requirementid" value="<?php echo $row_casereqs['id']; ?>"/>
+				<input type="hidden" name="atcsid" value="<?php echo $colname_abstracttestcase; ?>"/>
+				<input type="submit" value="Delete Requirement"/></td>
+		</tr>
+		</form>
+	<?php	} while ($row_casereqs = mysqli_fetch_assoc($casereqs));//end do
+	}//end if 
+	?>
+	
+	<tr>
+	<form action="atc_add_requirement.php" method="post" enctype="multipart/form-data">
+	<td> <select name="requirementid" id="requirement">
+      	<?php do {  ?>
+      		<option value="<?php echo $row_requirements['id']?>"<?php if (!(strcmp($row_requirements['id'], $row_abstracttestcase['requirements_id']))) {echo "selected=\"selected\"";} ?>><?php echo $row_requirements['identifier']?></option>
+      	<?php } while ($row_requirements = mysqli_fetch_assoc($requirements));
+  			$rows = mysqli_num_rows($requirements);
+  			if($rows > 0) {
+      			mysqli_data_seek($requirements, 0);
+	  			$row_requirements = mysqli_fetch_assoc($requirements);
+  			} ?>
+		</select>
+	</td>
+	<td><input type="hidden" name="atcsid" value="<?php echo $colname_abstracttestcase; ?>" /><input type="submit" value="Add Requirement"/></td>
+	</form>
+	</tr>
+	
+
+</table>
+
 <p> [<a href="editor_start.php"> Editor Home </a>| <a href="<?php echo $logoutAction ?>">Log out</a> ] </p>
 </body>
 </html>
