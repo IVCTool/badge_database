@@ -1,5 +1,6 @@
 <?php require_once('Connections/badgesdbcon.php'); ?>
-<?php $target_dir = "badge_graphics/"; ?>
+<?php require_once('globals.php'); ?>
+<?php require_once('include/getsqlvaluestring.php'); ?>
 <?php
 //initialize the session
 if (!isset($_SESSION)) {
@@ -28,8 +29,8 @@ if ((isset($_GET['doLogout'])) &&($_GET['doLogout']=="true")){
   }
 }
 ?>
-<?php require_once('include/getsqlvaluestring.php'); ?>
-<?php
+
+<?php 
 
 $editFormAction = $_SERVER['PHP_SELF'];
 if (isset($_SERVER['QUERY_STRING'])) {
@@ -44,22 +45,23 @@ if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "addform")) {
    
   $Result1 = mysqli_query($badgesdbcon, $insertSQL) or die(mysqli_error());
 }
-
 $colname_badge = "-1";
 if (isset($_POST['id'])) {
   $colname_badge = $_POST['id'];
 }
- 
+
+
 $query_badge = sprintf("SELECT * FROM badges WHERE id = %s", GetSQLValueString($badgesdbcon, $colname_badge, "int"));
 $badge = mysqli_query($badgesdbcon, $query_badge) or die(mysqli_error());
 $row_badge = mysqli_fetch_assoc($badge);
 $totalRows_badge = mysqli_num_rows($badge);
 
- 
+
 $query_requirements = "SELECT id, CONCAT(identifier, ' ', description) AS iddes FROM requirements ORDER BY identifier";
-$requirements = mysqli_query($badgesdbco, $query_requirementsn) or die(mysqli_error());
+$requirements = mysqli_query($badgesdbcon, $query_requirements) or die(mysqli_error());
 $row_requirements = mysqli_fetch_assoc($requirements);
 $totalRows_requirements = mysqli_num_rows($requirements);
+
 
 $theid_depreq = "-1";
 if (isset($_POST['id'])) {
@@ -68,8 +70,8 @@ if (isset($_POST['id'])) {
  
 $query_depreq = sprintf("SELECT requirements.id, requirements.identifier, requirements.description,  CONCAT(reqcategories.identifier, ' - ' , reqcategories.description)  AS reqidentifier FROM requirements INNER JOIN reqcategories  ON requirements.reqcategories_id=reqcategories.id WHERE requirements.id IN (SELECT requirements_id FROM badges_has_requirements WHERE badges_id=%s) ORDER BY requirements.identifier", GetSQLValueString($badgesdbcon, $theid_depreq, "int"));
 $depreq = mysqli_query($badgesdbcon, $query_depreq) or die(mysqli_error());
-$row_depreq = mysqli_fetch_assoc($depreq);
 $totalRows_depreq = mysqli_num_rows($depreq);
+$row_depreq = mysqli_fetch_assoc($depreq);
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -84,7 +86,7 @@ $totalRows_depreq = mysqli_num_rows($depreq);
 <p><strong>Identifier:</strong> <?php echo $row_badge['identifier'] ?><br />
   Description:</strong> <?php echo $row_badge['description'] ?>
   <br /> 
-  <img src="<?php echo $target_dir . $row_badge['graphicfile'] ?>" width="100" height="137"/>
+  <img src="<?php echo $bgURL . $row_badge['graphicfile'] ?>" width="<?php echo $bgWidth; ?>" height="<?php echo $bgHeight ?>"/>
 </p>
 <p>Requirements (<?php echo $totalRows_depreq ?>)</p>
 <table width="100%" border="1" cellpadding="1">
@@ -96,7 +98,7 @@ $totalRows_depreq = mysqli_num_rows($depreq);
 <?php 
 	$i = 0;
 	do {
-?>
+ ?>
   <tr>
     <td><?php echo $row_depreq['reqidentifier'] ?></td>
     <td><?php echo $row_depreq['description'] ?></td>
@@ -106,7 +108,7 @@ $totalRows_depreq = mysqli_num_rows($depreq);
       <input type="submit" name="button2" id="button2" value="Delete" />
     </form></td>
   </tr>
-<?php 
+<?php
 	} while ($row_depreq = mysqli_fetch_assoc($depreq));
 ?>
 </table>
@@ -115,18 +117,18 @@ $totalRows_depreq = mysqli_num_rows($depreq);
   <input name="id" type="hidden" id="id" value="<?php echo $row_badge['id']; ?>" />
   <label for="requirementid"></label>
   <select name="requirementid" id="requirementid">
-    <?php
+    <?php 
 do {  
-?>
+ ?>
     <option value="<?php echo $row_requirements['id']?>"><?php echo $row_requirements['iddes']?></option>
-    <?php
+ <?php 
 } while ($row_requirements = mysqli_fetch_assoc($requirements));
   $rows = mysqli_num_rows($requirements);
   if($rows > 0) {
       mysqli_data_seek($requirements, 0);
 	  $row_requirements = mysqli_fetch_assoc($requirements);
   }
-?>
+ ?>
   </select>
   <input type="submit" name="button" id="button" value="Add" />
   <input type="hidden" name="MM_insert" value="addform" />

@@ -102,7 +102,7 @@ do {
     <form action="badge_update.php" method="post" id="updateform">
     <td><?php echo $row_badges["identifier"] ?></td>
     <td><?php echo $row_badges["description"] ?></td>
-    <td><?php echo '<img width="100" height="137" src="badge_graphics/' . $row_badges["graphicfile"] . '" />' ?></td>
+    <td><?php echo '<img width="119" height="124" src="badge_graphics/' . $row_badges["graphicfile"] . '" />' ?></td>
     <td>&nbsp;</td>
     <td>&nbsp;</td>
     <td><input type="hidden" name="id" id="hiddenField" value="<?php echo $row_badges["id"]?>"/>      <input type="submit" name="button2" id="button2" value="Edit" /></td>

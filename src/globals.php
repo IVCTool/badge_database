@@ -11,8 +11,10 @@ $urlStub = "http://192.168.126.128/";
 //Where test case documents are kept
 $atcsURL = "atcs_files/";
 
-//where the badge graphics go
+//where the badge graphics go and how big to show them in forms
 $bgURL = "badge_graphics/";
+$bgWidth = 124;
+$bgHeight = 119;
 
 
 ?>

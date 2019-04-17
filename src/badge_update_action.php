@@ -1,7 +1,8 @@
 <?php require_once('Connections/badgesdbcon.php'); ?>
+<?php require_once('globals.php'); ?>
 <?php
 
-$target_dir = "badge_graphics/";
+
 
 //Fist check if a new graphic was indicated, if it was
 // then upload it and set it as the graphic file name.  If it
@@ -11,7 +12,7 @@ $updateGraphic = 0;
 if($_FILES['graphic']['size'] > 0) {
 	$updateGraphic = 1;
 	$target_file_name = basename($_FILES["graphic"]["name"]);
-	$target_file = $target_dir . $target_file_name;}
+	$target_file = $bgURL . $target_file_name;}
 else {
 	$target_file_name = $_POST['oldgrphic'];
 }//end if the file is empty
@@ -37,7 +38,7 @@ if (file_exists($target_file)) {
 	while(file_exists($target_file)) {
 		$i++;
 		$target_file_name = $i . $target_file_name;
-		$target_file = $target_dir . $target_file_name;
+		$target_file = $bgURL . $target_file_name;
 	}//end while
 }//end if file exitist
 
@@ -70,10 +71,10 @@ if ($uploadOk == 0) {
     }
 	
 	//since we are updating, we need to unlink the old file, and by this time it's done
-	if (unlink($target_dir . $_POST["oldgraphic"])) {
-		echo "Previous badge graphic file: " . $target_dir . $_POST["oldgraphic"] . " has been removed.";
+	if (unlink($bgURL . $_POST["oldgraphic"])) {
+		echo "Previous badge graphic file: " . $bgURL . $_POST["oldgraphic"] . " has been removed.";
 	} else {
-		echo "Previous badge graphic file: " . $target_dir . $_POST["oldgraphic"] . " has no been removed due to an error while unlinking the file.";
+		echo "Previous badge graphic file: " . $bgURL . $_POST["oldgraphic"] . " has no been removed due to an error while unlinking the file.";
 	}//end if the file was removed
 	
 }//endif upload OK
