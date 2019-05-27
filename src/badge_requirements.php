@@ -45,9 +45,14 @@ if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "addform")) {
    
   $Result1 = mysqli_query($badgesdbcon, $insertSQL) or die(mysqli_error());
 }
+//Decide which badge is getting pulled.  Try the POST first, but also check the GET as the
+//delete requirement script will need to come back here at the correct badge and that's
+//easiest way to do it.
 $colname_badge = "-1";
 if (isset($_POST['id'])) {
   $colname_badge = $_POST['id'];
+} elseif (isset($_GET['id'])) {
+	$colname_badge = $_GET['id'];
 }
 
 
@@ -102,7 +107,7 @@ $row_depreq = mysqli_fetch_assoc($depreq);
   <tr>
     <td><?php echo $row_depreq['reqidentifier'] ?></td>
     <td><?php echo $row_depreq['description'] ?></td>
-    <td><form action="badge_requirement_delete_action.php" method="post" enctype="multipart/form-data" name="formdelete<?php echo ++$i ?>" id="formdelete<?php echo ++$i ?>">
+    <td><form action="badge_requirement_delete_action.php" method="post" enctype="multipart/form-data" name="formdelete<?php echo ++$i ?>" id="formdelete<?php echo $i ?>">
       <input type="hidden" name="badgeid" id="badgeid" value="<?php echo $row_badge['id']; ?>" />
       <input type="hidden" name="reqid" id="reqid" value="<?php echo $row_depreq['id']; ?>" />
       <input type="submit" name="button2" id="button2" value="Delete" />
