@@ -107,7 +107,7 @@ $row_depreq = mysqli_fetch_assoc($depreq);
 	do {
  ?>
   <tr>
-    <td><?php echo $row_depreq['reqidentifier'] ?></td>
+    <td><?php echo $row_depreq['identifier'] ?></td>
     <td><?php echo $row_depreq['description'] ?></td>
     <td><form action="badge_requirement_delete_action.php" method="post" enctype="multipart/form-data" name="formdelete<?php echo ++$i ?>" id="formdelete<?php echo $i ?>">
       <input type="hidden" name="badgeid" id="badgeid" value="<?php echo $row_badge['id']; ?>" />
