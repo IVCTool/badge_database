@@ -62,7 +62,9 @@ $row_badge = mysqli_fetch_assoc($badge);
 $totalRows_badge = mysqli_num_rows($badge);
 
 
-$query_requirements = "SELECT id, CONCAT(identifier, ' ', description) AS iddes FROM requirements ORDER BY identifier";
+//To Fix Issue 16 - Allan
+//$query_requirements = "SELECT id, CONCAT(identifier, ' ', description) AS iddes FROM requirements ORDER BY identifier";
+$query_requirements = sprintf("SELECT id, CONCAT(identifier, ' ', description) AS iddes FROM requirements WHERE requirements.id NOT IN (SELECT requirements_id from badges_has_requirements where badges_id = %s) ORDER BY identifier", GetSQLValueString($badgesdbcon, $colname_badge, "int"));
 $requirements = mysqli_query($badgesdbcon, $query_requirements) or die(mysqli_error());
 $row_requirements = mysqli_fetch_assoc($requirements);
 $totalRows_requirements = mysqli_num_rows($requirements);
