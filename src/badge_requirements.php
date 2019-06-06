@@ -70,10 +70,11 @@ $row_requirements = mysqli_fetch_assoc($requirements);
 $totalRows_requirements = mysqli_num_rows($requirements);
 
 
-$theid_depreq = "-1";
-if (isset($_POST['id'])) {
-  $theid_depreq = $_POST['id'];
-}
+//This fixes issue 14 - Allan
+//Better would be to use one variable name in the script and also, why $colname_badge?
+//What does that mean?
+$theid_depreq = $colname_badge;
+
  
 $query_depreq = sprintf("SELECT requirements.id, requirements.identifier, requirements.description,  CONCAT(reqcategories.identifier, ' - ' , reqcategories.description)  AS reqidentifier FROM requirements INNER JOIN reqcategories  ON requirements.reqcategories_id=reqcategories.id WHERE requirements.id IN (SELECT requirements_id FROM badges_has_requirements WHERE badges_id=%s) ORDER BY requirements.identifier", GetSQLValueString($badgesdbcon, $theid_depreq, "int"));
 $depreq = mysqli_query($badgesdbcon, $query_depreq) or die(mysqli_error());
