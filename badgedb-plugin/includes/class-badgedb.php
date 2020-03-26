@@ -6,8 +6,8 @@
  * A class definition that includes attributes and functions used across both the
  * public-facing side of the site and the admin area.
  *
- * @link       http://example.com
- * @since      1.0.0
+ * @link       https://github.com/IVCTool/badge_database/tree/master/badgedb-plugin
+ * @since      0.1.0
  *
  * @package    Badgedb
  * @subpackage Badgedb/includes
@@ -156,6 +156,7 @@ class Badgedb {
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
+		$this->loader->add_action('admin_menu', $plugin_admin, 'add_admin_menu');
 
 	}
 

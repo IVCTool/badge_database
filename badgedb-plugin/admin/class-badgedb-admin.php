@@ -4,7 +4,7 @@
  * The admin-specific functionality of the plugin.
  *
  * @link       http://example.com
- * @since      1.0.0
+ * @since      0.1.0
  *
  * @package    Badgedb
  * @subpackage Badgedb/admin
@@ -47,13 +47,28 @@ class Badgedb_Admin {
 	 * @param      string    $badgedb       The name of this plugin.
 	 * @param      string    $version    The version of this plugin.
 	 */
-	public function __construct( $badgedb, $version ) {
+	public function __construct( $plugin_name, $version ) {
 
-		$this->badgedb = $badgedb;
+		$this->badgedb = $plugin_name;
 		$this->version = $version;
 
 	}
 
+
+	public function add_admin_menu() {
+		add_menu_page(
+			'BadgeDB Plugin',
+			'BadgeDB Plugin',
+			'manage_options',
+			'badgedb-plugin',
+			array($this, 'badgedb_admin_page'),
+			'dashicons-store',
+			1);
+	}
+
+	public function badgedb_admin_page() {
+		include( plugin_dir_path(__FILE__) . 'partials/badgedb-admin-page.php');
+	}
 	/**
 	 * Register the stylesheets for the admin area.
 	 *
