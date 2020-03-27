@@ -30,6 +30,7 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
+
 /**
  * Current plugin version.
  * Start at version 1.0.0 and use SemVer - https://semver.org
@@ -37,6 +38,12 @@ if ( ! defined( 'WPINC' ) ) {
  */
 define( 'BADGEDB_VERSION', '1.0.0' );
 define( 'BADGEDB_PATH', plugin_dir_path(__FILE__));
+
+/**
+ * Current database version and table prefix name
+ */
+define('BADGEDB_DATABASE_VERSION', '1.0.0');
+
 
 /**
  * The code that runs during plugin activation.

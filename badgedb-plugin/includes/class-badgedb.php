@@ -7,7 +7,7 @@
  * public-facing side of the site and the admin area.
  *
  * @link       https://github.com/IVCTool/badge_database/tree/master/badgedb-plugin
- * @since      0.1.0
+ * @since      1.0.0
  *
  * @package    Badgedb
  * @subpackage Badgedb/includes
@@ -25,7 +25,7 @@
  * @since      1.0.0
  * @package    Badgedb
  * @subpackage Badgedb/includes
- * @author     Your Name <email@example.com>
+ * @author     Allan Gillis
  */
 class Badgedb {
 
@@ -56,6 +56,14 @@ class Badgedb {
 	 * @var      string    $version    The current version of the plugin.
 	 */
 	protected $version;
+
+	/**
+	 * The class that handles access and modification to the database
+	 * @since	1.0.0
+	 * @access	protected
+	 * @var		Badgedb_Database	$badgedb_database
+	 */
+	protected $badgedb_database;
 
 	/**
 	 * Define the core functionality of the plugin.
@@ -121,6 +129,11 @@ class Badgedb {
 		 * side of the site.
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-badgedb-public.php';
+
+		/**
+		 * The class responsible for dealing with the Badge database.
+		 */
+		require_once plugin_dir_path( dirname(__FILE__)) . 'includes/class-badgedb-database.php';
 
 		$this->loader = new Badgedb_Loader();
 
@@ -216,4 +229,13 @@ class Badgedb {
 		return $this->version;
 	}
 
-}
+	/**
+	 * The reference to the database handling class
+	 * @since	1.0.0
+	 * @return	Badgedb_Database	the databse object
+	 */
+	public function get_database() {
+		return $this->badgedb_database;
+	}//end get_database
+
+}//end class

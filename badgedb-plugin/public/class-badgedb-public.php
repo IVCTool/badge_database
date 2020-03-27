@@ -3,7 +3,7 @@
 /**
  * The public-facing functionality of the plugin.
  *
- * @link       http://example.com
+ * @link       https://github.com/IVCTool/badge_database/tree/master/badgedb-plugin
  * @since      1.0.0
  *
  * @package    Badgedb
@@ -18,7 +18,7 @@
  *
  * @package    Badgedb
  * @subpackage Badgedb/public
- * @author     Your Name <email@example.com>
+ * @author     Allan Gillis
  */
 class Badgedb_Public {
 

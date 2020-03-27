@@ -29,3 +29,7 @@
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;
 }
+
+//Test the net database function
+include_once plugin_dir_path( __FILE__ ) . 'includes/class-badgedb-database.php';
+Badgedb_Database::badgedb_database_uninstall();

@@ -3,7 +3,7 @@
 /**
  * Fired during plugin activation
  *
- * @link       http://example.com
+ * @link       https://github.com/IVCTool/badge_database/tree/master/badgedb-plugin
  * @since      1.0.0
  *
  * @package    Badgedb
@@ -18,7 +18,7 @@
  * @since      1.0.0
  * @package    Badgedb
  * @subpackage Badgedb/includes
- * @author     Your Name <email@example.com>
+ * @author     Allan Gilis
  */
 class Badgedb_Activator {
 
@@ -30,7 +30,9 @@ class Badgedb_Activator {
 	 * @since    1.0.0
 	 */
 	public static function activate() {
-
+		//Test the net database function
+		plugin_dir_path( __FILE__ ) . 'includes/class-badgedb-database.php';
+		Badgedb_Database::badgedb_database_install();
 	}
 
-}
+}//end class

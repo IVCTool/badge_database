@@ -3,7 +3,7 @@
 /**
  * Register all actions and filters for the plugin
  *
- * @link       http://example.com
+ * @link       https://github.com/IVCTool/badge_database/tree/master/badgedb-plugin
  * @since      1.0.0
  *
  * @package    Badgedb
@@ -19,7 +19,7 @@
  *
  * @package    Badgedb
  * @subpackage Badgedb/includes
- * @author     Your Name <email@example.com>
+ * @author     Allan Gillis
  */
 class Badgedb_Loader {
 

@@ -6,7 +6,7 @@
  * Loads and defines the internationalization files for this plugin
  * so that it is ready for translation.
  *
- * @link       http://example.com
+ * @link       https://github.com/IVCTool/badge_database/tree/master/badgedb-plugin
  * @since      1.0.0
  *
  * @package    Badgedb
@@ -22,7 +22,7 @@
  * @since      1.0.0
  * @package    Badgedb
  * @subpackage Badgedb/includes
- * @author     Your Name <email@example.com>
+ * @author     Allan Gillis
  */
 class Badgedb_i18n {
 
