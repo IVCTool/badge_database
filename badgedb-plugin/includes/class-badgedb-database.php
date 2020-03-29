@@ -24,7 +24,19 @@ class Badgedb_Database {
 
 	//These are just used to make it a bit easier to deal with the database creation and removal
 	const REQCATEGORIES_TABLE_NAME = "reqcategories";
+	const ABSTRACT_TEST_CASES_TABLE_NAME = "abstracttcs";
+	const REQUIREMENTS_TABLE_NAME = "requirements";
 	const BADGES_TABLE_NAME = "badges";
+
+	/**
+	 * This array is just here to make the drop tables function easier to read.
+	 * 
+	 * Note: tables with foreign keys need to be dropped before the table they refer to, so make
+	 *		sure they are first in this list.  For example requirements needs to be dropped before
+	 *		reqcategories.
+	*/
+	protected static $all_tables = array(self::REQUIREMENTS_TABLE_NAME, self::REQCATEGORIES_TABLE_NAME, 
+						self::ABSTRACT_TEST_CASES_TABLE_NAME, self::BADGES_TABLE_NAME);
 
 	/**
 	 * This function sets up all the database structure when the plugin is installed.
@@ -38,6 +50,8 @@ class Badgedb_Database {
 		$table_prefix = $wpdb->prefix . "badgedb_";
 		$charset_collate = $wpdb->get_charset_collate();
 
+		//It would be a lot better to read all of this from an SQL file
+
 		//make the requirements categories table
 		$reqcat_table_name = $table_prefix . self::REQCATEGORIES_TABLE_NAME;
 		$reqcat_query = "CREATE TABLE $reqcat_table_name (
@@ -48,6 +62,32 @@ class Badgedb_Database {
 			PRIMARY KEY (`id`)
 		  ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;";
 		$wpdb->query($reqcat_query);
+
+		//make the abstract test case table
+		$abstcs_table_name = $table_prefix . self::ABSTRACT_TEST_CASES_TABLE_NAME;
+		$abstcs_query = "CREATE TABLE $abstcs_table_name (
+			`filename` varchar(255) CHARACTER SET armscii8 NOT NULL,
+			`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+			`identifier` varchar(25) NOT NULL,
+			`name` varchar(25) DEFAULT NULL,
+			`description` longtext NOT NULL,
+			`version` varchar(45) NOT NULL,
+			PRIMARY KEY (`id`)
+		  ) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8;";
+		  $wpdb->query($abstcs_query);
+
+		//make the requirements table
+		$req_table_name = $table_prefix . self::REQUIREMENTS_TABLE_NAME;
+		$req_query = "CREATE TABLE $req_table_name (
+			`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+			`identifier` varchar(25) NOT NULL,
+			`description` longtext NOT NULL,
+			`reqcategories_id` int(10) unsigned NOT NULL,
+			PRIMARY KEY (`id`),
+			KEY `fk_requirements_reqcategories_idx` (`reqcategories_id`),
+			CONSTRAINT `fk_requirements_reqcategories` FOREIGN KEY (`reqcategories_id`) REFERENCES `$reqcat_table_name` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+		  ) ENGINE=InnoDB AUTO_INCREMENT=151 DEFAULT CHARSET=utf8;";
+		$wpdb->query($req_query);
 
 		//Make the badges table
 		$badges_table_name = $table_prefix . self::BADGES_TABLE_NAME;
@@ -79,9 +119,7 @@ class Badgedb_Database {
 	private static function drop_tables() {
 		global $wpdb;
 		$table_prefix = $wpdb->prefix . "badgedb_";
-
-		$all_tables = array(self::REQCATEGORIES_TABLE_NAME, self::BADGES_TABLE_NAME);
-		foreach ($all_tables as $t) {
+		foreach (self::$all_tables as $t) {
 			$t_name = $table_prefix . $t;
 			$sql = "DROP TABLE $t_name;";
 			$wpdb->query($sql);
