@@ -24,9 +24,14 @@ class Badgedb_Database {
 
 	//These are just used to make it a bit easier to deal with the database creation and removal
 	const REQCATEGORIES_TABLE_NAME = "reqcategories";
+	const EXECUTABLETCS_TABLE_NAME = "executabletcs";
 	const ABSTRACT_TEST_CASES_TABLE_NAME = "abstracttcs";
 	const REQUIREMENTS_TABLE_NAME = "requirements";
 	const BADGES_TABLE_NAME = "badges";
+	const BADGES_HAS_BADGES_TABLE_NAME = "badges_has_badges";
+	const BADGES_HAS_REQUIREMENTS_TABLE_NAME = "badges_has_requirements";
+	const ABSTRACTTCS_HAS_REQUIREMENTS_TABLE_NAME = "abstracttcs_has_requirements";
+	
 
 	/**
 	 * This array is just here to make the drop tables function easier to read.
@@ -35,8 +40,16 @@ class Badgedb_Database {
 	 *		sure they are first in this list.  For example requirements needs to be dropped before
 	 *		reqcategories.
 	*/
-	protected static $all_tables = array(self::REQUIREMENTS_TABLE_NAME, self::REQCATEGORIES_TABLE_NAME, 
-						self::ABSTRACT_TEST_CASES_TABLE_NAME, self::BADGES_TABLE_NAME);
+	protected static $all_tables = array(
+						self::REQUIREMENTS_TABLE_NAME, 
+						self::EXECUTABLETCS_TABLE_NAME,
+						self::REQCATEGORIES_TABLE_NAME, 
+						self::ABSTRACT_TEST_CASES_TABLE_NAME, 
+						self::BADGES_HAS_BADGES_TABLE_NAME, 
+						self::BADGES_HAS_REQUIREMENTS_TABLE_NAME, 
+						self::BADGES_TABLE_NAME, 
+						self::ABSTRACTTCS_HAS_REQUIREMENTS_TABLE_NAME
+					);
 
 	/**
 	 * This function sets up all the database structure when the plugin is installed.
@@ -99,6 +112,51 @@ class Badgedb_Database {
 			PRIMARY KEY (`id`)
 		  ) ENGINE=MyISAM AUTO_INCREMENT=35 DEFAULT CHARSET=utf8;";
 		  $wpdb->query($badges_query);
+
+		  //badges_has_badges table
+		  $badgeshb_table_name = $table_prefix . self::BADGES_HAS_BADGES_TABLE_NAME;
+		  $bhb_query = "CREATE TABLE $badgeshb_table_name (
+			`badges_id` int(10) unsigned NOT NULL,
+			`badges_id_dependency` int(10) unsigned NOT NULL,
+			PRIMARY KEY (`badges_id`,`badges_id_dependency`),
+			KEY `fk_badges_has_badges_badges2_idx` (`badges_id_dependency`),
+			KEY `fk_badges_has_badges_badges1_idx` (`badges_id`)
+		  ) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
+		  $wpdb->query($bhb_query);
+
+		  //badges_has_requirements
+		  $badgeshr_table_name = $table_prefix . self::BADGES_HAS_REQUIREMENTS_TABLE_NAME;
+		  $bhr_query = "CREATE TABLE $badgeshr_table_name (
+			`requirements_id` int(10) unsigned NOT NULL,
+			`badges_id` int(10) unsigned NOT NULL,
+			PRIMARY KEY (`requirements_id`,`badges_id`),
+			KEY `fk_requirements_has_badges_badges1_idx` (`badges_id`),
+			KEY `fk_requirements_has_badges_requirements1_idx` (`requirements_id`)
+		  ) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+		  $wpdb->query($bhr_query);
+
+		  //abstract test case requirements
+		  $abstracttchr_table_name = $table_prefix . self::ABSTRACTTCS_HAS_REQUIREMENTS_TABLE_NAME;
+		  $atchr_query = "CREATE TABLE $abstracttchr_table_name (
+			`abstracttcs_id` int(10) unsigned NOT NULL,
+			`requirements_id` int(10) unsigned NOT NULL,
+			KEY `requirements_id` (`requirements_id`)
+		  ) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
+		  $wpdb->query($atchr_query);
+
+		  //executable test cases
+		  $etcs_table_name = $table_prefix . self::EXECUTABLETCS_TABLE_NAME;
+		  $etcs_query = "CREATE TABLE $etcs_table_name (
+			`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+			`Description` text NOT NULL,
+			`classname` varchar(255) NOT NULL,
+			`version` varchar(45) NOT NULL,
+			`abstracttcs_id` int(10) unsigned NOT NULL,
+			PRIMARY KEY (`id`,`abstracttcs_id`),
+			KEY `fk_executabletcs_abstracttcs1_idx` (`abstracttcs_id`),
+			CONSTRAINT `executabletcs_ibfk_1` FOREIGN KEY (`abstracttcs_id`) REFERENCES `$abstcs_table_name` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+		  ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;";
+		  $wpdb->query($etcs_query);
 
 	}//end function
 
