@@ -54,6 +54,30 @@ class Badgedb_Public {
 
 	}
 
+
+	/**
+	 * Handles the [badgedbpi] shortcode that allows access to the database.
+	 */
+	public function badgedb_public_entrypoint( $args ) {
+
+		/* $args = shortcode_atts(
+			array(
+				'arg1'   => 'arg1',
+				'arg2'   => 'arg2',
+			),
+			$atts
+		); */
+	
+		// code...
+	
+		//$var = ( strtolower( $args['arg1']) != "" ) ? strtolower( $args['arg1'] ) : 'default';
+		$var = "HELLO GENERAL PUBLIC!";
+	
+		// code...
+	
+		return $var;
+	}//end function
+
 	/**
 	 * Register the stylesheets for the public-facing side of the site.
 	 *

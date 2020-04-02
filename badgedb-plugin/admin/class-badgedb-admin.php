@@ -52,9 +52,14 @@ class Badgedb_Admin {
 		$this->badgedb = $plugin_name;
 		$this->version = $version;
 
-	}
+	}//end construct
 
 
+	/**
+	 * Takes care of adding the admin menu to the WP admin bar.
+	 * 
+	 * @since	1.0.0
+	 */
 	public function add_admin_menu() {
 		add_menu_page(
 			'BadgeDB Plugin',
