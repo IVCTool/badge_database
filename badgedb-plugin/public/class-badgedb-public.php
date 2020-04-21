@@ -57,25 +57,44 @@ class Badgedb_Public {
 
 	/**
 	 * Handles the [badgedbpi] shortcode that allows access to the database.
+	 * The function requires one argument that says what part of
+	 * the interface is to be returned.
+	 * 
+	 * Allowed values:
+	 * 			attributes:
+	 * 				interface
+	 * 					pubbadges	-the public badge view (is this mnaybe all the public needs?)
+	 *					areqcat		-the admin interface to edit requirement catagories.
+	 *			TODO Others
 	 */
-	public function badgedb_public_entrypoint( $args ) {
+	public function badgedb_public_entrypoint( $atts ) {
 
-		/* $args = shortcode_atts(
+		//We will start with assuming there was an error
+		$returnval = "Sorry, an error occured.";
+
+		//check that there is an att
+		if (count($atts) > 1) {
+			$returnval = $returnval . "  Too many attribnutes used.  Only the attribute 'interface' is supported.";
+			return $returnval;
+		}
+
+		//setup the 
+		$atts = shortcode_atts(
 			array(
-				'arg1'   => 'arg1',
-				'arg2'   => 'arg2',
+				'interface'   => 'pubbadges'
 			),
 			$atts
-		); */
+		);
+
 	
 		// code...
 	
 		//$var = ( strtolower( $args['arg1']) != "" ) ? strtolower( $args['arg1'] ) : 'default';
-		$var = "HELLO GENERAL PUBLIC!";
+		//$var = "HELLO GENERAL PUBLIC!";
 	
 		// code...
-	
-		return $var;
+		require_once plugin_dir_path( __FILE__ ) . '../dbinterface/badgedb_new_requirement_catagory.php';
+		return $returnval;
 	}//end function
 
 	/**
