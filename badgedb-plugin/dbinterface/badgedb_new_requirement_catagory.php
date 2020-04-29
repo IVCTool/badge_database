@@ -128,7 +128,7 @@ $returnval = '<h1>Interoperability Requirement Catagories</h1>
 //do {
 	
 	$returnval = $returnval . '<tr>
-    <form action="reqcatagories_update.php" method="post" id="updateform">
+    <form action="' . admin_url('admin-post.php') . '" method="post" id="badgedb_updateform">
     <td><?php echo $row_reqcatrecords["identifier"] ?></td>
     <td><?php echo $row_reqcatrecords["name"] ?></td>
     <td><?php echo $row_reqcatrecords["description"] ?></td>
@@ -144,7 +144,7 @@ $returnval = '<h1>Interoperability Requirement Catagories</h1>
 //end do loop
 //} while ($row_reqcatrecords = mysqli_fetch_assoc($reqcatrecords));
 
-$returnval = $returnval . '<form method="POST" action="<?php echo $editFormAction; ?>" name="newform">
+$returnval = $returnval . '<form method="POST" action="' . admin_url('admin-post.php') . '" name="badgedb_newform">
 <tr>
 <td><label for="identifier"></label>
   <input type="text" name="identifier" id="identifier" /></td>

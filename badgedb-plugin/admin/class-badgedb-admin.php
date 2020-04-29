@@ -69,11 +69,19 @@ class Badgedb_Admin {
 			array($this, 'badgedb_admin_page'),
 			'dashicons-store',
 			1);
-	}
+	}//end function
 
 	public function badgedb_admin_page() {
 		include( plugin_dir_path(__FILE__) . 'partials/badgedb-admin-page.php');
-	}
+	}//end function
+
+	/**
+	 * 
+	 */
+	public function badgedb_reqcatadd_response() {
+		
+	}//end function
+
 	/**
 	 * Register the stylesheets for the admin area.
 	 *
@@ -120,4 +128,4 @@ class Badgedb_Admin {
 
 	}
 
-}
+}//end class

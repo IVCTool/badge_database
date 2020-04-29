@@ -97,6 +97,8 @@ class Badgedb_Public {
 		return $returnval;
 	}//end function
 
+
+
 	/**
 	 * Register the stylesheets for the public-facing side of the site.
 	 *
@@ -118,7 +120,7 @@ class Badgedb_Public {
 
 		wp_enqueue_style( $this->badgedb, plugin_dir_url( __FILE__ ) . 'css/badgedb-public.css', array(), $this->version, 'all' );
 
-	}
+	}//end function
 
 	/**
 	 * Register the JavaScript for the public-facing side of the site.
@@ -141,6 +143,6 @@ class Badgedb_Public {
 
 		wp_enqueue_script( $this->badgedb, plugin_dir_url( __FILE__ ) . 'js/badgedb-public.js', array( 'jquery' ), $this->version, false );
 
-	}
+	}//end function
 
-}
+}//end class
