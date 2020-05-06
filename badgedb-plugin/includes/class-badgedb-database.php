@@ -11,9 +11,7 @@
  */
 
 /**
- * Fired during plugin activation.
- *
- * This class defines all code necessary to run during the plugin's activation.
+ * For dealing with the badgedb database tables
  *
  * @since      1.0.0
  * @package    Badgedb
@@ -159,6 +157,11 @@ class Badgedb_Database {
 		  $wpdb->query($etcs_query);
 
 	}//end function
+
+	public static function insert_new_reqcat($theName) {
+		$q = "INSERT INTO " . self::REQCATEGORIES_TABLE_NAME . " (name) VALUES('myfirsttest');";
+		$wpdb->query($q);
+	}
 
 	/**
 	 * This function deals with anything that needs doing when the plugin is uninstalled.

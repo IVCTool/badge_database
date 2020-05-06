@@ -40,6 +40,9 @@ class Badgedb_Admin {
 	 */
 	private $version;
 
+	private $admin_menu_hook;
+	private $admin_menu_sub_reqcat_hook;
+
 	/**
 	 * Initialize the class and set its properties.
 	 *
@@ -61,25 +64,50 @@ class Badgedb_Admin {
 	 * @since	1.0.0
 	 */
 	public function add_admin_menu() {
-		add_menu_page(
+
+		$this->admin_menu_hook = add_menu_page(
 			'BadgeDB Plugin',
 			'BadgeDB Plugin',
 			'manage_options',
-			'badgedb-plugin',
+			'badgedb-plugin-admin-menu',
 			array($this, 'badgedb_admin_page'),
 			'dashicons-store',
 			1);
+
+		//$this->admin_menu_sub_reqcat_hook = add_submenu_page(
+		$hook = add_submenu_page(
+			'badgedb-plugin-admin-menu',
+			'Edit Requirement Catagories',
+			'Requirement Catagories',
+			'manage_options',
+			'badgedb-plugin-admin-menu-sub-reqcat',
+			array($this, 'badgedb_admin_submenu_reqcat_page'),
+			1);
+		add_action('load-' . $hook, array($this, 'badgedb_req_cat_page_submit'));
+
 	}//end function
 
+	// public function get_admin_menu_hook() {
+	//  	return $this->admin_menu_hook;
+	// }
+
+	public function get_admin_menu_sub_reqcat_hook() {
+		return $this->admin_menu_sub_reqcat_hook;
+	}
+
 	public function badgedb_admin_page() {
-		include( plugin_dir_path(__FILE__) . 'partials/badgedb-admin-page.php');
+		include( plugin_dir_path(__FILE__) . 'partials/badgedb-admin-page.php');	
+	}//end function
+
+	public function badgedb_admin_submenu_reqcat_page() {
+		include( plugin_dir_path(__FILE__) . 'partials/badgedb-requirements-catagories-page.php');	
 	}//end function
 
 	/**
 	 * 
 	 */
-	public function badgedb_reqcatadd_response() {
-		
+	public function badgedb_req_cat_page_submit() {
+		include( plugin_dir_path(__FILE__) . 'partials/badgedb-requirements-catagories-formproc.php');
 	}//end function
 
 	/**

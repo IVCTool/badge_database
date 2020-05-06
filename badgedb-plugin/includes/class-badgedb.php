@@ -170,7 +170,9 @@ class Badgedb {
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
 		$this->loader->add_action('admin_menu', $plugin_admin, 'add_admin_menu');
-		$this->loader->add_action('admin_post_badgedb_reqcatadd_response', $plugin_admin, 'badgedb_reqcatadd_response');
+		//you need to do the add-action for the admin menu first here or the cached value won't exist.
+		//error_log('Hook: '. wp_cache_get('badgedb_reqcat_hook'));
+		//$this->loader->add_action('load-' . wp_cache_get('badgedb_reqcat_hook'), $plugin_admin, 'badgedb_req_cat_page_submit');
 	}
 
 	/**

@@ -11,9 +11,12 @@
  * @package    Badgedb
  * @subpackage Badgedb/admin/partials
  */
+
+
 ?>
 
 <!-- This file should primarily consist of HTML with a little bit of PHP. -->
-<div>
-    <h1>Hello world!</h1>
+<div class="wrap">
+    <h1>Main admin page!</h1>
+
 </div>
