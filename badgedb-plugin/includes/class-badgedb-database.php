@@ -159,7 +159,9 @@ class Badgedb_Database {
 	}//end function
 
 	public static function insert_new_reqcat($theName) {
-		$q = "INSERT INTO " . self::REQCATEGORIES_TABLE_NAME . " (name) VALUES('myfirsttest');";
+		global $wpdb;
+		$table_prefix = $wpdb->prefix . "badgedb_";
+		$q = "INSERT INTO " . $table_prefix . self::REQCATEGORIES_TABLE_NAME . " (name) VALUES('" . $theName . "');";
 		$wpdb->query($q);
 	}
 

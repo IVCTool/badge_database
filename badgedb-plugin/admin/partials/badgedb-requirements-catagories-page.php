@@ -16,12 +16,18 @@
 <!-- This file should primarily consist of HTML with a little bit of PHP. -->
 
 <div class="wrap">
-    <h1>REQCAT!!!</h1>
+    <h1>Interoperability Requirement Catagories</h1>
+
+    <p>Use this page to edit the catagories of requirements.</p>
+
+    <p>WARNING!<br>
+    Make sure the database has been backed-up recently before deleting catagories!<br>
+    Changes cannont be undone!</p>
 
     <p>
         <!--form action="test.php" method="post"-->
         <form action="<?php menu_page_url('badgedb-plugin-admin-menu-sub-reqcat') ?>" method="post">
-        New catagory: <input type="text" name="newcat" />
+        New catagory: <input type="text" name="newcat" maxlength="255"/>
         <input type="submit"/>
         </form>
     </p>
