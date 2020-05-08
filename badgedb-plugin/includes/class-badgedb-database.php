@@ -50,6 +50,14 @@ class Badgedb_Database {
 					);
 
 	/**
+	 * This section has the constants that define the maximum field lengths for using in form validation
+	 */
+	public const REQCATEGORIES_NAME_FIELD_MAX = 255;
+	public const REQCATEGORIES_DESCRIPTION_FIELD_MAX = 1431655765;
+	public const REQCATEGORIES_IDENTIFIER_FIELD_MAX = 10;
+	
+
+	/**
 	 * This function sets up all the database structure when the plugin is installed.
 	 * 
 	 * @since		1.0.0
@@ -158,10 +166,16 @@ class Badgedb_Database {
 
 	}//end function
 
-	public static function insert_new_reqcat($theName) {
+	/**
+	 * This just inserts a new requirement catagory record.
+	 * 
+	 * @since	1.0.0
+	 */
+	public static function insert_new_reqcat($theIdent, $theName, $theDesc) {
 		global $wpdb;
 		$table_prefix = $wpdb->prefix . "badgedb_";
-		$q = "INSERT INTO " . $table_prefix . self::REQCATEGORIES_TABLE_NAME . " (name) VALUES('" . $theName . "');";
+		$q = "INSERT INTO " . $table_prefix . self::REQCATEGORIES_TABLE_NAME . " (identifier, name, description) VALUES('" . $theIdent .
+					"', '" . $theName . "', '" . $theDesc . "');";
 		$wpdb->query($q);
 	}
 

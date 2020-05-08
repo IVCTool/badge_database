@@ -1,9 +1,13 @@
 <?php
 
 /**
- * Provide a admin area view for the plugin
+ * Handles form submissions from the requirements catagory editor.
  *
- * This file is used to markup the admin-facing aspects of the plugin.
+ * @link       https://github.com/IVCTool/badge_database/tree/master/badgedb-plugin
+ * @since      1.0.0
+ *
+ * @package    Badgedb
+ * @subpackage Badgedb/admin
  *
  * @link       http://example.com
  * @since      1.0.0
@@ -13,11 +17,15 @@
  */
 
  
- global $wpdb;
- //make sure we have a post, that the data is not too long, and that the user is actually an admin
+ /** 
+  * There are two different forms on the page that is calling this.  The processing for
+  * each will be in a separate include.
+ */
+
+ //make sure we have a post, and that the user is actually an admin
  $isPost = false;
  $isAdmin = false;
- $dataLengthOk = false;
+ 
 
  //set user flag
  $user = wp_get_current_user();
@@ -28,16 +36,13 @@
  //set is coming from a post
  if( $_SERVER['REQUEST_METHOD'] == 'POST') {
     $isPost = true;
-    //Now check the data lengths
-    if (strlen($_POST['newcat'] <= 255)) {
-        $dataLengthOk = true;
-    }
  }//end if
 
-//if we meet all the conditions then go ahead and add it.
-if ($isPost && $isAdmin && $dataLengthOk) {
-    $sanitised = sanitize_text_field($_POST['newcat']);
-    Badgedb_Database::insert_new_reqcat($sanitised);
-}
+ if ($isPost && $isAdmin) {
+     //check which action it was and include that processor.
+     if ($_POST['whichform'] == 'new') {
+         include_once(plugin_dir_path(__FILE__) . 'badgedb-requirements-catagories-new-proc.php');
+     }//end if it's a new catagory.
+ }//end if which processor should be included
 
 ?>
