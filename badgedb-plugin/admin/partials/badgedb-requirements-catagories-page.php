@@ -7,7 +7,7 @@
  * @since      1.0.0
  *
  * @package    Badgedb
- * @subpackage Badgedb/admin
+ * @subpackage Badgedb/admin/partials
  */
 ?>
 
@@ -30,11 +30,15 @@
     <p>
         <form action="<?php menu_page_url('badgedb-plugin-admin-menu-sub-reqcat') ?>" method="post">
         <input type="hidden" name="whichform" value="new" />
-        Identifier (max 10 characters): <input type="text" name="identifier" maxlength="<?php echo Badgedb_Database::REQCATEGORIES_IDENTIFIER_FIELD_MAX ?>" /><br>
-        Name (max 255 characters): <input type="text" name="name" maxlength="<?php echo Badgedb_Database::REQCATEGORIES_NAME_FIELD_MAX ?>" /><br>
-        <!-- note: this is max for mysql longtext with the UTF-8 character set-->
-        Description: <input type="textarea" name="description" maxlength="<?php echo Badgedb_Database::REQCATEGORIES_DESCRIPTION_FIELD_MAX ?>" /> 
-        <input type="submit"/>
+        <b>Identifier (max 10 characters):</b> <input type="text" name="identifier" maxlength="<?php echo Badgedb_Database::REQCATEGORIES_IDENTIFIER_FIELD_MAX ?>" /><br>
+        <b>Name (max 255 characters):</b> <input type="text" name="name" maxlength="<?php echo Badgedb_Database::REQCATEGORIES_NAME_FIELD_MAX ?>" /><br>
+        <b>Description:</b><br><textarea name="description" rows="4" cols="50" maxlength="<?php echo Badgedb_Database::REQCATEGORIES_DESCRIPTION_FIELD_MAX ?>"> </textarea> 
+        <br><input type="submit" value="Add"/>
         </form>
     </p>
+
+    <?php 
+        //This puts in the table of existing requirement catagories
+        include_once( plugin_dir_path(__FILE__) . 'badgedb-requirements-catagories-table.php');
+    ?>
 </div>

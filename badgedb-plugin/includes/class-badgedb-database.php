@@ -173,11 +173,60 @@ class Badgedb_Database {
 	 */
 	public static function insert_new_reqcat($theIdent, $theName, $theDesc) {
 		global $wpdb;
+		//$table_prefix = $wpdb->prefix . "badgedb_";
+		$table_name = $wpdb->prefix . "badgedb_" . self::REQCATEGORIES_TABLE_NAME;
+		$theData = array('identifier' => $theIdent, 'name' => $theName, 'description' => $theDesc);
+		$theFormat = array('%s', '%s', '%s');
+		$wpdb->insert($table_name, $theData, $theFormat);
+	}//end function
+
+	/**
+	 * Gets back all the requirement catagories.
+	 * 
+	 * @since	1.0.0
+	 */
+	public static function get_requirement_catagories() {
+		global $wpdb;
 		$table_prefix = $wpdb->prefix . "badgedb_";
-		$q = "INSERT INTO " . $table_prefix . self::REQCATEGORIES_TABLE_NAME . " (identifier, name, description) VALUES('" . $theIdent .
-					"', '" . $theName . "', '" . $theDesc . "');";
-		$wpdb->query($q);
-	}
+		$q = "SELECT * FROM " . $table_prefix . self::REQCATEGORIES_TABLE_NAME . ";";
+		$results = $wpdb->get_results($q, ARRAY_A);
+		if (count($results) < 1) {
+			//It does something wierd when there are no results, so lets just set it to null is the array is empty.
+			//The strange behaviour could also be related to being in WP_DEBUG = true mode and not show up in production.
+			return null;
+		} else {
+			return $results;
+		}
+
+	}//end function
+
+	/**
+	 * Deletes the requirement catagory with the id passed in.
+	 * 
+	 * @since	1.0.0
+	 */
+	public static function delete_reqcat($theId) {
+		global $wpdb;
+		$table_name = $wpdb->prefix . "badgedb_" . self::REQCATEGORIES_TABLE_NAME;
+		$where = array('id' => $theId);
+		$wpdb->delete($table_name, $where, array('%d'));
+
+	}//end function
+
+	/**
+	 * Updates a requirement catagory record.
+	 * 
+	 * @since	1.0.0
+	 */
+	public static function update_reqcat($theId, $theIdent, $theName, $theDesc) {
+		global $wpdb;
+		$table_name = $wpdb->prefix . "badgedb_" . self::REQCATEGORIES_TABLE_NAME;
+	
+		//For whatever reason, you need to call update this way instead of how I did it for 'insert' above.
+		//If you don't you get array to string conversion errors when you try to pass the arrays into the update function.
+		$wpdb->update($table_name, array('identifier' => $theIdent, 'name' => $theName, 'description' => $theDesc), 
+					array('id' => $theId), array('%s', '%s', '%s'), array('id' => $theId));
+	}//end update_reqcat
 
 	/**
 	 * This function deals with anything that needs doing when the plugin is uninstalled.

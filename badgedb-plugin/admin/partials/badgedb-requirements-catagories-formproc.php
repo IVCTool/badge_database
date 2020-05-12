@@ -43,6 +43,15 @@
      if ($_POST['whichform'] == 'new') {
          include_once(plugin_dir_path(__FILE__) . 'badgedb-requirements-catagories-new-proc.php');
      }//end if it's a new catagory.
+
+     if ($_POST['whichform'] == 'delete') {
+        include_once(plugin_dir_path(__FILE__) . 'badgedb-requirements-catagories-delete-proc.php');
+     }
+
+     if ($_POST['whichform'] == 'update') {
+      include_once(plugin_dir_path(__FILE__) . 'badgedb-requirements-catagories-edit-proc.php');
+   }
+
  }//end if which processor should be included
 
 ?>
