@@ -55,6 +55,10 @@ class Badgedb_Database {
 	public const REQCATEGORIES_NAME_FIELD_MAX = 255;
 	public const REQCATEGORIES_DESCRIPTION_FIELD_MAX = 1431655765;
 	public const REQCATEGORIES_IDENTIFIER_FIELD_MAX = 10;
+
+	public const REQUIREMENTS_IDENTIFIER_FIELD_MAX = 25;
+	public const REQUIREMENTS_DESCRIPTION_FIELD_MAX = 1431655765;
+	public const REQUIREMENTS_CATAGORY_FIELD_MAX = 10;
 	
 
 	/**
@@ -164,6 +168,9 @@ class Badgedb_Database {
 		  ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;";
 		  $wpdb->query($etcs_query);
 
+		  //fill in the base data
+		  self::insert_base_data();
+
 	}//end function
 
 	/**
@@ -187,11 +194,11 @@ class Badgedb_Database {
 	 */
 	public static function get_requirement_catagories() {
 		global $wpdb;
-		$table_prefix = $wpdb->prefix . "badgedb_";
-		$q = "SELECT * FROM " . $table_prefix . self::REQCATEGORIES_TABLE_NAME . ";";
+		$table_name = $wpdb->prefix . "badgedb_" . self::REQCATEGORIES_TABLE_NAME;
+		$q = "SELECT * FROM " . $table_name . ";";
 		$results = $wpdb->get_results($q, ARRAY_A);
 		if (count($results) < 1) {
-			//It does something wierd when there are no results, so lets just set it to null is the array is empty.
+			//It does something wierd when there are no results, so lets just set it to null if the array is empty.
 			//The strange behaviour could also be related to being in WP_DEBUG = true mode and not show up in production.
 			return null;
 		} else {
@@ -228,6 +235,131 @@ class Badgedb_Database {
 					array('id' => $theId), array('%s', '%s', '%s'), array('id' => $theId));
 	}//end update_reqcat
 
+
+	/**
+	 * This just inserts a new requirement record.
+	 * 
+	 * @since	1.0.0
+	 */
+	public static function insert_new_requirement($theIdent, $theDesc, $theCat) {
+		global $wpdb;
+		//$table_prefix = $wpdb->prefix . "badgedb_";
+		$table_name = $wpdb->prefix . "badgedb_" . self::REQUIREMENTS_TABLE_NAME;
+		$theData = array('identifier' => $theIdent, 'description' => $theDesc, 'reqcategories_id' => $theCat);
+		$theFormat = array('%s', '%s', '%d');
+		$wpdb->insert($table_name, $theData, $theFormat);
+	}//end function
+
+	/**
+	 * Gets back all the requirements.
+	 * 
+	 * @since	1.0.0
+	 */
+	public static function get_requirements() {
+		global $wpdb;
+		$table_name = $wpdb->prefix . "badgedb_" . self::REQUIREMENTS_TABLE_NAME;
+		$q = "SELECT * FROM " . $table_name . ";";
+		$results = $wpdb->get_results($q, ARRAY_A);
+		if (count($results) < 1) {
+			//It does something wierd when there are no results, so lets just set it to null if the array is empty.
+			//The strange behaviour could also be related to being in WP_DEBUG = true mode and not show up in production.
+			return null;
+		} else {
+			return $results;
+		}
+	}//end function	
+
+	/**
+	 * Deletes the requirement with the id passed in.
+	 * 
+	 * @since	1.0.0
+	 */
+	public static function delete_requirement($theId) {
+		global $wpdb;
+		$table_name = $wpdb->prefix . "badgedb_" . self::REQUIREMENTS_TABLE_NAME;
+		$where = array('id' => $theId);
+		$wpdb->delete($table_name, $where, array('%d'));
+
+	}//end function
+
+	/**
+	 * Updates a requirement record.
+	 * 
+	 * @since	1.0.0
+	 */
+	public static function update_requirement($theId, $theIdent, $theDesc, $theCatagory) {
+		global $wpdb;
+		$table_name = $wpdb->prefix . "badgedb_" . self::REQUIREMENTS_TABLE_NAME;
+	
+		//For whatever reason, you need to call update this way instead of how I did it for 'insert' above.
+		//If you don't you get array to string conversion errors when you try to pass the arrays into the update function.
+		$wpdb->update($table_name, array('identifier' => $theIdent, 'description' => $theDesc, 'reqcategories_id' => $theCatagory), 
+					array('id' => $theId), array('%s', '%s', '%d'), array('id' => $theId));
+	}//end update_reqcat
+
+	/**
+	 * This returns the HTML for a select list for forms.  You need to say which table you want.
+	 * The resulting select will have a name attribute equal to what you pass in.  If you want one
+	 * flagged as selected, pass the value of the selected item as the second parameter.
+	 * 
+	 * Valid options:
+	 * 			- catagory:	requirement catagories
+	 * 			- 
+	 * 
+	 * If you pass something not on the list you will get a select list with ERROR as the only
+	 * option.
+	 * 
+	 * I'm doing it this way to control what can get passed into this function.  In the past
+	 * I'd done this sort of thing with a general php function, but it feels like with WordPress
+	 * it's going to be safer to restrict who's calling the code and how.
+	 * 
+	 * @since	1.0.0
+	 */
+	public static function get_form_select($whichTable, $selected = null) {
+		global $wpdb;
+
+		//first, define some variables we will set in the if clause
+		//for the chosen table.
+		$valid = false;
+		$table_Name = null;
+		$fields = null;
+		$valueField = null;
+		$labelField = null;
+
+		//Make sure it's something we support
+		if ($whichTable == "catagory") {
+			$valid = true;
+			$table_name = $wpdb->prefix . "badgedb_" . self::REQCATEGORIES_TABLE_NAME;
+			$fields = "id, name";
+			$valueField = "id";
+			$labelField = "name";
+			$selectfield = 'id';
+		}
+
+		//See if it's not a valid choice, send back something to show there was an error.
+		if ($valid == false) {
+			return "<select name=\"ERROR\"><option value=\"ERROR\">ERROR</option></select>";
+		}//end if it's not valid
+
+
+		//if now let's get the records we need
+		$q = "SELECT " . $fields . " FROM " . $table_name . ";";
+		$result = $wpdb->get_results($q, ARRAY_A);
+
+		//Build up the select box
+		$selectbox = "<select name=\"" . $whichTable . "\">";
+		foreach ($result as $row) {
+			$selectbox .= "<option ";
+			if ($selected != null && $selected == $row[$selectfield]) {
+				$selectbox .= "selected ";
+			}
+			$selectbox .= "value=\"" . $row[$valueField] . "\">" . $row[$labelField] . "</option>";
+		}//end loop over records
+		$selectbox .= "</select>";
+
+		return $selectbox;
+	}//end functions
+
 	/**
 	 * This function deals with anything that needs doing when the plugin is uninstalled.
 	 * @since	1.0.0
@@ -252,5 +384,177 @@ class Badgedb_Database {
 		}//end foreach
 	}//end function
 
+
+	/**
+	 * This function fills in the new database tables with the base data.
+	 * TODO - it would be better to have this stuff get read in from a file
+	 * 			that was more easilly updated.
+	 */
+	private static function insert_base_data() {
+		global $wpdb;
+
+		//Requirement catagories
+		$table_name = $wpdb->prefix . "badgedb_" . self::REQCATEGORIES_TABLE_NAME;
+		$q = "INSERT INTO `" . $table_name . "` (`name`, `description`, `identifier`, `id`) VALUES
+		('Best Practice Conformance',	'Requirements related to best practices for distributed simulation',	'BP',	1),
+		('Documentation Conformance',	'Requirements for documenting interoperability capabilities',	'DOC',	6),
+		('Simulation Object Model Conformance',	'Requirements related to the Conformance of a SuT to the SOM provided in CS\r\n',	'SOM',	8),
+		('NETN Requirments',	'Requirements related to NETN FAFD, AMSP-04 Ed A, STANREC 4800',	'NETN',	9),
+		('RPR2 Requirements',	'Requirements related to RPR-FOM v2.0',	'RPR2',	10);";
+		$wpdb->query($q);
+
+		//Requirements
+		$table_name = $wpdb->prefix . "badgedb_" . self::REQUIREMENTS_TABLE_NAME;
+		$q = "INSERT INTO `" . $table_name . "` (`id`, `identifier`, `description`, `reqcategories_id`) VALUES
+		(1,	'IR-BP-0001',	'SuT shall provide attribute value updates for requested attributes owned by the SuT',	1),
+		(2,	'IR-DOC-0001',	'SuT interoperability capabilities shall be documented in a Conformance Statement including a SOM and a FOM with a minimum set of supporting FOM modules',	6),
+		(5,	'IR-BP-0002',	'SuT shall create a federation execution before joining, if it does not already exist',	1),
+		(6,	'IR-BP-0003',	'SuT shall create or join a federation execution with only those FOM modules that are specified in CS',	1),
+		(7,	'IR-SOM-0001',	'SuT CS/SOM shall be valid',	8),
+		(8,	'IR-SOM-0002',	'SuT CS/SOM shall be consistent',	8),
+		(9,	'IR-SOM-0003',	'SuT shall publish all object classes attributes defined as published in CS/SOM',	8),
+		(10,	'IR-SOM-0004',	'SuT shall not publish any object class attribute that is not defined as published in CS/SOM',	8),
+		(11,	'IR-SOM-0005',	'SuT shall publish all interaction classes defined as published is CS/SOM',	8),
+		(12,	'IR-SOM-0006',	'SuT shall not publish any interaction class that is not defined as published is CS/SOM',	8),
+		(13,	'IR-SOM-0007',	'SuT shall subscribe to all object classes attributes defined as subscribed in CS/SOM',	8),
+		(14,	'IR-SOM-0008',	'SuT shall not subscribe to any object class attribute that is not defined as subscribed in CS/SOM',	8),
+		(15,	'IR-SOM-0009',	'SuT shall subscribe to all interaction classes defined as subscribed in CS/SOM',	8),
+		(16,	'IR-SOM-0010',	'SuT shall not subscribe to any interaction class that is not defined as subscribed in CS/SOM',	8),
+		(17,	'IR-SOM-0011',	'SuT shall register at least one object instance for each published object class',	8),
+		(18,	'IR-SOM-0012',	'SuT shall discover object instances for all object classes with attributes defined as subscribed in CS/SOM.',	8),
+		(19,	'IR-SOM-0013',	'SuT shall update attribute values for each published object class attribute',	8),
+		(20,	'IR-SOM-0014',	'SuT shall reflect attribute values for each subscribed object class attribute',	8),
+		(21,	'IR-SOM-0015',	'SuT shall send at least one interaction for each published interaction class',	8),
+		(22,	'IR-SOM-0016',	'SuT shall recieve interactions for each subcribed interaction class',	8),
+		(23,	'IR-SOM-0017',	'SuT shall encode all updated attribute values according to CS/SOM',	8),
+		(24,	'IR-SOM-0018',	'SuT shall encode all sent interaction class parameters according to CS/SOM',	8),
+		(25,	'IR-SOM-0019',	'SuT shall implement/use all HLA services as described as implemented/used in CS/SOM',	8),
+		(26,	'IR-SOM-0020',	'SuT shall not implement/use any HLA service that is not described as implemented/used in CS/SOM',	8),
+		(27,	'IR-SOM-0027',	'SuT shall be able to decode attribute value updates of all object class attributes defined as subscribed in CS/SOM',	8),
+		(28,	'IR-SOM-0028',	'SuT shall be able to decode interaction class parameters for all interaction classes defined as subscribed in CS/SOM',	8),
+		(29,	'IR-BP-0004',	'SuT shall be configurable for the following parameters: FederateType, FederateName, FederationName',	1),
+		(30,	'IR-NETN-0001',	'SuT shall comply with STANREC 4800, AMSP-04 NETN FAFD Ed A, xx December 20xx',	9),
+		(31,	'IR-NETN-0002',	'SuT shall define BaseEntity.AggregateEntity.NETN_Aggregate as published and/or subscribed in CS/SOM',	9),
+		(32,	'IR-NETN-0003',	'SuT shall update the following required attributes for NETN_Aggregate object instances registered by SuT: UniqueID, Callsign, Status, Echelon, HigherHeadquarters, AggregateState, Dimensions, EntityIdentifier, EntityType, Spatial.',	9),
+		(33,	'IR-NETN-0004',	'SuT updates of NETN_Aggregate instance attributes shall be valid according to STANREC 4800.',	9),
+		(34,	'IR-NETN-0005',	'SuT shall assume default values for optional attributes on instances of NETN_Aggregate object class.',	9),
+		(35,	'IR-NETN-0006',	'SuT shall not rely on updates of optional attributes on instances of NETN_Aggregate object class.',	9),
+		(36,	'IR-NETN-0007',	'SuT shall use pre-defined IDs to generate the same UniqueID for an NETN_Aggregate instance in different Federation Executions.',	9),
+		(37,	'IR-NETN-0008',	'SuT shall document in CS if it acts as a NETN TMR Trigger, Requesting and/or Responding federate',	9),
+		(38,	'IR-NETN-0009',	'SuT triggering TMR shall define TMR_InitiateTransferModellingResponsibility as published in CS/SOM.',	9),
+		(39,	'IR-NETN-0010',	'SuT triggering TMR shall define TMR_OfferTransferModellingResponsibility as subscribed in CS/SOM.',	9),
+		(40,	'IR-NETN-0011',	'SuT triggering TMR shall define TMR_TransferResult as subscribed in CS/SOM.',	9),
+		(41,	'IR-NETN-0012',	'SuT requesting TMR shall define TMR_InitiateTransferModellingResponsibility as subscribed in CS/SOM',	9),
+		(42,	'IR-NETN-0013',	'SuT requesting TMR shall define TMR_OfferTransferModellingResponsibility as published and subscribed in CS/SOM.',	9),
+		(43,	'IR-NETN-0014',	'SuT requesting TMR shall define TMR_TransferResult as published in CS/SOM.',	9),
+		(44,	'IR-NETN-0015',	'SuT requesting TMR shall define TMR_RequestTransferModellingResponsibility as published in CS/SOM.',	9),
+		(45,	'IR-NETN-0016',	'SuT requesting TMR shall define TMR_CancelRequest as published in CS/SOM.',	9),
+		(46,	'IR-NETN-0017',	'SuT responding to TMR shall define TMR_RequestTransferModellingResponsibility as subscribed in CS/SOM.',	9),
+		(47,	'IR-NETN-0018',	'SuT responding to TMR shall define TMR_OfferTransferModellingResponsibility as published in CS/SOM.',	9),
+		(48,	'IR-NETN-0019',	'SuT responding to TMR shall define TMR_CancelRequest as',	9),
+		(49,	'IR-NETN-0020',	'SuT triggering TMR shall comply with TMR design pattern for a TMR Triggering federate as documented in NETN FAFD, STANREC 4800.',	9),
+		(50,	'IR-NETN-0021',	'SuT requesting TMR shall comply with TMR design pattern for a TMR Requesting federate as documented in NETN FAFD, STANREC 4800.',	9),
+		(51,	'IR-NETN-0022',	'SuT responding to TMR shall comply with TMR design pattern for TMR Responding federate as documented in NETN FAFD, STANREC 4800.',	9),
+		(52,	'IR-NETN-0023',	'SuT shall respond to a TMR_InitiateTransferModellingResponsibility directed to the SuT with a negative TMR_OfferTransferModellingResponsibility if it is not possible to initiate a transfer of modelling responsibility.',	9),
+		(53,	'IR-NETN-0024',	'SuT shall respond to a TMR_InitiateTransferModellingResponsibility directed to the SuT with a positive TMR_OfferTransferModellingResponsibility if it is possible to initiate a transfer of modelling responsibility.',	9),
+		(54,	'IR-NETN-0025',	'SuT shall respond to a TMR_InitiateTransferModellingResponsibility directed to the SuT with a TMR_TransferResult.',	9),
+		(55,	'IR-NETN-0026',	'SuT shall not respond to a TMR_InitiateTransferModellingResponsibility if it is not directed to the SuT.',	9),
+		(56,	'IR-NETN-0027',	'SuT shall respond to a TMR_RequestTransferModellingResponsibility directed to the SuT with a negative TMR_OfferTransferModellingResponsibility if it is not possible to perform a transfer of modelling responsibility.',	9),
+		(57,	'IR-NETN-0028',	'SuT shall respond to a TMR_RequestTransferModellingResponsibility directed to the SuT with a positive TMR_OfferTransferModellingResponsibility if it is possible to perform a transfer of modelling responsibility.',	9),
+		(58,	'IR-NETN-0029',	'SuT shall not respond to a TMR_RequestTransferModellingResponsibility if it is not directed to the SuT.',	9),
+		(59,	'IR-NETN-0030',	'SuT shall, if SuT responds positive to a TMR_RequestTransferModellingResponsibility, use HLA services to perform TMR according to pattern defined in NETN FAFD, STANREC 4800.',	9),
+		(61,	'IR-NETN-0031',	'SuT shall cancel or not perform TMR as a response to a TMR_CancelRequest directed to the SuT.',	9),
+		(62,	'IR-NETN-0032',	'SuT shall document time-out condition for receiving a TMR_OfferTransferModellingResponsibility corresponding to a TMR_RequestTransferModellingResponsibility sent by the SuT.',	9),
+		(63,	'IR-NETN-0033',	'SuT shall send TMR_CancelRequest after TMR_RequestTransferModellingResponsibility sent by SuT has timed-out.',	9),
+		(64,	'IR-NETN-0034',	'SuT acting as a MRM Service Provider shall define interaction class MRM_AggregationRequest as published in CS/SOM.',	9),
+		(65,	'IR-NETN-0035',	'SuT acting as a MRM Service Provider shall define interaction class MRM_AggregationResponse as subscribed in CS/SOM.',	9),
+		(66,	'IR-NETN-0036',	'SuT acting as a MRM Service Provider shall define interaction class MRM_ActionComplete as published in CS/SOM.',	9),
+		(67,	'IR-NETN-0037',	'SuT MRM Service Provider shall respond to interaction MRM_Trigger with interaction MRM_TriggerResponse.',	9),
+		(68,	'IR-NETN-0038',	'SuT MRM Service Provider shall send interaction MRM_ActionComplete, positive result when MRM actions are completed.',	9),
+		(69,	'IR-NETN-0040',	'SuT MRM Aggregate Federate shall comply with MRM design pattern for a MRM Service Provider federate as documented in NETN FAFD, STANREC 4800.',	9),
+		(70,	'IR-NETN-0041',	'SuT acting as a Aggregate Federate shall define object class NETN_Aggregate as published and subscribed in CS/SOM.',	9),
+		(71,	'IR-NETN-0042',	'SuT acting as a Aggregate Federate shall define interaction class MRM_DisaggregationRequest as subscribed in CS/SOM.',	9),
+		(72,	'IR-NETN-0043',	'SuT acting as a Aggregate Federate shall define interaction class MRM_DisaggregationResponse as published in CS/SOM.',	9),
+		(73,	'IR-NETN-0044',	'SuT acting as a Aggregate Federate shall define interaction class MRM_AggregationRequest as subscribed in CS/SOM.',	9),
+		(74,	'IR-NETN-0045',	'SuT acting as a Aggregate Federate shall define interaction class MRM_AggregationResponse as published in CS/SOM.',	9),
+		(75,	'IR-NETN-0046',	'SuT acting as a Aggregate Federate shall define interaction class MRM_ActionComplete as subscribed in CS/SOM.',	9),
+		(76,	'IR-NETN-0047',	'SuT Aggregate Federate shall respond to interaction MRM_DisaggregationRequest with interaction MRM_DisaggregationResponse.',	9),
+		(77,	'IR-NETN-0048',	'SuT Aggregate Federate shall respond to interaction MRM_AggregationRequest with interaction MRM_AggregationResponse.',	9),
+		(78,	'IR-NETN-0049',	'SuT MRM Higher Resolution Federate shall comply with MRM design pattern for a MRM Service Provider federate as documented in NETN FAFD, STANREC 4800',	9),
+		(79,	'IR-NETN-0050',	'SuT acting as a Higher Resolution Federate shall define the NETN-Physical leaf object classes as published and subscribed in CS/SOM',	9),
+		(80,	'IR-NETN-0051',	'SuT acting as a Higher Resolution Federate shall define interaction class MRM_DisaggregationRequest as subscribed in CS/SOM.',	9),
+		(81,	'IR-NETN-0052',	'SuT acting as a Higher Resolution Federate shall define interaction class MRM_DisaggregationResponse as published in CS/SOM.',	9),
+		(82,	'IR-NETN-0053',	'SuT acting as a Higher Resolution Federate shall define interaction class MRM_AggregationRequest as subscribed in CS/SOM.',	9),
+		(83,	'IR-NETN-0054',	'SuT acting as a Higher Resolution Federate shall define interaction class MRM_AggregationResponse as published in CS/SOM.',	9),
+		(84,	'IR-NETN-0055',	'SuT acting as a Higher Resolution Federate shall define interaction class MRM_ActionComplete as subscribed in CS/SOM.',	9),
+		(85,	'IR-NETN-0056',	'SuT Higher Resolution Federate shall respond to interaction MRM_DisaggregationRequest with interaction MRM_DisaggregationResponse.',	9),
+		(86,	'IR-NETN-0057',	'SuT Higher Resolution Federate shall respond to interaction MRM_AggregationRequest with interaction MRM_AggregationResponse.',	9),
+		(87,	'IR-NETN-0058',	'SuT MRM Service Provider shall, if SuT receives positive MRM_DisaggregationResponse, use HLA services and TMR interactions to perform MRM disaggregation according to pattern defined in NETN FAFD, STANREC 4800.',	9),
+		(88,	'IR-NETN-0059',	'SuT MRM Service Provider shall, if SuT receives positive MRM_AggregationResponse, use HLA services and TMR interactions to perform MRM aggregation according to pattern defined in NETN FAFD, STANREC 4800.',	9),
+		(89,	'IR-NETN-0060',	'SuT Aggregate or Higher Resolution Federate shall, if SuT responds positive to a MRM_DisaggregationRequest, use HLA services and TMR interactions to perform MRM disaggregation according to pattern defined in NETN FAFD, STANREC 4800.',	9),
+		(90,	'IR-NETN-0061',	'SuT Aggregate or Higher Resolution Federate shall, if SuT responds positive to a MRM_AggregationRequest, use HLA services and TMR interactions to perform MRM aggregation according to pattern defined in NETN FAFD, STANREC 4800.',	9),
+		(91,	'IR-NETN-0062',	'SuT Aggregate or Higher Resolution Federate shall, if SuT responds positive to a MRM_AggregationRequest, use HLA services and TMR interactions to perform MRM aggregation according to pattern defined in NETN FAFD, STANREC 4800.',	9),
+		(92,	'IR-NETN-0063',	'SuT shall define BaseEntity.AggregateEntity.NETN_Aggregate or a subclass and/or a NETN subclass of BaseEntity.PhysicalEntity as published and/or subscribed in CS/SOM.',	9),
+		(93,	'IR-NETN-0064',	'SuT defined as producer in CS/SOM shall for LBMLMessage.LBMLTask leaf interactions provide the following required parameters for the LBMLMessage.LBMLTask leaf classes: Task, Taskee, Tasker, TaskType.',	9),
+		(94,	'IR-NETN-0065',	'SuT defined as producer in CS/SOM shall for LBMLMessage.LBMLTask leaf interactions provide all required parameters defined in the LBMLMessage.LBMLTask leaf interaction class.',	9),
+		(95,	'IR-NETN-0066',	'SuT shall define NETN LBMLMessage.LBMLTask.MoveToLocation and LBMLMessage.LBMLTask.MoveToUnit as published and/or subscribed in CS/SOM.',	9),
+		(96,	'IR-NETN-0067',	'SuT shall define at least one leaf interaction class of NETN LBMLMessage.LBMLTaskManagement (CancelAllTasks, CancelSpecifiedTasks) as published and/or subscribed in CS/SOM.',	9),
+		(97,	'IR-NETN-0068',	'SuT shall define NETN LBMLReport.StatusReport.TaskStatusReport as subscribed in CS/SOM if SuT has defined leaf classes of LBMLTas as published in CS/SOM',	9),
+		(98,	'IR-NETN-0069',	'SuT shall define NETN LBMLReport.StatusReport.TaskStatusReport as published in CS/SOM if SuT has defined leaf classes of LBMLTas as subscribed in CS/SOM',	9),
+		(99,	'IR-NETN-0070',	'SuT shall define NETN LBMLMessage.LBMLTask.FireAtLocation and LBMLMessage.LBMLTask.FireAtUnit or subclasses of these as published and/or subscribed in CS/SOM.',	9),
+		(100,	'IR-NETN-0071',	'SuT defined as consumer in CS/SOM shall for NETN LBMLMessage.LBMLTask.FireAtLocation and LBMLMessage.LBMLTask.FireIndirectWM fire at the specified location.',	9),
+		(101,	'IR-NETN-0072',	'SuT defined as consumer in CS/SOM shall for NETN LBMLMessage.LBMLTask.FireAtUnit and LBMLMessage.LBMLTask.FireDirectWM fire at the specified unit.',	9),
+		(102,	'IR-NETN-0074',	'SuT defined as a consumer in CS/SOM shall clear the tasks at the entity that is specified in the LBMLMessage.LBMLTaskManagement.CancelSpecifiedTasks when it is received.',	9),
+		(103,	'IR-NETN-0075',	'SuT defined as consumer in CS/SOM shall for NETN LBMLMessage.LBMLTask.MoveToLocation and LBMLMessage.LBMLTask.MoveToUnit move the specified unit to the specified location and if the route is specified use it.',	9),
+		(104,	'IR-NETN-0076',	'SuT defined as a producer of NETN LBMLReport.StatusReport.TaskStatusReport in CS/SOM shall respond to a leaf class of LBMLMessage.LBMLTask with a status report of the task (Accepted/Refused).',	9),
+		(105,	'IR-NETN-0077',	'SuT defined as a producer of NETN LBMLReport.StatusReport.TaskStatusReport in CS/SOM shall update the status of the task (Aborted/Completed) when the status change.',	9),
+		(106,	'IR-NETN-0078',	'SuT shall define LBMLReport.SpotReport.ActivitySpotReport.CurrentActivitySpotReport as published and/or subscribed in CS/SOM.',	9),
+		(107,	'IR-NETN-0079',	'SuT defined as a provider in CS/SOM shall define BaseEntity.AggregateEntity.NETN_Aggregate or a subclass and/or a NETN subclass of BaseEntity.PhysicalEntity as subscribed in CS/SOM.',	9),
+		(108,	'IR-NETN-0080',	'SuT defined as a provider in SOM/CS shall send LBMLReport.SpotReport.ActivitySpotReport.CurrentActivitySpotReport about spotted enemies, neutral, or unknown units (in realation to the observer) when these are able to observ (determined by the SuT observing model).',	9),
+		(109,	'IR-NETN-0081',	'SuT shall define LBMLReport.StatusReport.ActivityStatusReport.CurrentActivityStatusReport as published and/or subscribed in CS/SOM.',	9),
+		(110,	'IR-NETN-0082',	'SuT defined as a provider in CS/SOM shall define BaseEntity.AggregateEntity.NETN_Aggregate or a subclass and/or a NETN subclass of BaseEntity.PhysicalEntity as published in CS/SOM.',	9),
+		(111,	'IR-NETN-0083',	'SuT defined as a provider in SOM/CS shall send LBMLReport.StatusReport.ActivityStatusReport.CurrentActivityStatusReport from friendly units about their own (perceived) state.',	9),
+		(112,	'IR-NETN-0084',	'SuT defined as a consumer in SOM/CS shall receive LBMLReport.StatusReport.ActivityStatusReport.CurrentActivityStatusReport for friendly units about their (perceived) state and base its low level BML tasks on this perceived truth data of blue units instead of RPR ground truth data.',	9),
+		(113,	'IR-NETN-0085',	'SuT defined as a consumer in SOM/CS shall receive LBMLReport.SpotReport.ActivitySpotReport.CurrentActivitySpotReport for spotted enemy, neutral, or unknown unit andl base its low level BML tasks on this perceived truth data on non friendly / unknown units instead of RPR ground truth data.',	9),
+		(114,	'IR-RPR2-0001',	'SuT shall comply with SISO-STD-001-2015, Standard for Guidance, Rationale, and Interoperability Modalities for the Real-time Platform Reference Federation Object Model, Version 2.0, 10 August 2015',	10),
+		(115,	'IR-RPR2-0002',	'SuT shall define BaseEntity.AggregateEntity as published or define a subclass of BaseEntity.AggregateEntity as published and/or define BaseEntity.AggregateEntity as subscribed in CS/SOM.',	10),
+		(116,	'IR-RPR2-0003',	'SuT shall update the following required attributes for AggregateEntity object instances registered by SuT: AggregateState, Dimensions, EntityIdentifier, EntityType, Spatial.',	10),
+		(117,	'IR-RPR2-0004',	'SuT shall assume default values for optional attributes on instances of AggregateEntity object class.',	10),
+		(118,	'IR-RPR2-0006',	'SuT shall not rely on updates of optional attributes on instances of AggregateEntity object class.',	10),
+		(119,	'IR-RPR2-0007',	'SuT shall be configurable for the following parameters: SiteID, ApplicationID.',	10),
+		(120,	'IR-RPR2-0008',	'SuT shall define at least one leaf object class of BaseEntity.PhysicalEntity as published and/or subscribed in CS/SOM.',	10),
+		(121,	'IR-RPR2-0009',	'SuT shall in CS specify the use of Articulated Parts for all published and subscribedBaseEntity.PhysicalEntity and subclasses.',	10),
+		(122,	'IR-RPR2-0010',	'SuT shall in CS specify the use of Dead-Reckoning algorithms for all published and subscribed BaseEntity.PhysicalEntity and subclasses.',	10),
+		(123,	'IR-RPR2-0011',	'SuT shall update the following required attributes for PhysicalEntity subclass object instances registered by SuT: EntityIdentifier, EntityType, Spatial.',	10),
+		(124,	'IR-RPR2-0012',	'SuT shall not update non-applicable PhysicalEntity Attributes as specified in Domain Appropriateness table in SISO-STD-001-2015.',	10),
+		(125,	'IR-RPR2-0013',	'SuT updates of instance attributes shall, for BaseEntity.PhysicalEntity and subclasses, be valid according to SISO-STD-001-2015 and SISO-STD-001.1-2015.',	10),
+		(126,	'IR-RPR2-0014',	'SuT updates of instance attribute Spatial shall, for BaseEntity.PhysicalEntity and subclasses, include valid Dead-Reckoning parameters for supported algorithms as specified in CS.',	10),
+		(127,	'IR-RPR2-0015',	'SuT shall assume default values for optional attributes on instances of BaseEntity.PhysicalEntity and subclasses according to SISO-STD-001-2015.',	10),
+		(128,	'IR-RPR2-0016',	'SuT shall not rely on updates of optional attributes on instances of BaseEntity.PhysicalEntity and subclasses.',	10),
+		(129,	'IR-RPR2-0017',	'SuT shall define BaseEntity.PhysicalEntity.Munition or at least one leaf object class as published or subscribed in CS/FOM when tracked munitions is used (e.g. torpedoes, missiles, etc.)',	10),
+		(130,	'IR-RPR2-0018',	'SuT shall define interaction class WeaponFire or at least one leaf class as published and/or subscribed in CS/SOM.',	10),
+		(131,	'IR-RPR2-0019',	'SuT shall provide the following required parameters for the WeaponFire interaction: EventIdentifier, FiringLocation, FiringObjectIdentifier, FuseType, InitialVelocityVector, MunitionType, WarheadType.',	10),
+		(132,	'IR-RPR2-0020',	'SuT shall when tracked munition is used provide the WeaponFire parameter MunitionObjectIdentifier.',	10),
+		(133,	'IR-RPR2-0021',	'SuT shall provide parameters for sent interactions of WeaponFire and subclasses according to SISO-STD-001-2015 and SISO-STD-001.1-2015.',	10),
+		(134,	'IR-RPR2-0022',	'SuT shall assume default values for optional parameters at interactions of WeaponFire and subclasses according to SISO-STD-001-2015.',	10),
+		(135,	'IR-RPR2-0023',	'SuT shall not rely on receiving optional parameters on interactions of WeaponFire and subclasses.',	10),
+		(136,	'IR-RPR2-0024',	'SuT shall define interaction class MunitionDetonation or at least one leaf class as published and/or subscribed in CS/SOM.',	10),
+		(137,	'IR-RPR2-0025',	'SuT shall provide the following required parameters for the MunitionDetonation interaction: DetonationLocation, EventIdentifier, FuseType, MunitionType, WarheadType.',	10),
+		(138,	'IR-RPR2-0026',	'SuT shall when munition type is not a mine provide the following required parameters for the MunitionDetonation interaction if: FiringObjectIdentifier, FinalVelocityVector.',	10),
+		(139,	'IR-RPR2-0027',	'SuT shall when tracked munition is used provide the MunitionDetonation parameter MunitionObjectIdentifier.',	10),
+		(140,	'IR-RPR2-0028',	'SuT shall when the parameter TargetObjectIdentifier at MunitionDetonation is provided, provide the parameter RelativeDetonationLocation.',	10),
+		(141,	'IR-RPR2-0029',	'SuT shall provide parameters for sent interactions of MunitionDetonation and subclasses according to SISO-STD-001-2015 and SISO-STD-001.1-2015.',	10),
+		(142,	'IR-RPR2-0030',	'SuT shall assume default values for optional parameters on interactions of MunitionDetonation and subclasses according to SISO-STD-001-2015.',	10),
+		(143,	'IR-RPR2-0031',	'SuT shall not rely on receiving optional parameters on interactions of MunitionDetonation and subclasses.',	10),
+		(144,	'IR-RPR2-0032',	'SuT shall when munition type was not a mine provide the same value on parameter EventIdentifier at the WeaponFire and the corresponding MunitionDetonation interaction.',	10),
+		(145,	'IR-RPR2-0033',	'SuT shall when receiving a MunitionDetonation interaction with a specified target (Direct Fire) and SuT has the modelling responsibility for the damage assessment at that entity, update the BaseEntity.PhysicalEntity attribute DamageState with an appropriate value.',	10),
+		(146,	'IR-RPR2-0034',	'SuT shall when receiving a MunitionDetonation without a specified target (Indirect Fire) but the same location as an entity and SuT has the modelling responsibility for the damage assessment at that entity, update the BaseEntity.PhysicalEntity attribute DamageState with an appropriate value.',	10),
+		(147,	'IR-RPR2-0005',	'SuT shall assume default values for optional attributes on instances of AggregateEntity object class.',	10),
+		(149,	'IR-NETN-0073',	'SuT defined as a consumer in CS/SOM shall clear all tasks at the entity when an LBMLMessage.LBMLTaskManagement.CancelAllTasks is received',	9),
+		(150,	'HLA-Verification-2016',	'This test case is equivalent to the FCTT_NG configuration verification step.',	6);";
+		$wpdb->query($q);
+
+
+	}//end function insert base data
 
 }//end class

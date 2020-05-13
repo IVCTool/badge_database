@@ -74,16 +74,32 @@ class Badgedb_Admin {
 			'dashicons-store',
 			1);
 
-		//$this->admin_menu_sub_reqcat_hook = add_submenu_page(
+		//I'm finding that sub menus need to be defined in here so that we
+		//	can get ahold of the hook that we need to pre-process
+		//	the page request.  This allows us to submit the forms
+		//	on the page back to themselves for processing.
+
+		//the admin sub menu for editing the requirement catagories.
 		$hook = add_submenu_page(
 			'badgedb-plugin-admin-menu',
 			'Edit Requirement Catagories',
 			'Requirement Catagories',
 			'manage_options',
 			'badgedb-plugin-admin-menu-sub-reqcat',
-			array($this, 'badgedb_admin_submenu_reqcat_page'),
-			1);
+			array($this, 'badgedb_admin_submenu_reqcat_page'), 
+			2);
 		add_action('load-' . $hook, array($this, 'badgedb_req_cat_page_submit'));
+
+		//The admin sub menu for editing requirements
+		$reqHook = add_submenu_page(
+			'badgedb-plugin-admin-menu',
+			'Edit Requirements',
+			'Requirements',
+			'manage_options',
+			'badgedb-plugin-admin-menu-sub-req',
+			array($this, 'badgedb_admin_submenu_req_page'), 
+			1);
+		add_action('load-' . $reqHook, array($this, 'badgedb_req_page_submit'));
 
 	}//end function
 
@@ -103,11 +119,22 @@ class Badgedb_Admin {
 		include( plugin_dir_path(__FILE__) . 'partials/badgedb-requirements-catagories-page.php');	
 	}//end function
 
+	public function badgedb_admin_submenu_req_page() {
+		include( plugin_dir_path(__FILE__) . 'partials/badgedb-requirements-page.php');	
+	}
+
 	/**
-	 * 
+	 * Called by the hook to handle pre-loading of the requirement catagory admin menu page.
 	 */
 	public function badgedb_req_cat_page_submit() {
 		include( plugin_dir_path(__FILE__) . 'partials/badgedb-requirements-catagories-formproc.php');
+	}//end function
+
+	/**
+	 * Called by the hook to handle pre-loading of the requirements admin menu page.
+	 */
+	public function badgedb_req_page_submit() {
+		include( plugin_dir_path(__FILE__) . 'partials/badgedb-requirements-formproc.php');
 	}//end function
 
 	/**

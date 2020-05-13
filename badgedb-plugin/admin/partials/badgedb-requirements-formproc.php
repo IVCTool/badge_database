@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Handles form submissions from the requirements catagory editor.
+ * Handles form submissions from the requirements editor.
  *
  * @link       https://github.com/IVCTool/badge_database/tree/master/badgedb-plugin
  * @since      1.0.0
@@ -41,15 +41,15 @@
  if ($isPost && $isAdmin) {
      //check which action it was and include that processor.
      if ($_POST['whichform'] == 'new') {
-         include_once(plugin_dir_path(__FILE__) . 'badgedb-requirements-catagories-new-proc.php');
+         include_once(plugin_dir_path(__FILE__) . 'badgedb-requirements-new-proc.php');
      }//end if it's a new catagory.
 
      if ($_POST['whichform'] == 'delete') {
-        include_once(plugin_dir_path(__FILE__) . 'badgedb-requirements-catagories-delete-proc.php');
+        include_once(plugin_dir_path(__FILE__) . 'badgedb-requirements-delete-proc.php');
      }
 
      if ($_POST['whichform'] == 'update') {
-      include_once(plugin_dir_path(__FILE__) . 'badgedb-requirements-catagories-edit-proc.php');
+      include_once(plugin_dir_path(__FILE__) . 'badgedb-requirements-edit-proc.php');
    }
 
  }//end if which processor should be included
