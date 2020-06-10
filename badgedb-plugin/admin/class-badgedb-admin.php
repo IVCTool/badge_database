@@ -4,7 +4,7 @@
  * The admin-specific functionality of the plugin.
  *
  * @link       https://github.com/IVCTool/badge_database/tree/master/badgedb-plugin
- * @since      0.1.0
+ * @since      1.0.0
  *
  * @package    Badgedb
  * @subpackage Badgedb/admin
@@ -41,7 +41,7 @@ class Badgedb_Admin {
 	private $version;
 
 	private $admin_menu_hook;
-	private $admin_menu_sub_reqcat_hook;
+	//private $admin_menu_sub_reqcat_hook;
 
 	/**
 	 * Initialize the class and set its properties.
@@ -80,6 +80,7 @@ class Badgedb_Admin {
 		//	on the page back to themselves for processing.
 
 		//the admin sub menu for editing the requirement catagories.
+		//TODO - explain what the last parameter (numeral) does.
 		$hook = add_submenu_page(
 			'badgedb-plugin-admin-menu',
 			'Edit Requirement Catagories',
@@ -87,7 +88,7 @@ class Badgedb_Admin {
 			'manage_options',
 			'badgedb-plugin-admin-menu-sub-reqcat',
 			array($this, 'badgedb_admin_submenu_reqcat_page'), 
-			2);
+			4);
 		add_action('load-' . $hook, array($this, 'badgedb_req_cat_page_submit'));
 
 		//The admin sub menu for editing requirements
@@ -98,18 +99,33 @@ class Badgedb_Admin {
 			'manage_options',
 			'badgedb-plugin-admin-menu-sub-req',
 			array($this, 'badgedb_admin_submenu_req_page'), 
-			1);
+			3);
 		add_action('load-' . $reqHook, array($this, 'badgedb_req_page_submit'));
 
+		//The admin sub menu for editing badges
+		$badgeHook = add_submenu_page(
+			'badgedb-plugin-admin-menu',
+			'Edit Badges',
+			'Badges',
+			'manage_options',
+			'badgedb-plugin-admin-menu-sub-badges',
+			array($this, 'badgedb_admin_submenu_badges_page'), 
+			2);
+		add_action('load-' . $badgeHook, array($this, 'badgedb_badges_page_submit'));
+
+		//The admin sub menu for editing abstract test cases
+		$atcsHook = add_submenu_page(
+			'badgedb-plugin-admin-menu',
+			'Edit Abstract Test Cases',
+			'Abstract Test Cases',
+			'manage_options',
+			'badgedb-plugin-admin-menu-sub-abstract',
+			array($this, 'badgedb_admin_submenu_atcs_page'), 
+			1);
+		add_action('load-' . $atcsHook, array($this, 'badgedb_atcs_page_submit'));
+
+
 	}//end function
-
-	// public function get_admin_menu_hook() {
-	//  	return $this->admin_menu_hook;
-	// }
-
-	public function get_admin_menu_sub_reqcat_hook() {
-		return $this->admin_menu_sub_reqcat_hook;
-	}
 
 	public function badgedb_admin_page() {
 		include( plugin_dir_path(__FILE__) . 'partials/badgedb-admin-page.php');	
@@ -121,6 +137,14 @@ class Badgedb_Admin {
 
 	public function badgedb_admin_submenu_req_page() {
 		include( plugin_dir_path(__FILE__) . 'partials/badgedb-requirements-page.php');	
+	}
+
+	public function badgedb_admin_submenu_badges_page() {
+		include( plugin_dir_path(__FILE__) . 'partials/badgedb-badges-page.php');	
+	}
+
+	public function badgedb_admin_submenu_atcs_page() {
+		include( plugin_dir_path(__FILE__) . 'partials/badgedb-abstract-test-case-page.php');
 	}
 
 	/**
@@ -135,6 +159,18 @@ class Badgedb_Admin {
 	 */
 	public function badgedb_req_page_submit() {
 		include( plugin_dir_path(__FILE__) . 'partials/badgedb-requirements-formproc.php');
+	}//end function
+
+	
+	/**
+	 * Called by the hook to handle pre-loading of the badge admin menu page.
+	 */
+	public function badgedb_badges_page_submit() {
+		include( plugin_dir_path(__FILE__) . 'partials/badgedb-badges-formproc.php');
+	}//end function
+
+	public function badgedb_atcs_page_submit() {
+		include( plugin_dir_path(__FILE__) . 'partials/badgedb-abstract-test-case-formproc.php');
 	}//end function
 
 	/**

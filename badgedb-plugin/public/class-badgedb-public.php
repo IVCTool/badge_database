@@ -93,7 +93,7 @@ class Badgedb_Public {
 		//$var = "HELLO GENERAL PUBLIC!";
 	
 		// code...
-		require_once plugin_dir_path( __FILE__ ) . '../dbinterface/badgedb_new_requirement_catagory.php';
+		require_once plugin_dir_path( __FILE__ ) . '/partials/badgedb-public-display.php';
 		return $returnval;
 	}//end function
 

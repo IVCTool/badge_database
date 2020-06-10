@@ -59,6 +59,17 @@ class Badgedb_Database {
 	public const REQUIREMENTS_IDENTIFIER_FIELD_MAX = 25;
 	public const REQUIREMENTS_DESCRIPTION_FIELD_MAX = 1431655765;
 	public const REQUIREMENTS_CATAGORY_FIELD_MAX = 10;
+
+	public const BADGES_DESCRIPTION_FIELD_MAX = 1431655765;
+	public const BADGES_GRAPHICFILE_FIELD_MAX = 255;
+	public const BADGES_IDENTIFIER_FIELD_LENGTH = 25;
+
+	//public const ABSTRACT_TEST_CASES_FILENAME_FIELD_MAX = 255;
+	public const ABSTRACT_TEST_CASES_IDENTIFIER_FIELD_MAX = 25;
+	public const ABSTRACT_TEST_CASES_NAME_FIELD_MAX = 25;
+	public const ABSTRACT_TEST_CASES_DESCRIPTION_FIELD_MAX = 1431655765;
+	public const ABSTRACT_TEST_CASES_VERSION_FIELD_MAX = 45;
+	public const ABSTRACT_TEST_CASES_WPID_FIELD_MAX = 20;
 	
 
 	/**
@@ -87,15 +98,26 @@ class Badgedb_Database {
 		$wpdb->query($reqcat_query);
 
 		//make the abstract test case table
+		//Due to the way WordPress handles file uploads the table needs
+		//to be different than it was in the original.  Basically we shouldn't
+		//use the file name, but instead need to track the ID that WordPress 
+		//uses in it's internal database for posts.  We can then retrieve
+		//the file by running a query on the wp_posts table with that ID.
+		//
+		//The wpid is a foreign key as it primarilly lives in the wp_posts table in Wordpress.
+		//
+		//NOTE: THIS MAKES THE TWO VERSIONS OF THE DATABASE SCHEMA INCOMPATIBLE!
 		$abstcs_table_name = $table_prefix . self::ABSTRACT_TEST_CASES_TABLE_NAME;
 		$abstcs_query = "CREATE TABLE $abstcs_table_name (
-			`filename` varchar(255) CHARACTER SET armscii8 NOT NULL,
 			`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
 			`identifier` varchar(25) NOT NULL,
 			`name` varchar(25) DEFAULT NULL,
 			`description` longtext NOT NULL,
 			`version` varchar(45) NOT NULL,
-			PRIMARY KEY (`id`)
+			`wpid` bigint(20) UNSIGNED NOT NULL,
+			PRIMARY KEY (`id`),
+			KEY `fk_wp_posts_idx` (`wpid`),
+			CONSTRAINT `fk_wp_posts` FOREIGN KEY (`wpid`) REFERENCES `wp_posts` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 		  ) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8;";
 		  $wpdb->query($abstcs_query);
 
@@ -297,6 +319,42 @@ class Badgedb_Database {
 					array('id' => $theId), array('%s', '%s', '%d'), array('id' => $theId));
 	}//end update_reqcat
 
+
+	/**
+	 * This just inserts a new requirement record.
+	 * 
+	 * @since	1.0.0
+	 */
+	public static function insert_new_atcs($theIdent, $theDesc, $theName, $theFileID) {
+		global $wpdb;
+		//$table_prefix = $wpdb->prefix . "badgedb_";
+		$table_name = $wpdb->prefix . "badgedb_" . self::ABSTRACT_TEST_CASES_TABLE_NAME;
+		//$theData = array('identifier' => 'Dolly', 'description' => "Clone!", 'name' => "the sheep", )
+		$theData = array('identifier' => $theIdent, 'description' => $theDesc, 'name' => $theName, 'wpid' => $theFileID);
+		$theFormat = array('%s', '%s', '%s', '%d');
+		$wpdb->insert($table_name, $theData, $theFormat);
+	}//end function
+
+		/**
+	 * Gets back all the abstract test cases.
+	 * 
+	 * @since	1.0.0
+	 */
+	public static function get_abstract_test_cases() {
+		global $wpdb;
+		$table_name = $wpdb->prefix . "badgedb_" . self::ABSTRACT_TEST_CASES_TABLE_NAME;
+		$q = "SELECT * FROM " . $table_name . ";";
+		$results = $wpdb->get_results($q, ARRAY_A);
+		if (count($results) < 1) {
+			//It does something wierd when there are no results, so lets just set it to null if the array is empty.
+			//The strange behaviour could also be related to being in WP_DEBUG = true mode and not show up in production.
+			return null;
+		} else {
+			return $results;
+		}
+
+	}//end function
+
 	/**
 	 * This returns the HTML for a select list for forms.  You need to say which table you want.
 	 * The resulting select will have a name attribute equal to what you pass in.  If you want one
@@ -365,8 +423,26 @@ class Badgedb_Database {
 	 * @since	1.0.0
 	 */
 	public static function badgedb_database_uninstall() {
+		//Get rid of all the files we uploaded (need to get them from wp_posts) 
+		//TODO 
+		//  *abstract test cases generate them
+		global $wpdb;
+		$table_name = $wpdb->prefix . "badgedb_" . self::ABSTRACT_TEST_CASES_TABLE_NAME;
+		$fields = "wpid";
+		$q = "SELECT DISTINCT " . $fields . " FROM " . $table_name . ";";
+		error_log($q);
+		$result = $wpdb->get_results($q, ARRAY_A);
+
 		//Drop all the database tables
 		self::drop_tables();
+
+		//we only delete the attachments here as it causes a FK constraint failure if 
+		// you try to delte them while the badge database tables still exist.
+		foreach ($result as $file ) {
+			error_log("Trying to remove attachment: " . $file['wpid']);
+			//This should remove the entry in the wp_posts table and get rid of the file.
+			wp_delete_attachment($file['wpid'], true);
+		}//end foreach
 
 	}//end function
 
@@ -553,6 +629,26 @@ class Badgedb_Database {
 		(149,	'IR-NETN-0073',	'SuT defined as a consumer in CS/SOM shall clear all tasks at the entity when an LBMLMessage.LBMLTaskManagement.CancelAllTasks is received',	9),
 		(150,	'HLA-Verification-2016',	'This test case is equivalent to the FCTT_NG configuration verification step.',	6);";
 		$wpdb->query($q);
+
+		$table_name = $wpdb->prefix . "badgedb_" . self::BADGES_TABLE_NAME;
+		$q = "INSERT INTO `" . $table_name . "` (`id`, `description`, `graphicfile`, `identifier`) VALUES
+		(20,	'Basic CS/SOM and Best Practices compliance',	'hlabase2016.jpg',	'HLA-BASE-2016'),
+		(21,	'NETN-FOM v2.0 Aggregate FOM Module',	'netnagg2016.jpg',	'NETN-AGG-2016'),
+		(22,	'NETN FOM v2.0 Physical FOM Module',	'netnentity2016.jpg',	'NETN-ENTITY-2016'),
+		(23,	'NETN FOM v2.0 MRM FOM Module',	'netnmrm2016.jpg',	'NETN-MRM-2016'),
+		(24,	'Basic support for NETN TMR pattern (AMSP-04 Ed A). SuT is able to respond to TMR requests.',	'netntmr2016.jpg',	'NETN-TMR-2016'),
+		(25,	'RPR-FOM v2.0 Aggregate FOM Module',	'rpragg2016.jpg',	'RPR-AGG-2016'),
+		(26,	'RPR-FOM v2.0 Physical FOM Module support. GRIM compliance wrt. Platforms, Lifeforms etc. representation of required attributes.',	'rprentity2016.jpg',	'RPR-ENTITY-2016'),
+		(30,	'RPR-Warfare v2.0 FOM Module support.',	'RprWarfare2016Pic.png',	'RPR-WARFARE-2016'),
+		(31,	'NETN-FOM v2.0 LBML FOM Module',	'NetnTask2016Pic.png',	'NETN-LBML-TASK-2016'),
+		(32,	'NETN-FOM v2.0 LBML FOM Module',	'NetnReport2016Pic.png',	'NETN-LBML-INTREP-2016'),
+		(33,	'NETN-FOM v2.0 LBML FOM Module',	'1NetnReport2016Pic.png',	'NETN-LBML-OWNSITREP-2016'),
+		(34,	'Test',	'52480977_2359249444305504_4261076894478237696_n.jpg',	'ATC-Test2');";
+		$wpdb->query($q);
+
+		//No default data to insert yet.
+		$table_name = $wpdb->prefix . "badgedb_" . self::ABSTRACT_TEST_CASES_TABLE_NAME;
+
 
 
 	}//end function insert base data
