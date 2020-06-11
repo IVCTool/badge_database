@@ -46,11 +46,13 @@
                         <input type="text" name="identifier" value="<?php echo $row['identifier'] ?>" maxlength="<?php echo Badgedb_Database::ABSTRACT_TEST_CASES_IDENTIFIER_FIELD_MAX ?>" /></td>
                         <td><input type="text" name="name" value="<?php echo $row['name'] ?>" maxlength="<?php echo Badgedb_Database::ABSTRACT_TEST_CASES_NAME_FIELD_MAX ?>" /></td>
                         <td><textarea name="description" rows="4" cols="50" " maxlength="<?php echo Badgedb_Database::ABSTRACT_TEST_CASES_DESCRIPTION_FIELD_MAX ?>" ><?php echo $row['description'] ?></textarea></td>
+                        <td><b>Replace file:</b> <input required type="file" name="newatcsfile" /></td>
                         <td><input type="submit" value="Edit" />
                         </form></td>
                         <td><form action="<?php menu_page_url('badgedb-plugin-admin-menu-sub-abstract') ?>" method="post">
                         <input type="hidden" name="whichform" value="delete" />
                         <input type="hidden" name="id" value="<?php echo $row['id'] ?>" />
+                        <input type="hidden" name="wpid" value="<?php echo $row['wpid']?>" />
                         <input type="submit" value="Delete" />
                         </form></td>
                     </tr>

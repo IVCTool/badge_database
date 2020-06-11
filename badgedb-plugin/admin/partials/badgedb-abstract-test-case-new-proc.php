@@ -53,6 +53,6 @@
     $sid = sanitize_text_field($_POST['identifier']);
     $sname = sanitize_text_field($_POST['name']);
     $sdesc = sanitize_text_field($_POST['description']);
-    Badgedb_Database::insert_new_atcs($sid, $sname, $sdesc, $fileID);
+    Badgedb_Database::insert_new_atcs($sid, $sdesc, $sname, $fileID);
 }//end insert into DB
  ?>

@@ -356,6 +356,23 @@ class Badgedb_Database {
 	}//end function
 
 	/**
+	 * Deletes the abstract test case with the id passed in.
+	 * 
+	 * @since	1.0.0
+	 */
+	public static function delete_abstract_test_case($theId, $attachementId) {
+		global $wpdb;
+		//First we need to delete the abstract test case.
+		$table_name = $wpdb->prefix . "badgedb_" . self::ABSTRACT_TEST_CASES_TABLE_NAME;
+		$where = array('id' => $theId);
+		$wpdb->delete($table_name, $where, array('%d'));
+
+		//once that's done we can delete the attachment.
+		wp_delete_attachment($attachementId, true);
+
+	}//end function
+
+	/**
 	 * This returns the HTML for a select list for forms.  You need to say which table you want.
 	 * The resulting select will have a name attribute equal to what you pass in.  If you want one
 	 * flagged as selected, pass the value of the selected item as the second parameter.
