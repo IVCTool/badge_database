@@ -104,8 +104,6 @@ class Badgedb_Database {
 		//uses in it's internal database for posts.  We can then retrieve
 		//the file by running a query on the wp_posts table with that ID.
 		//
-		//The wpid is a foreign key as it primarilly lives in the wp_posts table in Wordpress.
-		//
 		//NOTE: THIS MAKES THE TWO VERSIONS OF THE DATABASE SCHEMA INCOMPATIBLE!
 		$abstcs_table_name = $table_prefix . self::ABSTRACT_TEST_CASES_TABLE_NAME;
 		$abstcs_query = "CREATE TABLE $abstcs_table_name (
@@ -115,11 +113,9 @@ class Badgedb_Database {
 			`description` longtext NOT NULL,
 			`version` varchar(45) NOT NULL,
 			`wpid` bigint(20) UNSIGNED NOT NULL,
-			PRIMARY KEY (`id`),
-			KEY `fk_wp_posts_idx` (`wpid`),
-			CONSTRAINT `fk_wp_posts` FOREIGN KEY (`wpid`) REFERENCES `wp_posts` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+			PRIMARY KEY (`id`)
 		  ) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8;";
-		  $wpdb->query($abstcs_query);
+		$wpdb->query($abstcs_query);
 
 		//make the requirements table
 		$req_table_name = $table_prefix . self::REQUIREMENTS_TABLE_NAME;
@@ -321,17 +317,17 @@ class Badgedb_Database {
 
 
 	/**
-	 * This just inserts a new requirement record.
+	 * This just inserts a new abstract test case.
 	 * 
 	 * @since	1.0.0
 	 */
-	public static function insert_new_atcs($theIdent, $theDesc, $theName, $theFileID) {
+	public static function insert_new_atcs($theIdent, $theDesc, $theName, $theFileID, $theVersion) {
 		global $wpdb;
 		//$table_prefix = $wpdb->prefix . "badgedb_";
 		$table_name = $wpdb->prefix . "badgedb_" . self::ABSTRACT_TEST_CASES_TABLE_NAME;
 		//$theData = array('identifier' => 'Dolly', 'description' => "Clone!", 'name' => "the sheep", )
-		$theData = array('identifier' => $theIdent, 'description' => $theDesc, 'name' => $theName, 'wpid' => $theFileID);
-		$theFormat = array('%s', '%s', '%s', '%d');
+		$theData = array('identifier' => $theIdent, 'description' => $theDesc, 'name' => $theName, 'wpid' => $theFileID, 'version' => $theVersion);
+		$theFormat = array('%s', '%s', '%s', '%d', '%s');
 		$wpdb->insert($table_name, $theData, $theFormat);
 	}//end function
 
@@ -369,6 +365,39 @@ class Badgedb_Database {
 
 		//once that's done we can delete the attachment.
 		wp_delete_attachment($attachementId, true);
+
+	}//end function
+
+	
+	/**
+	 * This modifys an existing abstract test case.
+	 * 
+	 * @since	1.0.0
+	 */
+	public static function modify_atcs($theId, $theIdent, $theDesc, $theName, $theVersion, $fileUploaded, $theFileID = -1) {
+		global $wpdb;
+		//$table_prefix = $wpdb->prefix . "badgedb_";
+		$table_name = $wpdb->prefix . "badgedb_" . self::ABSTRACT_TEST_CASES_TABLE_NAME;
+
+		//We need to handle the update differently if the file was altered.
+		if ($fileUploaded) {
+			//remove the old attachment
+			//If you don't select all from the row in the query you don't get what you're expecting.
+			//For example SELCET 'wpid" .... will return a row with a field called wpid with the string value wpid, not the int value you
+			$q = "SELECT * FROM " . $table_name . " WHERE id=" . $theId . ";";
+			$oldRecord = $wpdb->get_row($q, ARRAY_A);
+			error_log($q);
+			error_log("Editing atcs and removing old attachment with post id: " . $oldRecord['wpid']);
+			wp_delete_attachment($oldRecord['wpid'], true);
+			//For whatever reason, you need to call update this way instead of how I did it for 'insert' above.
+			//If you don't you get array to string conversion errors when you try to pass the arrays into the update function.
+			$wpdb->update($table_name, array('identifier' => $theIdent, 'description' => $theDesc, 'name' => $theName, 'version' => $theVersion, 'wpid' => $theFileID), 
+				array('id' => $theId), array('%s', '%s', '%s', '%s', '%d'));
+		} else {
+			//and if the file didn't change we just won't change it.
+			$wpdb->update($table_name, array('identifier' => $theIdent, 'description' => $theDesc, 'name' => $theName, 'version' => $theVersion), 
+				array('id' => $theId), array('%s', '%s', '%s', '%s'));
+		} //end if the file wasn't updated
 
 	}//end function
 
