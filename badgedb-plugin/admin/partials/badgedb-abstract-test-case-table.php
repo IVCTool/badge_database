@@ -35,18 +35,19 @@
 
     <p>
         <table id="atcs">
-            <tr><th>Identifier</th><th>Name</th><th>Description</th></tr>
+            <tr><th>Identifier</th><th>Name</th><th>Version</th><th>Description</th></tr>
             <?php
                 foreach ($cases as $row) {
             ?>
                     <tr> 
-                        <td><form action="<?php menu_page_url('badgedb-plugin-admin-menu-sub-abstract') ?>" method="post">
+                        <td><form action="<?php menu_page_url('badgedb-plugin-admin-menu-sub-abstract') ?>" method="post" enctype="multipart/form-data">
                         <input type="hidden" name="whichform" value="update" />
                         <input type="hidden" name="id" value="<?php echo $row['id'] ?>" />
                         <input type="text" name="identifier" value="<?php echo $row['identifier'] ?>" maxlength="<?php echo Badgedb_Database::ABSTRACT_TEST_CASES_IDENTIFIER_FIELD_MAX ?>" /></td>
                         <td><input type="text" name="name" value="<?php echo $row['name'] ?>" maxlength="<?php echo Badgedb_Database::ABSTRACT_TEST_CASES_NAME_FIELD_MAX ?>" /></td>
+                        <td><input type="text" name="version" value="<?php echo $row['version'] ?>" maxlength="<?php echo Badgedb_Database::ABSTRACT_TEST_CASES_VERSION_FIELD_MAX ?>" /></td>
                         <td><textarea name="description" rows="4" cols="50" " maxlength="<?php echo Badgedb_Database::ABSTRACT_TEST_CASES_DESCRIPTION_FIELD_MAX ?>" ><?php echo $row['description'] ?></textarea></td>
-                        <td><b>Replace file:</b> <input required type="file" name="newatcsfile" /></td>
+                        <td><b>Replace file (optional):</b> (<a href="<?php echo wp_get_attachment_url($row['wpid']) ?>">current file</a>)<br><input type="file" name="newatcsfile" /></td>
                         <td><input type="submit" value="Edit" />
                         </form></td>
                         <td><form action="<?php menu_page_url('badgedb-plugin-admin-menu-sub-abstract') ?>" method="post">

@@ -1,0 +1,5 @@
+//These are the lines you need to add to the wp-config.php file
+//	to enable debugging, the log file, and the in-line display of errors.
+define( 'WP_DEBUG', true);
+define( 'WP_DEBUG_LOG', true);
+define( 'WP_DEBUG_DISPLAY', true);
