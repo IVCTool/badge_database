@@ -27,7 +27,6 @@
         
     }//end check lengths
 
-    error_log("POST variable for atcs file change is: " . $_POST['newatcsfile']);
 
     //Replace the file IF a new one was submitted
     $fileUploaded = false;
@@ -57,10 +56,16 @@
     $sname = sanitize_text_field($_POST['name']);
     $sdesc = sanitize_text_field($_POST['description']);
     $sversion = sanitize_text_field($_POST['version']);
+    $srequirements = array();
+    if (isset($_POST['requirements'])) {
+        foreach ($_POST['requirements'] as $r) {
+            array_push($srequirements, sanitize_text_field($r));
+        }
+    }
     if ($fileUploaded) {
-        Badgedb_Database::modify_atcs($_POST['id'], $sid, $sdesc, $sname, $sversion, true, $newFileID);
+        Badgedb_Database::modify_atcs($_POST['id'], $sid, $sdesc, $sname, $sversion, true, $srequirements, $newFileID);
     } else {
-        Badgedb_Database::modify_atcs($_POST['id'], $sid, $sdesc, $sname, $sversion, false);
+        Badgedb_Database::modify_atcs($_POST['id'], $sid, $sdesc, $sname, $sversion, false, $srequirements);
     }
 }//end modify into DB
  ?>

@@ -45,12 +45,24 @@
         }//end if ok
     }//end if var is set
 
+    //make an array of the requirements
+    //$requirements = [];
+    //if (isset($_POST['requirements'])) {
+    //    $requirements = $_POST['requirements'];
+    //}
+
     //if we meet all the conditions then go ahead and add it.
     if ($isPost && $isAdmin && $dataLengthOk && $fileUploaded) {
     $sid = sanitize_text_field($_POST['identifier']);
     $sname = sanitize_text_field($_POST['name']);
     $sdesc = sanitize_text_field($_POST['description']);
     $sversion = sanitize_text_field($_POST['version']);
-    Badgedb_Database::insert_new_atcs($sid, $sdesc, $sname, $fileID, $sversion);
+    $srequirements = array();
+    if (isset($_POST['requirements'])) {
+        foreach ($_POST['requirements'] as $r) {
+            array_push($srequirements, sanitize_text_field($r));
+        }
+    }
+    Badgedb_Database::insert_new_atcs($sid, $sdesc, $sname, $fileID, $sversion, $srequirements);
 }//end insert into DB
  ?>

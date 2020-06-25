@@ -321,14 +321,27 @@ class Badgedb_Database {
 	 * 
 	 * @since	1.0.0
 	 */
-	public static function insert_new_atcs($theIdent, $theDesc, $theName, $theFileID, $theVersion) {
+	public static function insert_new_atcs($theIdent, $theDesc, $theName, $theFileID, $theVersion, $theRequirements) {
 		global $wpdb;
 		//$table_prefix = $wpdb->prefix . "badgedb_";
 		$table_name = $wpdb->prefix . "badgedb_" . self::ABSTRACT_TEST_CASES_TABLE_NAME;
 		//$theData = array('identifier' => 'Dolly', 'description' => "Clone!", 'name' => "the sheep", )
 		$theData = array('identifier' => $theIdent, 'description' => $theDesc, 'name' => $theName, 'wpid' => $theFileID, 'version' => $theVersion);
 		$theFormat = array('%s', '%s', '%s', '%d', '%s');
-		$wpdb->insert($table_name, $theData, $theFormat);
+		$inserted = $wpdb->insert($table_name, $theData, $theFormat);
+		
+		//We need to create all the relevant records in abstracttcs_has_requirements
+		//We need the id of the new record
+		$newID = $wpdb->insert_id;
+		error_log("Requiremens for the new atcs: " . count($theRequirements));
+		//We need to make sure the record was inserted AND that there is an array of requirements
+		if ($inserted != false && is_array($theRequirements)) {
+			$tn = $wpdb->prefix . "badgedb_" . self::ABSTRACTTCS_HAS_REQUIREMENTS_TABLE_NAME;
+			foreach ($theRequirements as $r) {
+				$wpdb->insert($tn, array('abstracttcs_id' => $newID, 'requirements_id' => $r), array('%d', '%d'));
+			}//end loop
+		}//end if
+
 	}//end function
 
 		/**
@@ -366,6 +379,10 @@ class Badgedb_Database {
 		//once that's done we can delete the attachment.
 		wp_delete_attachment($attachementId, true);
 
+		//And then all the records in the list of requirements
+		$table_name = $wpdb->prefix . "badgedb_" . self::ABSTRACTTCS_HAS_REQUIREMENTS_TABLE_NAME;
+		$where = array('abstracttcs_id' => $theId);
+		$wpdb->delete($table_name, $where, array('%d'));
 	}//end function
 
 	
@@ -374,7 +391,7 @@ class Badgedb_Database {
 	 * 
 	 * @since	1.0.0
 	 */
-	public static function modify_atcs($theId, $theIdent, $theDesc, $theName, $theVersion, $fileUploaded, $theFileID = -1) {
+	public static function modify_atcs($theId, $theIdent, $theDesc, $theName, $theVersion, $fileUploaded, $theRequirements, $theFileID = -1) {
 		global $wpdb;
 		//$table_prefix = $wpdb->prefix . "badgedb_";
 		$table_name = $wpdb->prefix . "badgedb_" . self::ABSTRACT_TEST_CASES_TABLE_NAME;
@@ -398,6 +415,19 @@ class Badgedb_Database {
 			$wpdb->update($table_name, array('identifier' => $theIdent, 'description' => $theDesc, 'name' => $theName, 'version' => $theVersion), 
 				array('id' => $theId), array('%s', '%s', '%s', '%s'));
 		} //end if the file wasn't updated
+
+		//Now we also need to update the requirements associated with this.
+		//First just blow away whatever was in there
+		$table_name = $wpdb->prefix . "badgedb_" . self::ABSTRACTTCS_HAS_REQUIREMENTS_TABLE_NAME;
+		$where = array('abstracttcs_id' => $theId);
+		$wpdb->delete($table_name, $where, array('%d'));
+		//Now put in the ones that were passed, if there were any
+		if (is_array($theRequirements)) {
+			$tn = $wpdb->prefix . "badgedb_" . self::ABSTRACTTCS_HAS_REQUIREMENTS_TABLE_NAME;
+			foreach ($theRequirements as $r) {
+				$wpdb->insert($tn, array('abstracttcs_id' => $theId, 'requirements_id' => $r), array('%d', '%d'));
+			}//end loop
+		}//end if
 
 	}//end function
 
@@ -457,6 +487,107 @@ class Badgedb_Database {
 			if ($selected != null && $selected == $row[$selectfield]) {
 				$selectbox .= "selected ";
 			}
+			$selectbox .= "value=\"" . $row[$valueField] . "\">" . $row[$labelField] . "</option>";
+		}//end loop over records
+		$selectbox .= "</select>";
+
+		return $selectbox;
+	}//end functions
+
+	/**
+	 * This returns the HTML for a select list for forms where more than one item can
+	 * be selected.  You need to say which table you want the options to come from and
+	 * give an array (optional) of the selected values
+	 * 
+	 * The resulting select will have a name attribute equal to what you pass in.  If you want one
+	 * flagged as selected, pass the value of the selected item as the second parameter.
+	 * 
+	 * Valid options:
+	 * 			- atcs-req  (abstract test case has requirements)
+	 * 
+	 * If you pass something not on the list you will get a select list with ERROR as the only
+	 * option.
+	 * 
+	 * The rational for doing it this way is as for the single select.
+	 * 
+	 * @param	$optionTable	Code for what table to use.  Valid codes:
+	 * 								atcs-req	Gives a select box with the requirements for abstract test cases
+	 * 
+	 * @param	$formFieldName	What the HTML form element will have for a name
+	 * @param	$selectorID		If you need to pre-select options this is the id what will be used for the database query.
+	 * 
+	 * @return	string containing complete HTML syntax for a multi-select form element.
+	 * @since	1.0.0
+	 */
+	public static function get_form_multi_select($optionTable, $formFieldName, $selectorID = -1) {
+		global $wpdb;
+
+		//first, define some variables we will set in the if clause
+		//for the chosen table.
+		$valid = false;			//just a flag to decide if a valid option was passed for the table
+		$table_Name = null;		//the table we will use
+		$fields = null;			//the fields that will be retrieved
+		$valueField = null;		//the field that will have the option value for the form
+		$labelField = null;		//the field that will be used to show the option text to users
+		$selectedValues = null;	//which values should be pre-selected.  FOr multi-select this will have to come form a query.
+		$optionQuery = null;	//the query that will select the option data
+		$selectedQuery = null;	//the query that will get the values that need to be pre-selected.
+		$selectedValueField = null; //the field name for the selected elements result.
+
+		//Make sure it's something we support
+		if ($optionTable == "atcs-req") {
+			$valid = true;
+			//The two tables we need for the query
+			$ahrTableName = $wpdb->prefix . "badgedb_" . self::ABSTRACTTCS_HAS_REQUIREMENTS_TABLE_NAME;
+			$reqTableName = $wpdb->prefix . "badgedb_" . self::REQUIREMENTS_TABLE_NAME;
+			//The way I'm building the query the option table name should have all the SQL syntax needed 
+			//to get the data, so it can include joins or what have you
+			$selected_table_name = "(" . $reqTableName . 
+				" JOIN " . $ahrTableName . " ON " . $reqTableName . ".id = " . $ahrTableName . ".requirements_id)";
+			$fields = "identifier, requirements_id";
+			$selector = "abstracttcs_id";
+			$valueField = "id";
+			$selectedValueField = "requirements_id";
+
+			$labelField = "identifier";
+			$optionQuery = "SELECT id, identifier FROM " . $reqTableName . ";";	
+			error_log("Option query: " . $optionQuery);
+			//make up the selected query if we need to
+			if ($selectorID != -1) {
+				$selectedQuery = "SELECT requirements_id FROM " . $selected_table_name . " where " . $selector . " = " . $selectorID . ";";
+				error_log("Selected options query: " . $selectedQuery);
+			}
+		}
+
+		//See if it's not a valid choice, send back something to show there was an error.
+		if ($valid == false) {
+			return "<select name=\"ERROR\"><option value=\"ERROR\">ERROR</option></select>";
+		}//end if it's not valid
+
+
+		//Now get the whole set of options
+		$optionRecords = $wpdb->get_results($optionQuery, ARRAY_A);
+
+
+		//get the selected ones if we need to
+		$selectedRecords = array();
+		if (isset($selectedQuery)) {
+			$selectedRecords = $wpdb->get_results($selectedQuery, ARRAY_A);
+		}
+
+		//Build up the select box
+		$selectbox = "<select name=\"" . $formFieldName . "[]\" multiple>";
+		foreach ($optionRecords as $row) {
+			$selectbox .= "<option ";
+			$selected = false;
+			foreach ($selectedRecords as $s) {
+				error_log("Current, selected: " . $row[$valueField] . ", " . $s[$selectedValueField]);
+				if($row[$valueField] == $s[$selectedValueField]) { 
+					$selected = true; 
+					break;
+				}
+			}
+			if ($selected) { $selectbox .= "selected "; }
 			$selectbox .= "value=\"" . $row[$valueField] . "\">" . $row[$labelField] . "</option>";
 		}//end loop over records
 		$selectbox .= "</select>";
