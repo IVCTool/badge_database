@@ -38,6 +38,7 @@
         <b>Name (max 255 characters):</b> <input required type="text" name="name" maxlength="<?php echo Badgedb_Database::ABSTRACT_TEST_CASES_NAME_FIELD_MAX ?>" /><br>
         <b>Description:</b><br><textarea required name="description" rows="4" cols="50" maxlength="<?php echo Badgedb_Database::ABSTRACT_TEST_CASES_DESCRIPTION_FIELD_MAX ?>"> </textarea><br>
         <b>Version (max 45 characters):</b> <input required type="text" name="version" maxlength="<?php echo Badgedb_Database::ABSTRACT_TEST_CASES_VERSION_FIELD_MAX ?>" /><br>
+        <b>Interoperability Requirement Coverage (select all that apply):</b><br> <?php echo Badgedb_Database::get_form_multi_select('atcs-req', 'requirements') ?><br>
         <b>File:</b> <input required type="file" name="atcsfile" />
         <br><input type="submit" value="Add"/>
         </form>
