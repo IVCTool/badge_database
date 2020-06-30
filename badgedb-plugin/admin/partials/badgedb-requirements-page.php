@@ -30,9 +30,9 @@
     <p>
         <form action="<?php menu_page_url('badgedb-plugin-admin-menu-sub-req') ?>" method="post">
         <input type="hidden" name="whichform" value="new" />
-        <b>Identifier (max 10 characters):</b> <input type="text" name="identifier" maxlength="<?php echo Badgedb_Database::REQUIREMENTS_IDENTIFIER_FIELD_MAX ?>" /><br>
-        <b>Catagory: <?php echo Badgedb_Database::get_form_select("catagory") ?><br>
-        <b>Description:</b><br><textarea name="description" rows="4" cols="50" maxlength="<?php echo Badgedb_Database::REQUIREMENTS_DESCRIPTION_FIELD_MAX ?>"> </textarea>
+        <b>Identifier (max 10 characters):</b> <input required type="text" name="identifier" maxlength="<?php echo Badgedb_Database::REQUIREMENTS_IDENTIFIER_FIELD_MAX ?>" /><br>
+        <b>Catagory: <?php echo Badgedb_Database::get_form_select("catagory", true) ?><br>
+        <b>Description:</b><br><textarea required name="description" rows="4" cols="50" maxlength="<?php echo Badgedb_Database::REQUIREMENTS_DESCRIPTION_FIELD_MAX ?>"></textarea>
         <br><input type="submit" value="Add"/>
         </form>
     </p>

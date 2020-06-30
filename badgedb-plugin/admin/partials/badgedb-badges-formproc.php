@@ -36,15 +36,15 @@
  if ($isPost && $isAdmin) {
      //check which action it was and include that processor.
      if ($_POST['whichform'] == 'new') {
-         //include_once(plugin_dir_path(__FILE__) . 'badgedb-requirements-catagories-new-proc.php');
+         include_once(plugin_dir_path(__FILE__) . 'badgedb-badges-new-proc.php');
      }//end if it's a new catagory.
 
      if ($_POST['whichform'] == 'delete') {
-        //include_once(plugin_dir_path(__FILE__) . 'badgedb-requirements-catagories-delete-proc.php');
+        include_once(plugin_dir_path(__FILE__) . 'badgedb-badges-delete-proc.php');
      }
 
      if ($_POST['whichform'] == 'update') {
-      //include_once(plugin_dir_path(__FILE__) . 'badgedb-requirements-catagories-edit-proc.php');
+      //include_once(plugin_dir_path(__FILE__) . 'badgedb-badges-edit-proc.php');
    }
 
  }//end if which processor should be included

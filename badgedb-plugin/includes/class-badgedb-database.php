@@ -61,8 +61,8 @@ class Badgedb_Database {
 	public const REQUIREMENTS_CATAGORY_FIELD_MAX = 10;
 
 	public const BADGES_DESCRIPTION_FIELD_MAX = 1431655765;
-	public const BADGES_GRAPHICFILE_FIELD_MAX = 255;
-	public const BADGES_IDENTIFIER_FIELD_LENGTH = 25;
+	public const BADGES_IDENTIFIER_FIELD_MAX = 25;
+	public const BADGES_WPID_FIELD_MAX = 20;
 
 	//public const ABSTRACT_TEST_CASES_FILENAME_FIELD_MAX = 255;
 	public const ABSTRACT_TEST_CASES_IDENTIFIER_FIELD_MAX = 25;
@@ -135,7 +135,7 @@ class Badgedb_Database {
 		$badges_query = "CREATE TABLE $badges_table_name (
 			`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
 			`description` longtext NOT NULL,
-			`graphicfile` varchar(255) DEFAULT NULL,
+			`wpid` bigint(20) UNSIGNED,
 			`identifier` varchar(25) NOT NULL,
 			PRIMARY KEY (`id`)
 		  ) ENGINE=MyISAM AUTO_INCREMENT=35 DEFAULT CHARSET=utf8;";
@@ -431,6 +431,96 @@ class Badgedb_Database {
 
 	}//end function
 
+		/**
+	 * Gets back all the badges.
+	 * 
+	 * @since	1.0.0
+	 */
+	public static function get_badges() {
+		global $wpdb;
+		$table_name = $wpdb->prefix . "badgedb_" . self::BADGES_TABLE_NAME;
+		$q = "SELECT * FROM " . $table_name . ";";
+		$results = $wpdb->get_results($q, ARRAY_A);
+		if (count($results) < 1) {
+			//It does something wierd when there are no results, so lets just set it to null if the array is empty.
+			//The strange behaviour could also be related to being in WP_DEBUG = true mode and not show up in production.
+			return null;
+		} else {
+			return $results;
+		}
+	}//end function	
+
+	/**
+	 * Adds a new badge to the database
+	 * 
+	 * @since 1.0.0
+	 */
+	public static function insert_new_badge($theIdent, $theDesc, $theRequirements) {
+		global $wpdb;
+		
+		$table_name = $wpdb->prefix . "badgedb_" . self::BADGES_TABLE_NAME;
+		//$theData = array('identifier' => 'Dolly', 'description' => "Clone!", 'name' => "the sheep", )
+		$theData = array('identifier' => $theIdent, 'description' => $theDesc);
+		$theFormat = array('%s', '%s');
+		$inserted = $wpdb->insert($table_name, $theData, $theFormat);
+		
+		//We need to create all the relevant records in badges_has_requirements
+		//We need the id of the new record
+		$newID = $wpdb->insert_id;
+		error_log("Requiremens for the new badge: " . count($theRequirements));
+		//We need to make sure the record was inserted AND that there is an array of requirements
+		if ($inserted != false && is_array($theRequirements)) {
+			$tn = $wpdb->prefix . "badgedb_" . self::BADGES_HAS_REQUIREMENTS_TABLE_NAME;
+			foreach ($theRequirements as $r) {
+				$wpdb->insert($tn, array('badges_id' => $newID, 'requirements_id' => $r), array('%d', '%d'));
+			}//end loop
+		}//end if
+
+		//TODO - deal with graphic file
+		//TODO - badges_has_badges table
+	}
+
+	/**
+	 * Deletes a badge from the database.
+	 * 
+	 * @since 1.0.0
+	 */
+	public static function delete_badge($theID) {
+		error_log("Attempting to delete bage with id " . $theID);
+		//get the record we're going to delete
+		global $wpdb;
+		$tn = $wpdb->prefix . "badgedb_" . self::BADGES_TABLE_NAME;
+		$q = "SELECT * FROM " . $tn . " WHERE id=" . $theID;
+		error_log($q);
+		$records = $wpdb->get_results($q, ARRAY_A);
+		//There really should only be one, so lets just pop the last one.
+		$r = array_pop($records);
+		$theAttachmentId = $r['wpid'];
+
+		//Delete the attachment record
+		//TODO
+
+		//Delete the requirements recrods
+		//TODO
+
+		//Delete the badge prequisite records.
+		//TODO
+
+		//Delete the record.
+		$where = array('id' => $theID);
+		$wpdb->delete($tn, $where, array('%d'));
+	}
+
+	/**
+	 * Modifies an existing badge record
+	 * 
+	 * @since 1.0.0
+	 */
+	public static function modify_badge() {
+		//TODO
+	}
+
+
 	/**
 	 * This returns the HTML for a select list for forms.  You need to say which table you want.
 	 * The resulting select will have a name attribute equal to what you pass in.  If you want one
@@ -449,7 +539,7 @@ class Badgedb_Database {
 	 * 
 	 * @since	1.0.0
 	 */
-	public static function get_form_select($whichTable, $selected = null) {
+	public static function get_form_select($whichTable, $isRequired, $selected = null) {
 		global $wpdb;
 
 		//first, define some variables we will set in the if clause
@@ -459,6 +549,7 @@ class Badgedb_Database {
 		$fields = null;
 		$valueField = null;
 		$labelField = null;
+		if (!is_bool($isRequired)) { $isRequired = false; }  #just in case it get passed in wrong
 
 		//Make sure it's something we support
 		if ($whichTable == "catagory") {
@@ -481,7 +572,13 @@ class Badgedb_Database {
 		$result = $wpdb->get_results($q, ARRAY_A);
 
 		//Build up the select box
-		$selectbox = "<select name=\"" . $whichTable . "\">";
+		$selectbox = "<select ";
+		if ($isRequired) {
+			$selectbox .= "required name=\"" . $whichTable . "\">";
+		} else {
+			$selectbox .= "name=\"" . $whichTable . "\">";
+		}
+		//now the options
 		foreach ($result as $row) {
 			$selectbox .= "<option ";
 			if ($selected != null && $selected == $row[$selectfield]) {
@@ -504,6 +601,8 @@ class Badgedb_Database {
 	 * 
 	 * Valid options:
 	 * 			- atcs-req  (abstract test case has requirements)
+	 * 			- badges-req (badges has requirements)
+	 * 			- badges-badge (badges has badges)
 	 * 
 	 * If you pass something not on the list you will get a select list with ERROR as the only
 	 * option.
@@ -511,15 +610,14 @@ class Badgedb_Database {
 	 * The rational for doing it this way is as for the single select.
 	 * 
 	 * @param	$optionTable	Code for what table to use.  Valid codes:
-	 * 								atcs-req	Gives a select box with the requirements for abstract test cases
-	 * 
 	 * @param	$formFieldName	What the HTML form element will have for a name
+	 * @param	$isRequired		true/false should the select be marked as required for validation
 	 * @param	$selectorID		If you need to pre-select options this is the id what will be used for the database query.
 	 * 
 	 * @return	string containing complete HTML syntax for a multi-select form element.
 	 * @since	1.0.0
 	 */
-	public static function get_form_multi_select($optionTable, $formFieldName, $selectorID = -1) {
+	public static function get_form_multi_select($optionTable, $formFieldName, $isRequired, $selectorID = -1) {
 		global $wpdb;
 
 		//first, define some variables we will set in the if clause
@@ -533,6 +631,7 @@ class Badgedb_Database {
 		$optionQuery = null;	//the query that will select the option data
 		$selectedQuery = null;	//the query that will get the values that need to be pre-selected.
 		$selectedValueField = null; //the field name for the selected elements result.
+		if (!is_bool($isRequired)) { $isRequired = false; }  #just in case it get passed in wrong
 
 		//Make sure it's something we support
 		if ($optionTable == "atcs-req") {
@@ -557,6 +656,48 @@ class Badgedb_Database {
 				$selectedQuery = "SELECT requirements_id FROM " . $selected_table_name . " where " . $selector . " = " . $selectorID . ";";
 				error_log("Selected options query: " . $selectedQuery);
 			}
+		} elseif ($optionTable == "badges-req") {
+			$valid = true;
+			//The two tables needed for the query
+			$bhrTableName = $wpdb->prefix . "badgedb_" . self::BADGES_HAS_REQUIREMENTS_TABLE_NAME;
+			$reqTableName = $wpdb->prefix . "badgedb_" . self::REQUIREMENTS_TABLE_NAME;
+			//Now make up the poart of teh query that specifies the data.
+			$data_source = "(" . $reqTableName . 
+			" JOIN " . $bhrTableName . " ON " . $reqTableName . ".id = " . $bhrTableName . ".requirements_id)";
+			$fields = "identifier, requirements_id";
+			$selector = "badges_id";
+			$valueField = "id";
+			$selectedValueField = "requirements_id";
+
+			$labelField = "identifier";
+			$optionQuery = "SELECT id, identifier FROM " . $reqTableName . ";";	
+			error_log("Option query: " . $optionQuery);
+			//make up the selected query if we need to
+			if ($selectorID != -1) {
+				$selectedQuery = "SELECT requirements_id FROM " . $selected_table_name . " where " . $selector . " = " . $selectorID . ";";
+				error_log("Selected options query: " . $selectedQuery);
+			}
+		} elseif ($optionTable == "badges-badge") {
+			$valid = true;
+			//The two tables needed for the query
+			$bhbTableName = $wpdb->prefix . "badgedb_" . self::BADGES_HAS_REQUIREMENTS_TABLE_NAME;
+			$badgesTableName = $wpdb->prefix . "badgedb_" . self::BADGES_TABLE_NAME;
+			//Now make up the poart of teh query that specifies the data.
+			$data_source = "(" . $badgesTableName . 
+			" JOIN " . $bhbTableName . " ON " . $badgesTableName . ".id = " . $bhbTableName . ".badges_id_dependency)";
+			$fields = "identifier, badges_id_dependency";
+			$selector = "badges_id";
+			$valueField = "id";
+			$selectedValueField = "badges_id_dependency";
+
+			$labelField = "identifier";
+			$optionQuery = "SELECT id, identifier FROM " . $badgesTableName . ";";	
+			error_log("Option query: " . $optionQuery);
+			//make up the selected query if we need to
+			if ($selectorID != -1) {
+				$selectedQuery = "SELECT badges_id_dependency FROM " . $selected_table_name . " where " . $selector . " = " . $selectorID . ";";
+				error_log("Selected options query: " . $selectedQuery);
+			}
 		}
 
 		//See if it's not a valid choice, send back something to show there was an error.
@@ -576,7 +717,15 @@ class Badgedb_Database {
 		}
 
 		//Build up the select box
-		$selectbox = "<select name=\"" . $formFieldName . "[]\" multiple>";
+		//Make the opening select tag
+		$selectbox = "<select ";
+		if ($isRequired) {
+			$selectbox .= "required name=\"" . $formFieldName . "[]\" multiple>";
+		}
+		else {
+			$selectbox .= "name=\"" . $formFieldName . "[]\" multiple>";
+		}
+		//Now add the options
 		foreach ($optionRecords as $row) {
 			$selectbox .= "<option ";
 			$selected = false;
@@ -808,25 +957,26 @@ class Badgedb_Database {
 		$wpdb->query($q);
 
 		$table_name = $wpdb->prefix . "badgedb_" . self::BADGES_TABLE_NAME;
-		$q = "INSERT INTO `" . $table_name . "` (`id`, `description`, `graphicfile`, `identifier`) VALUES
-		(20,	'Basic CS/SOM and Best Practices compliance',	'hlabase2016.jpg',	'HLA-BASE-2016'),
-		(21,	'NETN-FOM v2.0 Aggregate FOM Module',	'netnagg2016.jpg',	'NETN-AGG-2016'),
-		(22,	'NETN FOM v2.0 Physical FOM Module',	'netnentity2016.jpg',	'NETN-ENTITY-2016'),
-		(23,	'NETN FOM v2.0 MRM FOM Module',	'netnmrm2016.jpg',	'NETN-MRM-2016'),
-		(24,	'Basic support for NETN TMR pattern (AMSP-04 Ed A). SuT is able to respond to TMR requests.',	'netntmr2016.jpg',	'NETN-TMR-2016'),
-		(25,	'RPR-FOM v2.0 Aggregate FOM Module',	'rpragg2016.jpg',	'RPR-AGG-2016'),
-		(26,	'RPR-FOM v2.0 Physical FOM Module support. GRIM compliance wrt. Platforms, Lifeforms etc. representation of required attributes.',	'rprentity2016.jpg',	'RPR-ENTITY-2016'),
-		(30,	'RPR-Warfare v2.0 FOM Module support.',	'RprWarfare2016Pic.png',	'RPR-WARFARE-2016'),
-		(31,	'NETN-FOM v2.0 LBML FOM Module',	'NetnTask2016Pic.png',	'NETN-LBML-TASK-2016'),
-		(32,	'NETN-FOM v2.0 LBML FOM Module',	'NetnReport2016Pic.png',	'NETN-LBML-INTREP-2016'),
-		(33,	'NETN-FOM v2.0 LBML FOM Module',	'1NetnReport2016Pic.png',	'NETN-LBML-OWNSITREP-2016'),
-		(34,	'Test',	'52480977_2359249444305504_4261076894478237696_n.jpg',	'ATC-Test2');";
+		$q = "INSERT INTO `" . $table_name . "` (`id`, `description`, `wpid`, `identifier`) VALUES
+		(20,	'Basic CS/SOM and Best Practices compliance',	NULL,	'HLA-BASE-2016'),
+		(21,	'NETN-FOM v2.0 Aggregate FOM Module',	NULL,	'NETN-AGG-2016'),
+		(22,	'NETN FOM v2.0 Physical FOM Module',	NULL,	'NETN-ENTITY-2016'),
+		(23,	'NETN FOM v2.0 MRM FOM Module',	NULL,	'NETN-MRM-2016'),
+		(24,	'Basic support for NETN TMR pattern (AMSP-04 Ed A). SuT is able to respond to TMR requests.',	NULL,	'NETN-TMR-2016'),
+		(25,	'RPR-FOM v2.0 Aggregate FOM Module',	NULL,	'RPR-AGG-2016'),
+		(26,	'RPR-FOM v2.0 Physical FOM Module support. GRIM compliance wrt. Platforms, Lifeforms etc. representation of required attributes.',	NULL,	'RPR-ENTITY-2016'),
+		(30,	'RPR-Warfare v2.0 FOM Module support.',	NULL,	'RPR-WARFARE-2016'),
+		(31,	'NETN-FOM v2.0 LBML FOM Module',	NULL,	'NETN-LBML-TASK-2016'),
+		(32,	'NETN-FOM v2.0 LBML FOM Module',	NULL,	'NETN-LBML-INTREP-2016'),
+		(33,	'NETN-FOM v2.0 LBML FOM Module',	NULL,	'NETN-LBML-OWNSITREP-2016'),
+		(34,	'Test',	NULL,	'ATC-Test2');";
 		$wpdb->query($q);
 
 		//No default data to insert yet.
 		$table_name = $wpdb->prefix . "badgedb_" . self::ABSTRACT_TEST_CASES_TABLE_NAME;
 
-
+		//No default data to insert yet
+		$table_name = $wpdb->prefix . "badgedb_" . self::BADGES_HAS_BADGES_TABLE_NAME;
 
 	}//end function insert base data
 

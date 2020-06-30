@@ -43,9 +43,9 @@
                         <td><form action="<?php menu_page_url('badgedb-plugin-admin-menu-sub-req') ?>" method="post">
                         <input type="hidden" name="whichform" value="update" />
                         <input type="hidden" name="id" value="<?php echo $row['id'] ?>" />
-                        <input type="text" name="identifier" value="<?php echo $row['identifier'] ?>" maxlength="<?php echo Badgedb_Database::REQUIREMENTS_IDENTIFIER_FIELD_MAX ?>" /></td>
-                        <td><?php echo Badgedb_Database::get_form_select("catagory", $row['reqcategories_id']) ?></td>
-                        <td><textarea name="description" rows="4" cols="50" maxlength="<?php echo Badgedb_Database::REQUIREMENTS_DESCRIPTION_FIELD_MAX ?>"><?php echo $row['description'] ?></textarea></td>
+                        <input required type="text" name="identifier" value="<?php echo $row['identifier'] ?>" maxlength="<?php echo Badgedb_Database::REQUIREMENTS_IDENTIFIER_FIELD_MAX ?>" /></td>
+                        <td><?php echo Badgedb_Database::get_form_select("catagory", true, $row['reqcategories_id']) ?></td>
+                        <td><textarea required name="description" rows="4" cols="50" maxlength="<?php echo Badgedb_Database::REQUIREMENTS_DESCRIPTION_FIELD_MAX ?>"><?php echo $row['description'] ?></textarea></td>
                         <td><input type="submit" value="Edit" />
                         </form></td>
                         <td><form action="<?php menu_page_url('badgedb-plugin-admin-menu-sub-req') ?>" method="post">
