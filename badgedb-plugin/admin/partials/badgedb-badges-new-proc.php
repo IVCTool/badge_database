@@ -26,10 +26,11 @@
     //Try to upload the file
     $fileUploaded = false;
     $fileID = "";
+    error_log("New badge proc: Checking for graphic file...");
     require_once( ABSPATH . 'wp-admin/includes/media.php' );
     if ( isset($_FILES['graphicFile'])) {
+        error_log("New badge proc: There was a file attached to the request.");
         $fileID = media_handle_upload('graphicFile', 0); //0 means it's not attached to a post
-
         if (is_wp_error($fileID)) {
             error_log($fileID->get_error_message());
             error_log($_FILES['graphicFile']['name']);
@@ -40,30 +41,28 @@
         }//end if ok
     }//end if var is set
 
-    //make an array of the requirements
-    //$requirements = [];
-    //if (isset($_POST['requirements'])) {
-    //    $requirements = $_POST['requirements'];
-    //}
-
-    $fileUploaded = true;  //just until we actually implement the file part
-
     //if we meet all the conditions then go ahead and add it.
+    error_log("New badge: testing condidionts");
+    error_log("isPost: " . $isPost);
+    error_log("isAdmin: " . $isAdmin);
+    error_log("datalengthok: " . $dataLengthOk);
+    error_log("fileUploaded: " . $fileUploaded);
     if ($isPost && $isAdmin && $dataLengthOk && $fileUploaded) {
-    $sidentifier = sanitize_text_field($_POST['identifier']);
-    $sdesc = sanitize_text_field($_POST['description']);
-    $srequirements = array();
-    if (isset($_POST['requirements'])) {
-        foreach ($_POST['requirements'] as $r) {
-            array_push($srequirements, sanitize_text_field($r));
+        error_log("Conditions met!");
+        $sidentifier = sanitize_text_field($_POST['identifier']);
+        $sdesc = sanitize_text_field($_POST['description']);
+        $srequirements = array();
+        if (isset($_POST['requirements'])) {
+            foreach ($_POST['requirements'] as $r) {
+                array_push($srequirements, sanitize_text_field($r));
+            }
         }
-    }
-    $sbadgedeps = array();
-    if (isset($_POST['badgedeps'])) {
-        foreach ($_POST['badgedeps'] as $b) {
-            array_push($sbadgedeps, sanitize_text_field($b));
+        $sbadgedeps = array();
+        if (isset($_POST['badgedeps'])) {
+            foreach ($_POST['badgedeps'] as $b) {
+                array_push($sbadgedeps, sanitize_text_field($b));
+            }
         }
-    }
-    Badgedb_Database::insert_new_badge($sidentifier, $sdesc, $srequirements, $sbadgedeps);
-}//end insert into DB
+        Badgedb_Database::insert_new_badge($sidentifier, $sdesc, $srequirements, $sbadgedeps, $fileID);
+    }//end insert into DB
  ?>

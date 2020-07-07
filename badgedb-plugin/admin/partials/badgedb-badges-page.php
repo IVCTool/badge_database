@@ -34,6 +34,7 @@
         <b>Description:</b><br><textarea required name="description" rows="4" cols="50" maxlength="<?php echo Badgedb_Database::BADGES_DESCRIPTION_FIELD_MAX ?>"></textarea><br>
         <b>Interoperability Requirements (select all that apply):</b><br> <?php echo Badgedb_Database::get_form_multi_select('badges-req', 'requirements', false) ?><br>
         <b>Badge Prerequisits (select all that apply):</b><br> <?php echo Badgedb_Database::get_form_multi_select('badges-badge', 'badgedeps', false) ?><br>
+        <b>Badge Graphic:</b><br> <input type="file" name="graphicFile" required /><br>
         <br><input type="submit" value="Add"/>
         </form>
     </p>

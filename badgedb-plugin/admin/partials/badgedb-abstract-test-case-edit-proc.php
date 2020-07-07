@@ -36,14 +36,13 @@
     if ( isset($_FILES['newatcsfile'])) {
         //Upload the new attachement now, and then deal with it when we alter the record.
         $newFileID = media_handle_upload('newatcsfile', 0); //0 means it's not attached to a post
-        error_log("File replacement requested for Abstract Test Case!");
         if (is_wp_error($newFileID)) {
+            error_log("File replacement requested for Abstract Test Case!");
             error_log($newFileID->get_error_message());
             error_log($_FILES['newatcsfile']['name']);
             error_log($_FILES['newatcsfile']['error']);
         } else {
             //No error, so we should be good to continue.
-            error_log($_FILES['newatcsfile']['name'] . " uploaded with id " . $newFileID);
             $fileUploaded = true;
             $uploadGood = true;
         }//end if ok

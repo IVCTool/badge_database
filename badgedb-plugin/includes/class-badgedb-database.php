@@ -325,7 +325,6 @@ class Badgedb_Database {
 		global $wpdb;
 		//$table_prefix = $wpdb->prefix . "badgedb_";
 		$table_name = $wpdb->prefix . "badgedb_" . self::ABSTRACT_TEST_CASES_TABLE_NAME;
-		//$theData = array('identifier' => 'Dolly', 'description' => "Clone!", 'name' => "the sheep", )
 		$theData = array('identifier' => $theIdent, 'description' => $theDesc, 'name' => $theName, 'wpid' => $theFileID, 'version' => $theVersion);
 		$theFormat = array('%s', '%s', '%s', '%d', '%s');
 		$inserted = $wpdb->insert($table_name, $theData, $theFormat);
@@ -403,8 +402,6 @@ class Badgedb_Database {
 			//For example SELCET 'wpid" .... will return a row with a field called wpid with the string value wpid, not the int value you
 			$q = "SELECT * FROM " . $table_name . " WHERE id=" . $theId . ";";
 			$oldRecord = $wpdb->get_row($q, ARRAY_A);
-			error_log($q);
-			error_log("Editing atcs and removing old attachment with post id: " . $oldRecord['wpid']);
 			wp_delete_attachment($oldRecord['wpid'], true);
 			//For whatever reason, you need to call update this way instead of how I did it for 'insert' above.
 			//If you don't you get array to string conversion errors when you try to pass the arrays into the update function.
@@ -455,14 +452,14 @@ class Badgedb_Database {
 	 * 
 	 * @since 1.0.0
 	 */
-	public static function insert_new_badge($theIdent, $theDesc, $theRequirements, $theBadgeDeps) {
+	public static function insert_new_badge($theIdent, $theDesc, $theRequirements, $theBadgeDeps, $fileID) {
 		global $wpdb;
 		
 		$table_name = $wpdb->prefix . "badgedb_" . self::BADGES_TABLE_NAME;
-		//$theData = array('identifier' => 'Dolly', 'description' => "Clone!", 'name' => "the sheep", )
-		$theData = array('identifier' => $theIdent, 'description' => $theDesc);
-		$theFormat = array('%s', '%s');
+		$theData = array('identifier' => $theIdent, 'description' => $theDesc, 'wpid' => $fileID);
+		$theFormat = array('%s', '%s', '%d');
 		$inserted = $wpdb->insert($table_name, $theData, $theFormat);
+		error_log("Badge insert query: " . $wpdb->last_query);
 		
 		//We need to create all the relevant records in badges_has_requirements
 		//We need the id of the new record
@@ -476,7 +473,6 @@ class Badgedb_Database {
 			}//end loop
 		}//end if
 
-		//TODO - deal with graphic file
 
 		//now lets add all the badges_has_badges records
 		error_log("Badge dependancies: " . count($theBadgeDeps));
@@ -486,6 +482,7 @@ class Badgedb_Database {
 				$wpdb->insert($btn, array('badges_id' => $newID, 'badges_id_dependency' => $r), array('%d', '%d'));
 			}//end loop
 		}//end if
+
 
 	}//end insert_new_badge
 
@@ -500,7 +497,6 @@ class Badgedb_Database {
 		global $wpdb;
 		$tn = $wpdb->prefix . "badgedb_" . self::BADGES_TABLE_NAME;
 		$q = "SELECT * FROM " . $tn . " WHERE id=" . $theID;
-		error_log($q);
 		$records = $wpdb->get_results($q, ARRAY_A);
 		//There really should only be one, so lets just pop the last one.
 		$r = array_pop($records);
@@ -714,11 +710,9 @@ class Badgedb_Database {
 
 			$labelField = "identifier";
 			$optionQuery = "SELECT id, identifier FROM " . $reqTableName . ";";	
-			error_log("Option query: " . $optionQuery);
 			//make up the selected query if we need to
 			if ($selectorID != -1) {
 				$selectedQuery = "SELECT requirements_id FROM " . $selected_table_name . " where " . $selector . " = " . $selectorID . ";";
-				error_log("Selected options query: " . $selectedQuery);
 			}
 		} elseif ($optionTable == "badges-req") {
 			$valid = true;
@@ -735,11 +729,9 @@ class Badgedb_Database {
 
 			$labelField = "identifier";
 			$optionQuery = "SELECT id, identifier FROM " . $reqTableName . ";";	
-			error_log("Option query: " . $optionQuery);
 			//make up the selected query if we need to
 			if ($selectorID != -1) {
 				$selectedQuery = "SELECT requirements_id FROM " . $data_source . " where " . $selector . " = " . $selectorID . ";";
-				error_log("Selected options query: " . $selectedQuery);
 			}
 		} elseif ($optionTable == "badges-badge") {
 			$valid = true;
@@ -756,11 +748,9 @@ class Badgedb_Database {
 
 			$labelField = "identifier";
 			$optionQuery = "SELECT id, identifier FROM " . $badgesTableName . ";";	
-			error_log("Option query: " . $optionQuery);
 			//make up the selected query if we need to
 			if ($selectorID != -1) {
 				$selectedQuery = "SELECT badges_id_dependency FROM " . $data_source . " where " . $selector . " = " . $selectorID . ";";
-				error_log("Selected options query: " . $selectedQuery);
 			}
 		}
 
@@ -794,7 +784,6 @@ class Badgedb_Database {
 			$selectbox .= "<option ";
 			$selected = false;
 			foreach ($selectedRecords as $s) {
-				error_log("Current, selected: " . $row[$valueField] . ", " . $s[$selectedValueField]);
 				if($row[$valueField] == $s[$selectedValueField]) { 
 					$selected = true; 
 					break;
@@ -816,11 +805,12 @@ class Badgedb_Database {
 		//Get rid of all the files we uploaded (need to get them from wp_posts) 
 		//TODO 
 		//  *abstract test cases generate them
+		//	*badges generate them
 		global $wpdb;
-		$table_name = $wpdb->prefix . "badgedb_" . self::ABSTRACT_TEST_CASES_TABLE_NAME;
+		$atcstable_name = $wpdb->prefix . "badgedb_" . self::ABSTRACT_TEST_CASES_TABLE_NAME;
+		$badgeTable_name = $wpdb->prefix . "badgedb_" . self::BADGES_TABLE_NAME;
 		$fields = "wpid";
-		$q = "SELECT DISTINCT " . $fields . " FROM " . $table_name . ";";
-		error_log($q);
+		$q = "SELECT " . $fields . " FROM " . $atcstable_name . " UNION SELECT " . $fields . " FROM " . $badgeTable_name . ";";
 		$result = $wpdb->get_results($q, ARRAY_A);
 
 		//Drop all the database tables
@@ -829,8 +819,8 @@ class Badgedb_Database {
 		//we only delete the attachments here as it causes a FK constraint failure if 
 		// you try to delte them while the badge database tables still exist.
 		foreach ($result as $file ) {
-			error_log("Trying to remove attachment: " . $file['wpid']);
 			//This should remove the entry in the wp_posts table and get rid of the file.
+			if (!is_null($file['wpid']))
 			wp_delete_attachment($file['wpid'], true);
 		}//end foreach
 

@@ -45,11 +45,6 @@
         }//end if ok
     }//end if var is set
 
-    //make an array of the requirements
-    //$requirements = [];
-    //if (isset($_POST['requirements'])) {
-    //    $requirements = $_POST['requirements'];
-    //}
 
     //if we meet all the conditions then go ahead and add it.
     if ($isPost && $isAdmin && $dataLengthOk && $fileUploaded) {

@@ -13,3 +13,5 @@ SELECT identifier, requirements_id FROM (wp_badgedb_requirements JOIN wp_badgedb
 /* This query is for getting the info needed for a select box of badge dependancies */
 /* For testing the join */
 SELECT * FROM (wp_badgedb_badges JOIN wp_badgedb_badges_has_badges on wp_badgedb_badges.id=wp_badgedb_badges_has_badges.badges_id_dependency)
+/* for getting rid of the badge and atcs files */
+SELECT wpid FROM wp_badgedb_badges UNION SELECT wpid FROM wp_badgedb_abstracttcs

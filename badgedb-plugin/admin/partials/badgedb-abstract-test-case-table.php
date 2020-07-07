@@ -48,7 +48,6 @@
                         <td><input type="text" name="version" value="<?php echo $row['version'] ?>" maxlength="<?php echo Badgedb_Database::ABSTRACT_TEST_CASES_VERSION_FIELD_MAX ?>" /></td>
                         <td><textarea name="description" rows="4" cols="50" " maxlength="<?php echo Badgedb_Database::ABSTRACT_TEST_CASES_DESCRIPTION_FIELD_MAX ?>" ><?php echo $row['description'] ?></textarea></td>
                         <td><?php echo Badgedb_Database::get_form_multi_select('atcs-req', 'requirements', true, $row['id']) ?></td>
-                        <?php error_log("The row id is: " . $row['id']) ?>
                         <td><b>Replace file (optional):</b> (<a href="<?php echo wp_get_attachment_url($row['wpid']) ?>">current file</a>)<br><input type="file" name="newatcsfile" /></td>
                         <td><input type="submit" value="Edit" />
                         </form></td>
