@@ -44,7 +44,7 @@
      }
 
      if ($_POST['whichform'] == 'update') {
-      //include_once(plugin_dir_path(__FILE__) . 'badgedb-badges-edit-proc.php');
+      include_once(plugin_dir_path(__FILE__) . 'badgedb-badges-edit-proc.php');
    }
 
  }//end if which processor should be included

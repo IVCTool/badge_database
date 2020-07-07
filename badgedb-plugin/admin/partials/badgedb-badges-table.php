@@ -45,8 +45,8 @@
                         <input type="hidden" name="id" value="<?php echo $row['id'] ?>" />
                         <input type="text" name="identifier" value="<?php echo $row['identifier'] ?>" maxlength="<?php echo Badgedb_Database::BADGES_IDENTIFIER_FIELD_MAX ?>" /></td>
                         <td><textarea name="description" rows="4" cols="50" maxlength="<?php echo Badgedb_Database::BADGES_DESCRIPTION_FIELD_MAX ?>"><?php echo $row['description'] ?></textarea></td>
-                        <td>Requirements HERE</td>
-                        <td>Badge Prequisits HERE</td>
+                        <td><?php echo Badgedb_Database::get_form_multi_select('badges-req', 'requirements', true, $row['id']) ?></td>
+                        <td><?php echo Badgedb_Database::get_form_multi_select('badges-badge', 'badgedeps', true, $row['id']) ?></td>
                         <td><input type="submit" value="Edit" />
                         </form></td>
                         <td><form action="<?php menu_page_url('badgedb-plugin-admin-menu-sub-badges') ?>" method="post">

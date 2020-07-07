@@ -58,6 +58,12 @@
             array_push($srequirements, sanitize_text_field($r));
         }
     }
-    Badgedb_Database::insert_new_badge($sidentifier, $sdesc, $srequirements);
+    $sbadgedeps = array();
+    if (isset($_POST['badgedeps'])) {
+        foreach ($_POST['badgedeps'] as $b) {
+            array_push($sbadgedeps, sanitize_text_field($b));
+        }
+    }
+    Badgedb_Database::insert_new_badge($sidentifier, $sdesc, $srequirements, $sbadgedeps);
 }//end insert into DB
  ?>

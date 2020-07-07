@@ -455,7 +455,7 @@ class Badgedb_Database {
 	 * 
 	 * @since 1.0.0
 	 */
-	public static function insert_new_badge($theIdent, $theDesc, $theRequirements) {
+	public static function insert_new_badge($theIdent, $theDesc, $theRequirements, $theBadgeDeps) {
 		global $wpdb;
 		
 		$table_name = $wpdb->prefix . "badgedb_" . self::BADGES_TABLE_NAME;
@@ -477,8 +477,17 @@ class Badgedb_Database {
 		}//end if
 
 		//TODO - deal with graphic file
-		//TODO - badges_has_badges table
-	}
+
+		//now lets add all the badges_has_badges records
+		error_log("Badge dependancies: " . count($theBadgeDeps));
+		if ($inserted != false && is_array($theBadgeDeps)) {
+			$btn = $wpdb->prefix . "badgedb_" . self::BADGES_HAS_BADGES_TABLE_NAME;
+			foreach ($theBadgeDeps as $r) {
+				$wpdb->insert($btn, array('badges_id' => $newID, 'badges_id_dependency' => $r), array('%d', '%d'));
+			}//end loop
+		}//end if
+
+	}//end insert_new_badge
 
 	/**
 	 * Deletes a badge from the database.
@@ -498,13 +507,19 @@ class Badgedb_Database {
 		$theAttachmentId = $r['wpid'];
 
 		//Delete the attachment record
-		//TODO
+		if ($theAttachmentId != "NULL" && !is_null($theAttachmentId)) {
+			wp_delete_attachment($theAttachmentId, true);
+		}
 
 		//Delete the requirements recrods
-		//TODO
+		$where = array('badges_id' => $theID);
+		$rtn = $wpdb->prefix . "badgedb_" . self::BADGES_HAS_REQUIREMENTS_TABLE_NAME;
+		$wpdb->delete($rtn, $where, array('%d'));
 
 		//Delete the badge prequisite records.
-		//TODO
+		$where = array('badges_id' => $theID);
+		$btn = $wpdb->prefix . "badgedb_" . self::BADGES_HAS_BADGES_TABLE_NAME;
+		$wpdb->delete($btn, $where, array('%d'));
 
 		//Delete the record.
 		$where = array('id' => $theID);
@@ -516,9 +531,58 @@ class Badgedb_Database {
 	 * 
 	 * @since 1.0.0
 	 */
-	public static function modify_badge() {
-		//TODO
-	}
+	public static function modify_badge($theID, $theIdent, $theDesc, $theRequirements, $theBadgeDeps, $fileUploaded, $theFileID = -1) {
+		global $wpdb;
+		//$table_prefix = $wpdb->prefix . "badgedb_";
+		$table_name = $wpdb->prefix . "badgedb_" . self::BADGES_TABLE_NAME;
+
+		//We need to handle the update differently if the file was altered.
+		if ($fileUploaded) {
+			//remove the old attachment
+			//If you don't select all from the row in the query you don't get what you're expecting.
+			//For example SELCET 'wpid" .... will return a row with a field called wpid with the string value wpid, not the int value you
+			// $q = "SELECT * FROM " . $table_name . " WHERE id=" . $theID . ";";
+			// $oldRecord = $wpdb->get_row($q, ARRAY_A);
+			// error_log($q);
+			// error_log("Editing atcs and removing old attachment with post id: " . $oldRecord['wpid']);
+			// wp_delete_attachment($oldRecord['wpid'], true);
+			// //For whatever reason, you need to call update this way instead of how I did it for 'insert' above.
+			// //If you don't you get array to string conversion errors when you try to pass the arrays into the update function.
+			// $wpdb->update($table_name, array('identifier' => $theIdent, 'description' => $theDesc, 'name' => $theName, 'version' => $theVersion, 'wpid' => $theFileID), 
+			// 	array('id' => $theID), array('%s', '%s', '%s', '%s', '%d'));
+		} else {
+			//and if the file didn't change we just won't change it.
+			$wpdb->update($table_name, array('identifier' => $theIdent, 'description' => $theDesc), array('id' => $theID), 
+				array('%s', '%s', '%d'));
+		} //end if the file wasn't updated
+
+		//Now we also need to update the requirements associated with this.
+		//First just blow away whatever was in there
+		$table_name = $wpdb->prefix . "badgedb_" . self::BADGES_HAS_REQUIREMENTS_TABLE_NAME;
+		$where = array('badges_id' => $theID);
+		$wpdb->delete($table_name, $where, array('%d'));
+		//Now put in the ones that were passed, if there were any
+		if (is_array($theRequirements)) {
+			$tn = $wpdb->prefix . "badgedb_" . self::BADGES_HAS_REQUIREMENTS_TABLE_NAME;
+			foreach ($theRequirements as $r) {
+				$wpdb->insert($tn, array('badges_id' => $theID, 'requirements_id' => $r), array('%d', '%d'));
+			}//end loop
+		}//end if
+
+		//And again for badges the record depoends on
+		//First just blow away whatever was in there
+		$table_name = $wpdb->prefix . "badgedb_" . self::BADGES_HAS_BADGES_TABLE_NAME;
+		$where = array('badges_id' => $theID);
+		$wpdb->delete($table_name, $where, array('%d'));
+		//Now put in the ones that were passed, if there were any
+		if (is_array($theBadgeDeps)) {
+			$tn = $wpdb->prefix . "badgedb_" . self::BADGES_HAS_BADGES_TABLE_NAME;
+			foreach ($theBadgeDeps as $r) {
+				$wpdb->insert($tn, array('badges_id' => $theID, 'badges_id_dependency' => $r), array('%d', '%d'));
+			}//end loop
+		}//end if
+
+	}//end modify_badge
 
 
 	/**
@@ -662,8 +726,8 @@ class Badgedb_Database {
 			$bhrTableName = $wpdb->prefix . "badgedb_" . self::BADGES_HAS_REQUIREMENTS_TABLE_NAME;
 			$reqTableName = $wpdb->prefix . "badgedb_" . self::REQUIREMENTS_TABLE_NAME;
 			//Now make up the poart of teh query that specifies the data.
-			$data_source = "(" . $reqTableName . 
-			" JOIN " . $bhrTableName . " ON " . $reqTableName . ".id = " . $bhrTableName . ".requirements_id)";
+			$data_source = "(" . $reqTableName . " JOIN " . $bhrTableName . 
+				" ON " . $reqTableName . ".id = " . $bhrTableName . ".requirements_id)";
 			$fields = "identifier, requirements_id";
 			$selector = "badges_id";
 			$valueField = "id";
@@ -674,17 +738,17 @@ class Badgedb_Database {
 			error_log("Option query: " . $optionQuery);
 			//make up the selected query if we need to
 			if ($selectorID != -1) {
-				$selectedQuery = "SELECT requirements_id FROM " . $selected_table_name . " where " . $selector . " = " . $selectorID . ";";
+				$selectedQuery = "SELECT requirements_id FROM " . $data_source . " where " . $selector . " = " . $selectorID . ";";
 				error_log("Selected options query: " . $selectedQuery);
 			}
 		} elseif ($optionTable == "badges-badge") {
 			$valid = true;
 			//The two tables needed for the query
-			$bhbTableName = $wpdb->prefix . "badgedb_" . self::BADGES_HAS_REQUIREMENTS_TABLE_NAME;
+			$bhbTableName = $wpdb->prefix . "badgedb_" . self::BADGES_HAS_BADGES_TABLE_NAME;
 			$badgesTableName = $wpdb->prefix . "badgedb_" . self::BADGES_TABLE_NAME;
 			//Now make up the poart of teh query that specifies the data.
-			$data_source = "(" . $badgesTableName . 
-			" JOIN " . $bhbTableName . " ON " . $badgesTableName . ".id = " . $bhbTableName . ".badges_id_dependency)";
+			$data_source = "(" . $badgesTableName . " JOIN " . $bhbTableName . 
+				" ON " . $badgesTableName . ".id = " . $bhbTableName . ".badges_id_dependency)";
 			$fields = "identifier, badges_id_dependency";
 			$selector = "badges_id";
 			$valueField = "id";
@@ -695,7 +759,7 @@ class Badgedb_Database {
 			error_log("Option query: " . $optionQuery);
 			//make up the selected query if we need to
 			if ($selectorID != -1) {
-				$selectedQuery = "SELECT badges_id_dependency FROM " . $selected_table_name . " where " . $selector . " = " . $selectorID . ";";
+				$selectedQuery = "SELECT badges_id_dependency FROM " . $data_source . " where " . $selector . " = " . $selectorID . ";";
 				error_log("Selected options query: " . $selectedQuery);
 			}
 		}
