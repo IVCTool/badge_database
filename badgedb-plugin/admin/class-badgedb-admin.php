@@ -124,6 +124,16 @@ class Badgedb_Admin {
 			1);
 		add_action('load-' . $atcsHook, array($this, 'badgedb_atcs_page_submit'));
 
+		//The sub menus for executable test cases
+		$etcsHook = add_submenu_page(
+			'badgedb-plugin-admin-menu',
+			'Edit Executable Test Cases',
+			'Executable Test Cases',
+			'manage_options',
+			'badgedb-plugin-admin-menu-sub-executabletcs',
+			array($this, 'badgedb_admin_submenu_executabletcs_page'),
+			3);
+		add_action('load-' . $etcsHook, array($this, 'badgedb_executabletcs_page_submit'));
 
 	}//end function
 
@@ -145,6 +155,10 @@ class Badgedb_Admin {
 
 	public function badgedb_admin_submenu_atcs_page() {
 		include( plugin_dir_path(__FILE__) . 'partials/badgedb-abstract-test-case-page.php');
+	}
+
+	public function badgedb_admin_submenu_executabletcs_page() {
+		include( plugin_dir_path(__FILE__) . 'partials/badgedb-executabletcs-page.php');
 	}
 
 	/**
@@ -172,6 +186,10 @@ class Badgedb_Admin {
 	public function badgedb_atcs_page_submit() {
 		include( plugin_dir_path(__FILE__) . 'partials/badgedb-abstract-test-case-formproc.php');
 	}//end function
+
+	public function badgedb_executabletcs_page_submit() {
+		include( plugin_dir_path(__FILE__) . 'partials/badgedb-executabletcs-formproc.php');
+	}
 
 	/**
 	 * Register the stylesheets for the admin area.

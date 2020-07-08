@@ -70,6 +70,10 @@ class Badgedb_Database {
 	public const ABSTRACT_TEST_CASES_DESCRIPTION_FIELD_MAX = 1431655765;
 	public const ABSTRACT_TEST_CASES_VERSION_FIELD_MAX = 45;
 	public const ABSTRACT_TEST_CASES_WPID_FIELD_MAX = 20;
+
+	public const EXECUTABLETCS_DESCRIPTION_FIELD_MAX = 1431655765;
+	public const EXECUTABLETCS_CLASSNAME_FIELD_MAX = 255;
+	public const EXECUTABLETCS_VERSION_FIELD_MAX = 45;
 	
 
 	/**
@@ -176,7 +180,7 @@ class Badgedb_Database {
 		  $etcs_table_name = $table_prefix . self::EXECUTABLETCS_TABLE_NAME;
 		  $etcs_query = "CREATE TABLE $etcs_table_name (
 			`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-			`Description` text NOT NULL,
+			`description` text NOT NULL,
 			`classname` varchar(255) NOT NULL,
 			`version` varchar(45) NOT NULL,
 			`abstracttcs_id` int(10) unsigned NOT NULL,
@@ -581,13 +585,77 @@ class Badgedb_Database {
 
 
 	/**
+	 * This just inserts a new executable test case record.
+	 * 
+	 * @since	1.0.0
+	 */
+	public static function insert_new_executabletcs($theDesc, $theClass, $theVersion, $theAtcs) {
+		error_log("Now in the insert function for etcs");
+		global $wpdb;
+		//$table_prefix = $wpdb->prefix . "badgedb_";
+		$table_name = $wpdb->prefix . "badgedb_" . self::EXECUTABLETCS_TABLE_NAME;
+		$theData = array('description' => $theDesc, 'classname' => $theClass, 'version' => $theVersion, 'abstracttcs_id' => $theAtcs);
+		$theFormat = array('%s', '%s', '%s', '%d');
+		$wpdb->insert($table_name, $theData, $theFormat);
+	}//end function
+
+	/**
+	 * This gets back all the executable test cases
+	 * 
+	 * @since 1.0.0
+	 */
+	public static function get_executabletcss() {
+		global $wpdb;
+		$table_name = $wpdb->prefix . "badgedb_" . self::EXECUTABLETCS_TABLE_NAME;
+		$q = "SELECT * FROM " . $table_name . ";";
+		$results = $wpdb->get_results($q, ARRAY_A);
+		if (count($results) < 1) {
+			//It does something wierd when there are no results, so lets just set it to null if the array is empty.
+			//The strange behaviour could also be related to being in WP_DEBUG = true mode and not show up in production.
+			return null;
+		} else {
+			return $results;
+		}
+	}//end function
+
+	/**
+	 * Allows you to modify an executable test case record.
+	 * 
+	 * @since 1.0.0
+	 */
+	public static function modify_executabletcs($theID, $theDesc, $theClassname, $theVersion, $theATCSID) {
+		global $wpdb;
+		$table_name = $wpdb->prefix . "badgedb_" . self::EXECUTABLETCS_TABLE_NAME;
+	
+		//For whatever reason, you need to call update this way instead of how I did it for 'insert' above.
+		//If you don't you get array to string conversion errors when you try to pass the arrays into the update function.
+		$wpdb->update($table_name, array('description' => $theDesc, 'classname' => $theClassname, 'version' => $theVersion, 'abstracttcs_id' => $theATCSID), 
+					array('id' => $theID), array('%s', '%s', '%s', '%d'));
+	}//end function
+
+
+	/**
+	 * Deletes the executable test case
+	 * 
+	 * @since	1.0.0
+	 */
+	public static function delete_executabletcs($theId) {
+		global $wpdb;
+		$table_name = $wpdb->prefix . "badgedb_" . self::EXECUTABLETCS_TABLE_NAME;
+		$where = array('id' => $theId);
+		$wpdb->delete($table_name, $where, array('%d'));
+
+	}//end function
+
+
+	/**
 	 * This returns the HTML for a select list for forms.  You need to say which table you want.
 	 * The resulting select will have a name attribute equal to what you pass in.  If you want one
 	 * flagged as selected, pass the value of the selected item as the second parameter.
 	 * 
 	 * Valid options:
 	 * 			- catagory:	requirement catagories
-	 * 			- 
+	 * 			- abstracttcs: the abstract test cases
 	 * 
 	 * If you pass something not on the list you will get a select list with ERROR as the only
 	 * option.
@@ -617,6 +685,14 @@ class Badgedb_Database {
 			$fields = "id, name";
 			$valueField = "id";
 			$labelField = "name";
+			$selectfield = 'id';
+		} 
+		if($whichTable == "abstracttcs") {
+			$valid = true;
+			$table_name = $wpdb->prefix . "badgedb_" . self::ABSTRACT_TEST_CASES_TABLE_NAME;
+			$fields = "id, identifier";
+			$valueField = "id";
+			$labelField = "identifier";
 			$selectfield = 'id';
 		}
 
