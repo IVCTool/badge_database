@@ -26,10 +26,8 @@
     //Try to upload the file
     $fileUploaded = false;
     $fileID = "";
-    error_log("New badge proc: Checking for graphic file...");
     require_once( ABSPATH . 'wp-admin/includes/media.php' );
     if ( isset($_FILES['graphicFile'])) {
-        error_log("New badge proc: There was a file attached to the request.");
         $fileID = media_handle_upload('graphicFile', 0); //0 means it's not attached to a post
         if (is_wp_error($fileID)) {
             error_log($fileID->get_error_message());
@@ -42,13 +40,7 @@
     }//end if var is set
 
     //if we meet all the conditions then go ahead and add it.
-    error_log("New badge: testing condidionts");
-    error_log("isPost: " . $isPost);
-    error_log("isAdmin: " . $isAdmin);
-    error_log("datalengthok: " . $dataLengthOk);
-    error_log("fileUploaded: " . $fileUploaded);
     if ($isPost && $isAdmin && $dataLengthOk && $fileUploaded) {
-        error_log("Conditions met!");
         $sidentifier = sanitize_text_field($_POST['identifier']);
         $sdesc = sanitize_text_field($_POST['description']);
         $srequirements = array();

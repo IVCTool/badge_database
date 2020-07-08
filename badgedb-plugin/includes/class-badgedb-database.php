@@ -536,16 +536,15 @@ class Badgedb_Database {
 		if ($fileUploaded) {
 			//remove the old attachment
 			//If you don't select all from the row in the query you don't get what you're expecting.
-			//For example SELCET 'wpid" .... will return a row with a field called wpid with the string value wpid, not the int value you
-			// $q = "SELECT * FROM " . $table_name . " WHERE id=" . $theID . ";";
-			// $oldRecord = $wpdb->get_row($q, ARRAY_A);
-			// error_log($q);
-			// error_log("Editing atcs and removing old attachment with post id: " . $oldRecord['wpid']);
-			// wp_delete_attachment($oldRecord['wpid'], true);
-			// //For whatever reason, you need to call update this way instead of how I did it for 'insert' above.
-			// //If you don't you get array to string conversion errors when you try to pass the arrays into the update function.
-			// $wpdb->update($table_name, array('identifier' => $theIdent, 'description' => $theDesc, 'name' => $theName, 'version' => $theVersion, 'wpid' => $theFileID), 
-			// 	array('id' => $theID), array('%s', '%s', '%s', '%s', '%d'));
+			$q = "SELECT * FROM " . $table_name . " WHERE id=" . $theID . ";";
+			$oldRecord = $wpdb->get_row($q, ARRAY_A);
+			error_log($q);
+			error_log("Editing badge and removing old attachment with post id: " . $oldRecord['wpid']);
+			wp_delete_attachment($oldRecord['wpid'], true);
+			//For whatever reason, you need to call update this way instead of how I did it for 'insert' above.
+			//If you don't you get array to string conversion errors when you try to pass the arrays into the update function.
+			$wpdb->update($table_name, array('identifier' => $theIdent, 'description' => $theDesc, 'wpid' => $theFileID), 
+				array('id' => $theID), array('%s', '%s','%d'));
 		} else {
 			//and if the file didn't change we just won't change it.
 			$wpdb->update($table_name, array('identifier' => $theIdent, 'description' => $theDesc), array('id' => $theID), 

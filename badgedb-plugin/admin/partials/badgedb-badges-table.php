@@ -35,18 +35,19 @@
 
     <p>
         <table id="badge">
-            <tr><th>Identifier</th><th>Description</th><th>Interoperability Requirements</th><th>Badge Prerequisits</th></tr>
+            <tr><th>Identifier</th><th>Description</th><th>Interoperability Requirements</th><th>Badge Prerequisits</th><th>Badge Graphic</th></tr>
             <?php
                 foreach ($badges as $row) {
             ?>
                     <tr> 
-                        <td><form action="<?php menu_page_url('badgedb-plugin-admin-menu-sub-badges') ?>" method="post">
+                        <td><form action="<?php menu_page_url('badgedb-plugin-admin-menu-sub-badges') ?>" method="post" enctype="multipart/form-data">
                         <input type="hidden" name="whichform" value="update" />
                         <input type="hidden" name="id" value="<?php echo $row['id'] ?>" />
                         <input type="text" name="identifier" value="<?php echo $row['identifier'] ?>" maxlength="<?php echo Badgedb_Database::BADGES_IDENTIFIER_FIELD_MAX ?>" /></td>
                         <td><textarea name="description" rows="4" cols="50" maxlength="<?php echo Badgedb_Database::BADGES_DESCRIPTION_FIELD_MAX ?>"><?php echo $row['description'] ?></textarea></td>
                         <td><?php echo Badgedb_Database::get_form_multi_select('badges-req', 'requirements', true, $row['id']) ?></td>
                         <td><?php echo Badgedb_Database::get_form_multi_select('badges-badge', 'badgedeps', true, $row['id']) ?></td>
+                        <td><b>Replace file (optional):</b> (<a href="<?php echo wp_get_attachment_url($row['wpid']) ?>">current file</a>)<br><input type="file" name="newbadgegraphic" /></td>
                         <td><input type="submit" value="Edit" />
                         </form></td>
                         <td><form action="<?php menu_page_url('badgedb-plugin-admin-menu-sub-badges') ?>" method="post">

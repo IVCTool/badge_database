@@ -28,24 +28,26 @@
 
     //Replace the file IF a new one was submitted
     $fileUploaded = false;
-    // $uploadGood = false;
-    // $newFileID = "";
-    // require_once( ABSPATH . 'wp-admin/includes/media.php' );
-    // if ( isset($_FILES['newatcsfile'])) {
-    //     //Upload the new attachement now, and then deal with it when we alter the record.
-    //     $newFileID = media_handle_upload('newatcsfile', 0); //0 means it's not attached to a post
-    //     error_log("File replacement requested for Abstract Test Case!");
-    //     if (is_wp_error($newFileID)) {
-    //         error_log($newFileID->get_error_message());
-    //         error_log($_FILES['newatcsfile']['name']);
-    //         error_log($_FILES['newatcsfile']['error']);
-    //     } else {
-    //         //No error, so we should be good to continue.
-    //         error_log($_FILES['newatcsfile']['name'] . " uploaded with id " . $newFileID);
-    //         $fileUploaded = true;
-    //         $uploadGood = true;
-    //     }//end if ok
-    // } //end if the file is there
+    //$uploadGood = false;
+    $newFileID = "";
+    error_log("Checking for modified badge graphic");
+    require_once( ABSPATH . 'wp-admin/includes/media.php' );
+    if ( isset($_FILES['newbadgegraphic'])) {
+        error_log("New file was specified");
+         //Upload the new attachement now, and then deal with it when we alter the record.
+         $newFileID = media_handle_upload('newbadgegraphic', 0); //0 means it's not attached to a post
+         error_log("File replacement requested for Badge!");
+         if (is_wp_error($newFileID)) {
+             error_log($newFileID->get_error_message());
+             error_log($_FILES['newbadgegraphic']['name']);
+             error_log($_FILES['newbadgegraphic']['error']);
+         } else {
+             //No error, so we should be good to continue.
+             error_log($_FILES['newbadgegraphic']['name'] . " uploaded with id " . $newFileID);
+             $fileUploaded = true;
+             //$uploadGood = true;
+         }//end if ok
+    } //end if the file is there
 
 
     //if we meet all the conditions then go ahead and add it.
