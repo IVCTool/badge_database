@@ -69,14 +69,14 @@ class Badgedb_Public {
 	 */
 	public function badgedb_public_entrypoint( $atts ) {
 
-		error_log("In badgedb public entry point function");
+		//error_log("In badgedb public entry point function");
 
 		//We will start with assuming there was an error
 		$returnval = "Sorry, an error occured displaying the Capability Badges.";
 
 		//check that there is a single attribute
 		if (count($atts) != 1) {
-			$returnval = $returnval . "Only the attribute 'interface' is supported and it must be set.";
+			$returnval = $returnval . "BadgeDB Error: Only the attribute 'interface' is supported and it must be set.";
 			return $returnval;
 		}
 

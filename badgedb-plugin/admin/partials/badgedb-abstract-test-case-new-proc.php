@@ -36,9 +36,9 @@
         $fileID = media_handle_upload('atcsfile', 0); //0 means it's not attached to a post
 
         if (is_wp_error($fileID)) {
-            error_log($fileID->get_error_message());
-            error_log($_FILES['atcsfile']['name']);
-            error_log($_FILES['atcsfile']['error']);
+            //error_log($fileID->get_error_message());
+            //error_log($_FILES['atcsfile']['name']);
+            //error_log($_FILES['atcsfile']['error']);
         } else {
             //No error, so we should be good to continue.
             $fileUploaded = true;

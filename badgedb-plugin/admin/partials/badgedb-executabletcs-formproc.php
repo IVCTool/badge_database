@@ -26,7 +26,7 @@
  $isPost = false;
  $isAdmin = false;
  
-error_log("In etcs form proc");
+//error_log("In etcs form proc");
 
  //set user flag
  $user = wp_get_current_user();

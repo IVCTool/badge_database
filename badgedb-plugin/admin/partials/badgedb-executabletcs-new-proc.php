@@ -13,7 +13,7 @@
     //We need the database class with all that info
     include_once( plugin_dir_path(__FILE__) . '../../includes/class-badgedb-database.php');
 
-    error_log("Trying to make a new etcs");
+    //error_log("Trying to make a new etcs");
     //All we need to check extra, is the data lengths
     $dataLengthOk = false;
     //Now check the data lengths

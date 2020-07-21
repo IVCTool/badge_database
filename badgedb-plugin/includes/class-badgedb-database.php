@@ -336,7 +336,7 @@ class Badgedb_Database {
 		//We need to create all the relevant records in abstracttcs_has_requirements
 		//We need the id of the new record
 		$newID = $wpdb->insert_id;
-		error_log("Requiremens for the new atcs: " . count($theRequirements));
+		//error_log("Requiremens for the new atcs: " . count($theRequirements));
 		//We need to make sure the record was inserted AND that there is an array of requirements
 		if ($inserted != false && is_array($theRequirements)) {
 			$tn = $wpdb->prefix . "badgedb_" . self::ABSTRACTTCS_HAS_REQUIREMENTS_TABLE_NAME;
@@ -463,12 +463,12 @@ class Badgedb_Database {
 		$theData = array('identifier' => $theIdent, 'description' => $theDesc, 'wpid' => $fileID);
 		$theFormat = array('%s', '%s', '%d');
 		$inserted = $wpdb->insert($table_name, $theData, $theFormat);
-		error_log("Badge insert query: " . $wpdb->last_query);
+		//error_log("Badge insert query: " . $wpdb->last_query);
 		
 		//We need to create all the relevant records in badges_has_requirements
 		//We need the id of the new record
 		$newID = $wpdb->insert_id;
-		error_log("Requiremens for the new badge: " . count($theRequirements));
+		//error_log("Requiremens for the new badge: " . count($theRequirements));
 		//We need to make sure the record was inserted AND that there is an array of requirements
 		if ($inserted != false && is_array($theRequirements)) {
 			$tn = $wpdb->prefix . "badgedb_" . self::BADGES_HAS_REQUIREMENTS_TABLE_NAME;
@@ -479,7 +479,7 @@ class Badgedb_Database {
 
 
 		//now lets add all the badges_has_badges records
-		error_log("Badge dependancies: " . count($theBadgeDeps));
+		//error_log("Badge dependancies: " . count($theBadgeDeps));
 		if ($inserted != false && is_array($theBadgeDeps)) {
 			$btn = $wpdb->prefix . "badgedb_" . self::BADGES_HAS_BADGES_TABLE_NAME;
 			foreach ($theBadgeDeps as $r) {
@@ -496,7 +496,7 @@ class Badgedb_Database {
 	 * @since 1.0.0
 	 */
 	public static function delete_badge($theID) {
-		error_log("Attempting to delete bage with id " . $theID);
+		//error_log("Attempting to delete bage with id " . $theID);
 		//get the record we're going to delete
 		global $wpdb;
 		$tn = $wpdb->prefix . "badgedb_" . self::BADGES_TABLE_NAME;
@@ -542,8 +542,8 @@ class Badgedb_Database {
 			//If you don't select all from the row in the query you don't get what you're expecting.
 			$q = "SELECT * FROM " . $table_name . " WHERE id=" . $theID . ";";
 			$oldRecord = $wpdb->get_row($q, ARRAY_A);
-			error_log($q);
-			error_log("Editing badge and removing old attachment with post id: " . $oldRecord['wpid']);
+			//error_log($q);
+			//error_log("Editing badge and removing old attachment with post id: " . $oldRecord['wpid']);
 			wp_delete_attachment($oldRecord['wpid'], true);
 			//For whatever reason, you need to call update this way instead of how I did it for 'insert' above.
 			//If you don't you get array to string conversion errors when you try to pass the arrays into the update function.
@@ -964,7 +964,7 @@ class Badgedb_Database {
 		('NETN Requirments',	'Requirements related to NETN FAFD, AMSP-04 Ed A, STANREC 4800',	'NETN',	9),
 		('RPR2 Requirements',	'Requirements related to RPR-FOM v2.0',	'RPR2',	10);
 		ENDRC;
-		error_log($q);
+		//error_log($q);
 		$wpdb->query($q);
 
 		//Requirements
@@ -1118,7 +1118,7 @@ class Badgedb_Database {
 		(149,	'IR-NETN-0073',	'SuT defined as a consumer in CS/SOM shall clear all tasks at the entity when an LBMLMessage.LBMLTaskManagement.CancelAllTasks is received',	9),
 		(150,	'HLA-Verification-2016',	'This test case is equivalent to the FCTT_NG configuration verification step.',	6);
 		ENDR;
-		error_log($q);
+		//error_log($q);
 		$wpdb->query($q);
 
 		//Badges
@@ -1138,7 +1138,7 @@ class Badgedb_Database {
 		(33,	'NETN-FOM v2.0 LBML FOM Module',	NULL,	'NETN-LBML-OWNSITREP-2016'),
 		(34,	'Test',	NULL,	'ATC-Test2');
 		ENDB;
-		error_log($q);
+		//error_log($q);
 		$wpdb->query($q);
 
 		//Abstract test cases - No default data to insert yet.
@@ -1296,7 +1296,7 @@ class Badgedb_Database {
 		(147,	25),
 		(149,	31);
 		ENDBR;
-		error_log($q);
+		//error_log($q);
 		$wpdb->query($q);
 
 		//Badge prequisits
@@ -1318,7 +1318,7 @@ class Badgedb_Database {
 		(33,	21),
 		(33,	22);
 		ENDBB;
-		error_log($q);
+		//error_log($q);
 		$wpdb->query($q);
 
 	}//end function insert base data
