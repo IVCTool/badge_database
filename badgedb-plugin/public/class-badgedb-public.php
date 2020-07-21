@@ -64,36 +64,29 @@ class Badgedb_Public {
 	 * 			attributes:
 	 * 				interface
 	 * 					pubbadges	-the public badge view (is this mnaybe all the public needs?)
-	 *					areqcat		-the admin interface to edit requirement catagories.
+	 *				
 	 *			TODO Others
 	 */
 	public function badgedb_public_entrypoint( $atts ) {
 
-		//We will start with assuming there was an error
-		$returnval = "Sorry, an error occured.";
+		error_log("In badgedb public entry point function");
 
-		//check that there is an att
-		if (count($atts) > 1) {
-			$returnval = $returnval . "  Too many attribnutes used.  Only the attribute 'interface' is supported.";
+		//We will start with assuming there was an error
+		$returnval = "Sorry, an error occured displaying the Capability Badges.";
+
+		//check that there is a single attribute
+		if (count($atts) != 1) {
+			$returnval = $returnval . "Only the attribute 'interface' is supported and it must be set.";
 			return $returnval;
 		}
 
-		//setup the 
-		$atts = shortcode_atts(
-			array(
-				'interface'   => 'pubbadges'
-			),
-			$atts
-		);
-
-	
 		// code...
 	
 		//$var = ( strtolower( $args['arg1']) != "" ) ? strtolower( $args['arg1'] ) : 'default';
 		//$var = "HELLO GENERAL PUBLIC!";
 	
 		// code...
-		require_once plugin_dir_path( __FILE__ ) . '/partials/badgedb-public-display.php';
+		require_once plugin_dir_path( __FILE__ ) . '/partials/badgedb-public-display-table.php';
 		return $returnval;
 	}//end function
 

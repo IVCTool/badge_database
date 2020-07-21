@@ -15,3 +15,12 @@ SELECT identifier, requirements_id FROM (wp_badgedb_requirements JOIN wp_badgedb
 SELECT * FROM (wp_badgedb_badges JOIN wp_badgedb_badges_has_badges on wp_badgedb_badges.id=wp_badgedb_badges_has_badges.badges_id_dependency)
 /* for getting rid of the badge and atcs files */
 SELECT wpid FROM wp_badgedb_badges UNION SELECT wpid FROM wp_badgedb_abstracttcs
+
+/* These queries are for the public display of badges */
+SELECT * FROM wp_badgedb_badges WHERE id=?  /* Badge data */
+/* All the badges it bepends on */
+/* All the requirements it has, including the ones form other badges if any */
+/* The graphic file. */
+/* The Abstract Test Cases that could apply */
+/* The executable test cases that apply */
+/* The IVCT file info */

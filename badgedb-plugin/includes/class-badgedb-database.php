@@ -254,7 +254,7 @@ class Badgedb_Database {
 		//For whatever reason, you need to call update this way instead of how I did it for 'insert' above.
 		//If you don't you get array to string conversion errors when you try to pass the arrays into the update function.
 		$wpdb->update($table_name, array('identifier' => $theIdent, 'name' => $theName, 'description' => $theDesc), 
-					array('id' => $theId), array('%s', '%s', '%s'), array('id' => $theId));
+					array('id' => $theId), array('%s', '%s', '%s'));
 	}//end update_reqcat
 
 
@@ -316,7 +316,7 @@ class Badgedb_Database {
 		//For whatever reason, you need to call update this way instead of how I did it for 'insert' above.
 		//If you don't you get array to string conversion errors when you try to pass the arrays into the update function.
 		$wpdb->update($table_name, array('identifier' => $theIdent, 'description' => $theDesc, 'reqcategories_id' => $theCatagory), 
-					array('id' => $theId), array('%s', '%s', '%d'), array('id' => $theId));
+					array('id' => $theId), array('%s', '%s', '%d'));
 	}//end update_reqcat
 
 
@@ -583,6 +583,38 @@ class Badgedb_Database {
 
 	}//end modify_badge
 
+	/**
+	 * This gets back all the information about a badge that will be displayed
+	 * to the public.  The function returns an associative array of information with
+	 * the following indicies:
+	 * 		- badge		the info in the badge record
+	 * 		- bprs		the info for each badge pre-requisit
+	 * 		- reqs		the info for all of the interoperabilty requirements, including for the bprs
+	 * 		- graphic	the info for the graphic
+	 * 
+	 * Each of these elements will be the associative array from the database call to create them.
+	 * 
+	 * @since 1.0.0
+	 */
+	public static function get_all_badge_info($theBadgeID): array {
+		global $wpdb;
+
+		//make an empty array we can return after we fill it
+		$rv = array();
+
+		//get the raw badge info
+		$table_name = $wpdb->prefix . "badgedb_" . self::BADGES_TABLE_NAME;
+		$bq = "SELECT id, description, identifier, wpid FROM " . $table_name . " WHERE id=" . $theBadgeID .";";
+		$bresults = $wpdb->get_results($bq, ARRAY_A);
+		$rv['badge']  = $bresults;
+
+		$bprs = array("bprs" => "BPRS");
+		$reqs = array("reqs" => "REQS");
+		$graphic = array("graphic" => "GRAPHIC");
+
+		return $rv;
+	}//end function get_all_badge_info
+
 
 	/**
 	 * This just inserts a new executable test case record.
@@ -590,9 +622,7 @@ class Badgedb_Database {
 	 * @since	1.0.0
 	 */
 	public static function insert_new_executabletcs($theDesc, $theClass, $theVersion, $theAtcs) {
-		error_log("Now in the insert function for etcs");
 		global $wpdb;
-		//$table_prefix = $wpdb->prefix . "badgedb_";
 		$table_name = $wpdb->prefix . "badgedb_" . self::EXECUTABLETCS_TABLE_NAME;
 		$theData = array('description' => $theDesc, 'classname' => $theClass, 'version' => $theVersion, 'abstracttcs_id' => $theAtcs);
 		$theFormat = array('%s', '%s', '%s', '%d');
@@ -672,7 +702,7 @@ class Badgedb_Database {
 		//first, define some variables we will set in the if clause
 		//for the chosen table.
 		$valid = false;
-		$table_Name = null;
+		$table_name = null;
 		$fields = null;
 		$valueField = null;
 		$labelField = null;
@@ -758,7 +788,7 @@ class Badgedb_Database {
 		//first, define some variables we will set in the if clause
 		//for the chosen table.
 		$valid = false;			//just a flag to decide if a valid option was passed for the table
-		$table_Name = null;		//the table we will use
+		$table_name = null;		//the table we will use
 		$fields = null;			//the fields that will be retrieved
 		$valueField = null;		//the field that will have the option value for the form
 		$labelField = null;		//the field that will be used to show the option text to users
@@ -926,17 +956,21 @@ class Badgedb_Database {
 
 		//Requirement catagories
 		$table_name = $wpdb->prefix . "badgedb_" . self::REQCATEGORIES_TABLE_NAME;
-		$q = "INSERT INTO `" . $table_name . "` (`name`, `description`, `identifier`, `id`) VALUES
+		$q = <<<ENDRC
+		INSERT INTO `$table_name` (`name`, `description`, `identifier`, `id`) VALUES
 		('Best Practice Conformance',	'Requirements related to best practices for distributed simulation',	'BP',	1),
 		('Documentation Conformance',	'Requirements for documenting interoperability capabilities',	'DOC',	6),
 		('Simulation Object Model Conformance',	'Requirements related to the Conformance of a SuT to the SOM provided in CS\r\n',	'SOM',	8),
 		('NETN Requirments',	'Requirements related to NETN FAFD, AMSP-04 Ed A, STANREC 4800',	'NETN',	9),
-		('RPR2 Requirements',	'Requirements related to RPR-FOM v2.0',	'RPR2',	10);";
+		('RPR2 Requirements',	'Requirements related to RPR-FOM v2.0',	'RPR2',	10);
+		ENDRC;
+		error_log($q);
 		$wpdb->query($q);
 
 		//Requirements
 		$table_name = $wpdb->prefix . "badgedb_" . self::REQUIREMENTS_TABLE_NAME;
-		$q = "INSERT INTO `" . $table_name . "` (`id`, `identifier`, `description`, `reqcategories_id`) VALUES
+		$q = <<<ENDR
+		INSERT INTO `$table_name` (`id`, `identifier`, `description`, `reqcategories_id`) VALUES
 		(1,	'IR-BP-0001',	'SuT shall provide attribute value updates for requested attributes owned by the SuT',	1),
 		(2,	'IR-DOC-0001',	'SuT interoperability capabilities shall be documented in a Conformance Statement including a SOM and a FOM with a minimum set of supporting FOM modules',	6),
 		(5,	'IR-BP-0002',	'SuT shall create a federation execution before joining, if it does not already exist',	1),
@@ -1082,11 +1116,15 @@ class Badgedb_Database {
 		(146,	'IR-RPR2-0034',	'SuT shall when receiving a MunitionDetonation without a specified target (Indirect Fire) but the same location as an entity and SuT has the modelling responsibility for the damage assessment at that entity, update the BaseEntity.PhysicalEntity attribute DamageState with an appropriate value.',	10),
 		(147,	'IR-RPR2-0005',	'SuT shall assume default values for optional attributes on instances of AggregateEntity object class.',	10),
 		(149,	'IR-NETN-0073',	'SuT defined as a consumer in CS/SOM shall clear all tasks at the entity when an LBMLMessage.LBMLTaskManagement.CancelAllTasks is received',	9),
-		(150,	'HLA-Verification-2016',	'This test case is equivalent to the FCTT_NG configuration verification step.',	6);";
+		(150,	'HLA-Verification-2016',	'This test case is equivalent to the FCTT_NG configuration verification step.',	6);
+		ENDR;
+		error_log($q);
 		$wpdb->query($q);
 
+		//Badges
 		$table_name = $wpdb->prefix . "badgedb_" . self::BADGES_TABLE_NAME;
-		$q = "INSERT INTO `" . $table_name . "` (`id`, `description`, `wpid`, `identifier`) VALUES
+		$q = <<<ENDB
+		INSERT INTO `$table_name` (`id`, `description`, `wpid`, `identifier`) VALUES
 		(20,	'Basic CS/SOM and Best Practices compliance',	NULL,	'HLA-BASE-2016'),
 		(21,	'NETN-FOM v2.0 Aggregate FOM Module',	NULL,	'NETN-AGG-2016'),
 		(22,	'NETN FOM v2.0 Physical FOM Module',	NULL,	'NETN-ENTITY-2016'),
@@ -1098,14 +1136,190 @@ class Badgedb_Database {
 		(31,	'NETN-FOM v2.0 LBML FOM Module',	NULL,	'NETN-LBML-TASK-2016'),
 		(32,	'NETN-FOM v2.0 LBML FOM Module',	NULL,	'NETN-LBML-INTREP-2016'),
 		(33,	'NETN-FOM v2.0 LBML FOM Module',	NULL,	'NETN-LBML-OWNSITREP-2016'),
-		(34,	'Test',	NULL,	'ATC-Test2');";
+		(34,	'Test',	NULL,	'ATC-Test2');
+		ENDB;
+		error_log($q);
 		$wpdb->query($q);
 
-		//No default data to insert yet.
+		//Abstract test cases - No default data to insert yet.
 		$table_name = $wpdb->prefix . "badgedb_" . self::ABSTRACT_TEST_CASES_TABLE_NAME;
 
-		//No default data to insert yet
+		//Badge requirements
+		$table_name = $wpdb->prefix . "badgedb_" . self::BADGES_HAS_REQUIREMENTS_TABLE_NAME;
+		$q = <<<ENDBR
+		INSERT INTO `$table_name` (`requirements_id`, `badges_id`) VALUES
+		(1,	20),
+		(2,	20),
+		(5,	20),
+		(6,	20),
+		(7,	20),
+		(8,	20),
+		(9,	20),
+		(10,	20),
+		(11,	20),
+		(12,	20),
+		(13,	20),
+		(14,	20),
+		(15,	20),
+		(16,	20),
+		(17,	20),
+		(18,	20),
+		(19,	20),
+		(20,	20),
+		(21,	20),
+		(23,	20),
+		(24,	20),
+		(25,	20),
+		(25,	24),
+		(26,	20),
+		(29,	20),
+		(30,	21),
+		(30,	24),
+		(31,	21),
+		(32,	21),
+		(33,	21),
+		(34,	21),
+		(35,	21),
+		(36,	21),
+		(37,	24),
+		(38,	24),
+		(39,	24),
+		(40,	24),
+		(41,	24),
+		(42,	24),
+		(43,	24),
+		(44,	24),
+		(45,	20),
+		(45,	24),
+		(46,	24),
+		(47,	24),
+		(49,	24),
+		(50,	24),
+		(51,	24),
+		(52,	24),
+		(53,	24),
+		(54,	24),
+		(55,	24),
+		(56,	24),
+		(57,	24),
+		(58,	24),
+		(59,	24),
+		(61,	24),
+		(62,	24),
+		(63,	24),
+		(64,	23),
+		(65,	23),
+		(66,	23),
+		(67,	23),
+		(68,	23),
+		(69,	23),
+		(70,	23),
+		(71,	23),
+		(72,	23),
+		(73,	23),
+		(74,	23),
+		(75,	23),
+		(77,	23),
+		(78,	23),
+		(79,	23),
+		(80,	23),
+		(81,	23),
+		(82,	23),
+		(83,	23),
+		(84,	23),
+		(85,	23),
+		(86,	23),
+		(87,	23),
+		(88,	23),
+		(89,	23),
+		(90,	23),
+		(91,	23),
+		(92,	31),
+		(93,	31),
+		(94,	31),
+		(95,	31),
+		(96,	31),
+		(97,	31),
+		(98,	31),
+		(99,	31),
+		(100,	31),
+		(101,	31),
+		(102,	31),
+		(103,	31),
+		(104,	31),
+		(105,	31),
+		(106,	32),
+		(107,	32),
+		(108,	32),
+		(109,	33),
+		(110,	33),
+		(111,	33),
+		(112,	33),
+		(113,	32),
+		(114,	25),
+		(114,	26),
+		(114,	30),
+		(115,	25),
+		(116,	25),
+		(117,	25),
+		(118,	25),
+		(119,	25),
+		(119,	26),
+		(119,	30),
+		(120,	26),
+		(121,	26),
+		(122,	26),
+		(123,	26),
+		(124,	26),
+		(125,	26),
+		(126,	26),
+		(127,	26),
+		(128,	26),
+		(129,	30),
+		(130,	30),
+		(131,	30),
+		(132,	30),
+		(133,	30),
+		(134,	30),
+		(135,	30),
+		(136,	30),
+		(137,	30),
+		(138,	30),
+		(139,	30),
+		(140,	30),
+		(141,	30),
+		(142,	30),
+		(143,	30),
+		(144,	30),
+		(145,	30),
+		(146,	30),
+		(147,	25),
+		(149,	31);
+		ENDBR;
+		error_log($q);
+		$wpdb->query($q);
+
+		//Badge prequisits
 		$table_name = $wpdb->prefix . "badgedb_" . self::BADGES_HAS_BADGES_TABLE_NAME;
+		$q = <<<ENDBB
+		INSERT INTO `$table_name` (`badges_id`, `badges_id_dependency`) VALUES
+		(21,	25),
+		(22,	26),
+		(23,	24),
+		(24,	20),
+		(25,	20),
+		(26,	20),
+		(30,	20),
+		(30,	26),
+		(31,	21),
+		(31,	22),
+		(32,	21),
+		(32,	22),
+		(33,	21),
+		(33,	22);
+		ENDBB;
+		error_log($q);
+		$wpdb->query($q);
 
 	}//end function insert base data
 
