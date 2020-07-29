@@ -15,10 +15,6 @@
  * @subpackage Badgedb/public/partials
  */
 
- // Set the return value to something.  It will be overwritten.
- $returnval = "BADGE DATA PLACEHOLDER";
-
-
 
 //we need the database object
 include_once( plugin_dir_path(__FILE__) . '../../includes/class-badgedb-database.php');

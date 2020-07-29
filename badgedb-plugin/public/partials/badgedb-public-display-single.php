@@ -14,45 +14,89 @@
  * @subpackage Badgedb/public/partials
  */
 
+ //Set it up for an error just in case
  $returnval = <<< EOT
- <h1>HELLO WORLD!</h1>
- <p>This is where the badges will go!</p>
+ <div <p style="color:red;">An error occured while trying to display a single badge using the <em>badgedbpi</em> shortcode.</p></div>
  EOT;
 
-//This section displays what's in the database already, along with delete and edit buttons.
+//Now lets make sure the identifier is set and go from there
+if(isset($atts['identifier'])) {
+    //we can continue
+    include_once( plugin_dir_path(__FILE__) . '../../includes/class-badgedb-database.php');
+    $badgeInfo = Badgedb_Database::get_all_badge_info_by_identifier($atts['identifier']);
 
-//we need the database object
-include_once( plugin_dir_path(__FILE__) . '../../includes/class-badgedb-database.php');
-$badges = Badgedb_Database::get_badges();
-//Make sure it didn't return null, because if it does we don't need to show this table.
-if (is_null($badges)) {
-    $returnval = "<p>There are currently no interoperability badges in the database.</p>";
-} else {
-    //Go ahead and show the table of existing records.
-    $returnval = <<< EOT2
-        <h2>Badges</h2>
-        <style>
-            table#badge { border: 1px solid black; }
-            th, tr, td {
-            padding: 3px;
-            border: 1px solid black;
+    $bident = $badgeInfo['badge']['identifier'];
+    $bdesc = $badgeInfo['badge']['description'];
+    $bgraphicurl = "";
+    if (is_numeric($badgeInfo['badge']['wpid'])) {
+        $bgraphic = wp_get_attachment_url($badgeInfo['badge']['wpid']);
+        $returnval = <<<EOB
+        <div class="badge-info">
+        <img src="$bgraphic" style="float:left" />
+        <h2>Identifier: $bident</h2>
+        <p>Description: $bdesc</p>
+        EOB;    
+    } else {
+        $returnval = <<<EOB2
+        <div class="badge-info">
+        <h2>Identifier: $bident</h2>
+        <p>Description: $bdesc</p>
+        EOB2;
+    }
+    //Now the requirements.
+    $returnval .= "<h3>Requirements for this badge</h3>";
+    if (!is_null($badgeInfo['reqs'])) {
+        foreach ($badgeInfo['reqs'] as $r) {
+            $rident = $r['identifier'];
+            $rdesc = $r['description'];
+            $returnval .= <<<ENDR
+            <P><b>$rident:</b> $rdesc</p>
+            ENDR;
+        }//end loop over requirement information
+    } else {
+        $returnval .= "<p>No requirements found for this badge.</p>";
+    }
+
+    //And the abstract test cases related to any of the requirements.
+    $returnval .= "<h3>Abstract test cases related to this badge</h3>";
+    //if there were no results the element for the atcs should be null
+    if (!is_null($badgeInfo['atcs'])) {
+        $appenda = "<p>No abstract test cases found for this badge.</p>";
+        foreach ($badgeInfo['atcs'] as $a) {
+            if ($appenda == "<p>No abstract test cases found for this badge.</p>") {
+                $appenda = "";
             }
-        </style>
+            $aident = $a['identifier'];
+            $aname = $a['name'];
+            $adescription = $a['description'];
+            $aversion = $a['version'];
+            $fileUrl = wp_get_attachment_url($a['wpid']);
+            $appenda .= <<<EOA
+            <p><b>$aident:</b> $aname.<br>
+            $adescription<br>
+            EOA;
+            if ($fileUrl != false) {
+                $appenda .= <<<EOU
+                Abstract test case document. <a href="$fileUrl">$fileUrl</a></p>
+                EOU;
+            } else {
+                $returnval .= "No document for this abstract test case.</P>";
+            }
+        }
+    } //end abstract test case
+    $returnval .= $appenda;
 
-        <p>
-            <table id="badge">
-                <tr><th>Identifier</th><th>Description</th><th>Interoperability Requirements</th><th>Badge Prerequisits</th><th>Badge Graphic</th></tr>
-EOT2;
-    foreach ($badges as $row) {
-     $returnval .= "<tr> ";
-    $returnval .= "<td>" . $row['identifier'] . "</td>";
-    $returnval .= "<td>" . $row['description'] . "</td>";
-    $returnval .= "<td>" . Badgedb_Database::get_form_multi_select('badges-req', 'requirements', true, $row['id']) . "</td>";
-    $returnval .= "<td>" . Badgedb_Database::get_form_multi_select('badges-badge', 'badgedeps', true, $row['id']) . "</td>";
-    $returnval .= "<td> <a href=\"" . wp_get_attachment_url($row['wpid']) . "\">current file</a></td>";
-    $returnval .= "</tr>";
+    //Just close off the DIV tag
+    $returnval .= "</div>";
 
-    }//end loop over records
-    $returnval .= "</table></p>";
-} //endif
+} else {
+    $returnval = <<<EOE
+    <div>
+    <p style="color:red;">An error occured while trying to display a single badge using the <em>badgedbpi</em> shortcode. To show
+     a single badge's information the <em>identifier</em> attribute must be set to a valid badge identifier.</p>
+     </div>
+    EOE;
+}//end isset identifier
+
+
 ?>

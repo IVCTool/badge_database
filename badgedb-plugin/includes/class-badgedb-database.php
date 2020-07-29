@@ -590,27 +590,104 @@ class Badgedb_Database {
 	 * 		- badge		the info in the badge record
 	 * 		- bprs		the info for each badge pre-requisit
 	 * 		- reqs		the info for all of the interoperabilty requirements, including for the bprs
+	 * 		- atcs		any abstract test cases that cover any of the requirements
 	 * 		- graphic	the info for the graphic
 	 * 
 	 * Each of these elements will be the associative array from the database call to create them.
 	 * 
 	 * @since 1.0.0
 	 */
-	public static function get_all_badge_info($theBadgeID): array {
+	public static function get_all_badge_info_by_identifier($theBadgeIendifier): array {
 		global $wpdb;
 
 		//make an empty array we can return after we fill it
 		$rv = array();
 
-		//get the raw badge info
-		$table_name = $wpdb->prefix . "badgedb_" . self::BADGES_TABLE_NAME;
-		$bq = "SELECT id, description, identifier, wpid FROM " . $table_name . " WHERE id=" . $theBadgeID .";";
-		$bresults = $wpdb->get_results($bq, ARRAY_A);
-		$rv['badge']  = $bresults;
+		//We need the record ID that corresponds to the identifier... I suppose we could select on identifier but it isn't indexed
+		$b_table_name = $wpdb->prefix . "badgedb_" . self::BADGES_TABLE_NAME;
+		$idq = <<<ENDBID
+		SELECT id FROM $b_table_name WHERE identifier='$theBadgeIendifier';
+		ENDBID;
+		error_log($idq);
+		$idres = $wpdb->get_results($idq, ARRAY_A);
+		$theBadgeID = $idres[0]['id'];
+		error_log("Found badge record id: " . $theBadgeID);
+		//Just make sure we actually found something
+		if(!isset($theBadgeID)) {
+			return $rv;
+		}
 
-		$bprs = array("bprs" => "BPRS");
-		$reqs = array("reqs" => "REQS");
-		$graphic = array("graphic" => "GRAPHIC");
+
+		//get the raw badge info
+		$bq = <<<ENDB
+		SELECT id, description, identifier, wpid FROM $b_table_name WHERE id=$theBadgeID;
+		ENDB;
+		//error_log($bq);
+		$bresults = $wpdb->get_results($bq, ARRAY_A);
+		//error_log($bresults[0]['identifier']);
+		$rv['badge']  = $bresults[0];
+
+		//The badge prequisits
+		$bpr_table_name = $wpdb->prefix . "badgedb_" . self::BADGES_HAS_BADGES_TABLE_NAME;
+		$bprq = <<<ENDBPR
+		SELECT id, description, wpid, identifier FROM ($bpr_table_name JOIN $b_table_name ON $bpr_table_name.badges_id_dependency=$b_table_name.id) WHERE badges_id=$theBadgeID;
+		ENDBPR;
+		//error_log($bprq);
+		$bprresults = $wpdb->get_results($bprq, ARRAY_A);
+		$rv['brps'] = $bprresults;
+
+		//The requirements, all of them, that apply to this badge.
+		//You need to split these multi-line queries up into separate calls or they won't work in Wordpress (might actually be a PHP thing)
+		$r_table_name = $wpdb->prefix . "badgedb_" . self::REQUIREMENTS_TABLE_NAME;
+		$bhr_table_name = $wpdb->prefix . "badgedb_" . self::BADGES_HAS_REQUIREMENTS_TABLE_NAME;
+		$r1q = <<<ENDR1
+		CREATE TEMPORARY TABLE allbadges SELECT id FROM ($bpr_table_name JOIN $b_table_name ON $bpr_table_name.badges_id_dependency=$b_table_name.id) WHERE badges_id=$theBadgeID;
+		ENDR1;
+		//error_log($r1q);
+		$r2q = <<<ENDR2
+		INSERT INTO allbadges (id) VALUES ($theBadgeID);
+		ENDR2;
+		//error_log($r2q);
+		$r3q = <<<ENDR3
+		CREATE TEMPORARY TABLE allreqs SELECT requirements_id FROM ($bhr_table_name JOIN allbadges ON allbadges.id=$bhr_table_name.badges_id);
+		ENDR3;
+		//error_log($r3q);
+		$r4q = <<<ENDR4
+		SELECT id, identifier, description FROM (allreqs JOIN $r_table_name ON allreqs.requirements_id=$r_table_name.id);
+		ENDR4;
+		//error_log($r4q);
+		$wpdb->query($r1q);
+		$wpdb->query($r2q);
+		$wpdb->query($r3q);
+		$rresults = $wpdb->get_results($r4q, ARRAY_A);
+		$rv['reqs'] = $rresults;
+
+		//All the abstract test cases that apply to any of the requirements.
+		$a_table_name = $wpdb->prefix . "badgedb_" . self::ABSTRACT_TEST_CASES_TABLE_NAME;
+		$ahr_table_name = $wpdb->prefix . "badgedb_" . self::ABSTRACTTCS_HAS_REQUIREMENTS_TABLE_NAME;
+		$a4q = <<<ENDA4
+		CREATE TEMPORARY TABLE allatcs SELECT abstracttcs_id FROM ($ahr_table_name JOIN allreqs ON $ahr_table_name.requirements_id=allreqs.requirements_id);
+		ENDA4;
+		error_log($a4q);
+		$a5q = <<<ENDA5
+		SELECT id, identifier, name, description, version, wpid FROM ($a_table_name JOIN allatcs ON $a_table_name.id=allatcs.abstracttcs_id);
+		ENDA5;
+		error_log($a5q);
+		// $wpdb->query($a1q);
+		// $wpdb->query($a2q);
+		// $wpdb->query($a3q);
+		$wpdb->query($a4q);
+		$aresults = $wpdb->get_results($a5q, ARRAY_A);
+		$rv['atcs'] = $aresults;
+
+		//The info about the graphic
+		$wppost_table_name = "wp_posts";
+		$gq = <<<ENDG
+		SELECT $wppost_table_name.ID, $wppost_table_name.guid FROM ($wppost_table_name JOIN $b_table_name ON $wppost_table_name.id=$b_table_name.wpid) WHERE $b_table_name.id=$theBadgeID;
+		ENDG;
+		error_log($gq);
+		$gresults = $wpdb->get_results($gq, ARRAY_A);
+		$rv['graphic'] = $gresults;
 
 		return $rv;
 	}//end function get_all_badge_info

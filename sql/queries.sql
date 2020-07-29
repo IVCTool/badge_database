@@ -19,8 +19,19 @@ SELECT wpid FROM wp_badgedb_badges UNION SELECT wpid FROM wp_badgedb_abstracttcs
 /* These queries are for the public display of badges */
 SELECT * FROM wp_badgedb_badges WHERE id=?  /* Badge data */
 /* All the badges it bepends on */
+SELECT id, description, wpid, identifier FROM (wp_badgedb_badges_has_badges JOIN wp_badgedb_badges ON wp_badgedb_badges_has_badges.badges_id_dependency=wp_badgedb_badges.id) WHERE badges_id=21
 /* All the requirements it has, including the ones form other badges if any */
+CREATE TEMPORARY TABLE allbadges SELECT id FROM (wp_badgedb_badges_has_badges JOIN wp_badgedb_badges ON wp_badgedb_badges_has_badges.badges_id_dependency=wp_badgedb_badges.id) WHERE badges_id=21;
+INSERT INTO allbadges (id) VALUES (21);
+CREATE TEMPORARY TABLE allreqs SELECT requirements_id FROM (wp_badgedb_badges_has_requirements JOIN allbadges ON allbadges.id=wp_badgedb_badges_has_requirements.badges_id);
+SELECT id, identifier, description FROM (allreqs JOIN wp_badgedb_requirements ON allreqs.requirements_id=wp_badgedb_requirements.id);
 /* The graphic file. */
+SELECT wp_posts.ID, wp_posts.guid FROM (wp_posts JOIN wp_badgedb_badges ON wp_posts.id=wp_badgedb_badges.wpid) WHERE wp_badgedb_badges.id=26
 /* The Abstract Test Cases that could apply */
+CREATE TEMPORARY TABLE allbadges SELECT id FROM (wp_badgedb_badges_has_badges JOIN wp_badgedb_badges ON wp_badgedb_badges_has_badges.badges_id_dependency=wp_badgedb_badges.id) WHERE badges_id=21;
+INSERT INTO allbadges (id) VALUES (21);
+CREATE TEMPORARY TABLE allreqs SELECT requirements_id FROM (wp_badgedb_badges_has_requirements JOIN allbadges ON allbadges.id=wp_badgedb_badges_has_requirements.badges_id);
+CREATE TEMPORARY TABLE allatcs SELECT abstracttcs_id FROM (wp_badgedb_abstracttcs_has_requirements JOIN allreqs ON wp_badgedb_abstracttcs_has_requirements.requirements_id=allreqs.requirements_id);
+SELECT id, identifier, name, description, version, wpid FROM (wp_badgedb_abstracttcs JOIN allatcs ON wp_badgedb_abstracttcs.id=allatcs.abstracttcs_id);
 /* The executable test cases that apply */
 /* The IVCT file info */
