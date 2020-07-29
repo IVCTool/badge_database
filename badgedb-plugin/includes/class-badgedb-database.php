@@ -608,10 +608,10 @@ class Badgedb_Database {
 		$idq = <<<ENDBID
 		SELECT id FROM $b_table_name WHERE identifier='$theBadgeIendifier';
 		ENDBID;
-		error_log($idq);
+		//error_log($idq);
 		$idres = $wpdb->get_results($idq, ARRAY_A);
 		$theBadgeID = $idres[0]['id'];
-		error_log("Found badge record id: " . $theBadgeID);
+		//error_log("Found badge record id: " . $theBadgeID);
 		//Just make sure we actually found something
 		if(!isset($theBadgeID)) {
 			return $rv;
@@ -668,11 +668,11 @@ class Badgedb_Database {
 		$a4q = <<<ENDA4
 		CREATE TEMPORARY TABLE allatcs SELECT abstracttcs_id FROM ($ahr_table_name JOIN allreqs ON $ahr_table_name.requirements_id=allreqs.requirements_id);
 		ENDA4;
-		error_log($a4q);
+		//error_log($a4q);
 		$a5q = <<<ENDA5
 		SELECT id, identifier, name, description, version, wpid FROM ($a_table_name JOIN allatcs ON $a_table_name.id=allatcs.abstracttcs_id);
 		ENDA5;
-		error_log($a5q);
+		//error_log($a5q);
 		// $wpdb->query($a1q);
 		// $wpdb->query($a2q);
 		// $wpdb->query($a3q);
@@ -685,7 +685,7 @@ class Badgedb_Database {
 		$gq = <<<ENDG
 		SELECT $wppost_table_name.ID, $wppost_table_name.guid FROM ($wppost_table_name JOIN $b_table_name ON $wppost_table_name.id=$b_table_name.wpid) WHERE $b_table_name.id=$theBadgeID;
 		ENDG;
-		error_log($gq);
+		//error_log($gq);
 		$gresults = $wpdb->get_results($gq, ARRAY_A);
 		$rv['graphic'] = $gresults;
 
