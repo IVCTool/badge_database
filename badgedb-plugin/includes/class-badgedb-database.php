@@ -97,7 +97,8 @@ class Badgedb_Database {
 			`description` longtext NOT NULL,
 			`identifier` varchar(10) NOT NULL,
 			`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-			PRIMARY KEY (`id`)
+			PRIMARY KEY (`id`),
+			UNIQUE (identifier)
 		  ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;";
 		$wpdb->query($reqcat_query);
 
@@ -117,7 +118,8 @@ class Badgedb_Database {
 			`description` longtext NOT NULL,
 			`version` varchar(45) NOT NULL,
 			`wpid` bigint(20) UNSIGNED NOT NULL,
-			PRIMARY KEY (`id`)
+			PRIMARY KEY (`id`),
+			UNIQUE (identifier)
 		  ) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8;";
 		$wpdb->query($abstcs_query);
 
@@ -129,6 +131,7 @@ class Badgedb_Database {
 			`description` longtext NOT NULL,
 			`reqcategories_id` int(10) unsigned NOT NULL,
 			PRIMARY KEY (`id`),
+			UNIQUE (identifier),
 			KEY `fk_requirements_reqcategories_idx` (`reqcategories_id`),
 			CONSTRAINT `fk_requirements_reqcategories` FOREIGN KEY (`reqcategories_id`) REFERENCES `$reqcat_table_name` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 		  ) ENGINE=InnoDB AUTO_INCREMENT=151 DEFAULT CHARSET=utf8;";
@@ -141,7 +144,8 @@ class Badgedb_Database {
 			`description` longtext NOT NULL,
 			`wpid` bigint(20) UNSIGNED,
 			`identifier` varchar(25) NOT NULL,
-			PRIMARY KEY (`id`)
+			PRIMARY KEY (`id`),
+			UNIQUE (identifier)
 		  ) ENGINE=MyISAM AUTO_INCREMENT=35 DEFAULT CHARSET=utf8;";
 		  $wpdb->query($badges_query);
 
