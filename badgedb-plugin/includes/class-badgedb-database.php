@@ -1197,7 +1197,29 @@ class Badgedb_Database {
 		(146,	'IR-RPR2-0034',	'SuT shall when receiving a MunitionDetonation without a specified target (Indirect Fire) but the same location as an entity and SuT has the modelling responsibility for the damage assessment at that entity, update the BaseEntity.PhysicalEntity attribute DamageState with an appropriate value.',	10),
 		(147,	'IR-RPR2-0005',	'SuT shall assume default values for optional attributes on instances of AggregateEntity object class.',	10),
 		(149,	'IR-NETN-0073',	'SuT defined as a consumer in CS/SOM shall clear all tasks at the entity when an LBMLMessage.LBMLTaskManagement.CancelAllTasks is received',	9),
-		(150,	'HLA-Verification-2016',	'This test case is equivalent to the FCTT_NG configuration verification step.',	6);
+		(150,	'HLA-Verification-2016',	'This test case is equivalent to the FCTT_NG configuration verification step.',	6),
+		(151,	'IR_DS_0001',	'[Create] The SUT shall provide all non-optional attributes in the initial attribute value update of the Designator object instance.',	10),
+		(152,	'IR_DS_0002',	'[Create] The SUT shall refer to an existing host object instance in the EmbeddedSystem.HostObjectIdentifier (the designating entity).',	10),
+		(153,	'IR_DS_0003',	'[Create] The SUT shall refer to an existing host object instance in the EmbeddedSystem.EntityIdentifier (the designating entity).',	10),
+		(154,	'IR_DS_0004',	'[Create] The SUT shall refer to the same host object instance in EmbeddedSystem.HostObjectIdentifier and EmbeddedSystem.EntityIdentifier.',	10),
+		(155,	'IR_DS_0005',	'[Update] When the SUT provides a DesignatedObjectIdentifier value, it shall refer to an existing object instance.',	10),
+		(156,	'IR_DS_0006',	'[Update] The SUT shall provide static attributes only once, unless requested via a Provide Attribute Value Update request.',	10),
+		(157,	'IR_DS_0007',	'[Update] The SUT shall provide a non-negative value for the DesignatorOutputPower attribute.',	10),
+		(158,	'IR_DS_0008',	'[Update] The SUT shall provide a non-negative value for the DesignatorEmissionWavelength attribute.',	10),
+		(159,	'IR_DS_0009',	'[Update] When the SUT provides a non-zero-filled relative spot location, it shall (in the same or an earlier update) provide a DesignatedObjectIdentifier value.',	10),
+		(160,	'IR_DS_0010',	'[Update] When the SUT provides a zero-length DesignatedObjectIdentifier value (representing D-SPOT_NO_ENTITY), it shall (in the same update) provide a zero-filled relative spot location if a non-zero-filled relative spot location was provided before.',	10),
+		(161,	'IR_DS_0011',	'[Delete] The SUT shall provide a zero value for the Designator Power to indicate that the designator is inactive.',	10),
+		(162,	'IR_DS_0012',	'[Delete] When the SUT provides a zero value for the Designator Power, it shall not provide further Designator object instance attribute updates.',	10),
+		(163,	'IR_DS_0013',	'[Delete] When the SUT provides a zero value for the Designator Power, it shall delete the Designator object instance within DS_DELETE_TIME wall-clock seconds.',	10),
+		(164,	'IR_DS_0014',	'[Delete] When the SUT deletes the host entity of the Designator object instance, it shall (in this order) provide a zero value for the Designator Power and delete the Designator object instance within DS_DELETE_TIME wall-clock seconds.',	10),
+		(165,	'IR_DS_0015',	'[Delete] When the SUT deletes the Designated object instance to which the designator spot is attached, it shall (in this order) provide a zero value for the Designator Power and delete the Designator object instance within DS_DELETE_TIME wall-clock seconds.',	10),
+		(166,	'IR_DS_0016',	'[Dead reckoning] The SUT shall provide a location update when the discrepancy between the designator spot’s actual position (as determined by its own internal model) and its dead reckoned position (as determined by using specified dead reckoning algorithms) exceeds a predetermined threshold.',	10),
+		(167,	'IR_DS_0017',	'[Dead reckoning] The SUT shall provide a location update when a predetermined length of real-world time (HBT_PDU_DESIGNATOR seconds) has elapsed since the issuing of the last Designator location update.',	10),
+		(168,	'IR_DS_0018',	'[Dead reckoning] When the SUT uses the static DR algorithm, it shall either (1) not provide an update of the SpotLinearAcceleration Vector, or (2) provide an update of the SpotLinearAcceleration with zero values in the attribute value update of the object instance.',	10),
+		(169,	'IR_DS_0019',	'[Dead reckoning] When the SUT uses a non-static DR algorithm, it shall provide an update of the SpotLinearAcceleration Vector in the attribute value update of the object instance.',	10),
+		(170,	'IR_DS_0020',	'[Dead reckoning] When the DR algorithm is static and the SUT does an update of the SpotLinearAcceleration, the SUT shall only provide zero values.',	10),
+		(171,	'IR_DS_0021',	'[Dead reckoning] When the DR algorithm is changed from static to non-static, the SUT shall provide an update of the SpotLinearAcceleration Vector in the same attribute value update of the object instance.',	10),
+		(172,	'IR_DS_0022',	'[Dead reckoning] When the DR algorithm is changed from non-static to static, the SUT shall provide an update of the SpotLinearAcceleration Vector in the same attribute value update of the object instance, providing zero values.',	10);
 		ENDR;
 		//error_log($q);
 		$wpdb->query($q);
